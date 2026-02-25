@@ -10,6 +10,10 @@ export interface ProjectData {
   phone: string;
   colorScheme: string;
   darkMode: boolean;
+  slogan?: string;
+  businessHours?: string;
+  servicesList?: { name: string; description: string }[];
+  photos?: string[];
 }
 
 export const COLOR_SCHEMES = [

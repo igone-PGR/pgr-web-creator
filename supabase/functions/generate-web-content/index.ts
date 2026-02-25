@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { businessName, description, sector, address, phone, email } = await req.json();
+    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -23,6 +23,10 @@ NUNCA uses textos genéricos como "Lorem ipsum" o frases vacías.
 Adapta el tono y vocabulario al sector del negocio.
 Responde SOLO con el JSON solicitado, sin explicaciones adicionales.`;
 
+    const servicesContext = servicesList?.length
+      ? `\n- Servicios que ofrece: ${servicesList.map((s: { name: string; description: string }) => `${s.name} (${s.description})`).join(", ")}`
+      : "";
+
     const userPrompt = `Genera el contenido web profesional para este negocio:
 
 - Nombre: ${businessName}
@@ -31,6 +35,8 @@ Responde SOLO con el JSON solicitado, sin explicaciones adicionales.`;
 - Dirección: ${address || "No proporcionada"}
 - Teléfono: ${phone || "No proporcionado"}
 - Email: ${email}
+- Slogan: ${slogan || "No proporcionado"}
+- Horario: ${businessHours || "No proporcionado"}${servicesContext}
 
 Devuelve un JSON con esta estructura exacta:
 {
