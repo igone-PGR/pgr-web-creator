@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -35,6 +36,42 @@ serve(async (req) => {
           stripe_payment_status: "paid",
         })
         .eq("id", project_id);
+
+      // Fetch project details for email
+      const { data: project } = await supabaseAdmin
+        .from("projects")
+        .select("business_name, email, sector")
+        .eq("id", project_id)
+        .single();
+
+      // Send notification email to admin
+      try {
+        const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+        const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL");
+
+        if (adminEmail && project) {
+          await resend.emails.send({
+            from: "PGR Web Creator <onboarding@resend.dev>",
+            to: [adminEmail],
+            subject: `💰 Nuevo pago recibido: ${project.business_name}`,
+            html: `
+              <h1>¡Nuevo pago recibido!</h1>
+              <p>Se ha completado un pago para un nuevo proyecto web.</p>
+              <table style="border-collapse:collapse;margin:16px 0;">
+                <tr><td style="padding:8px;font-weight:bold;">Negocio:</td><td style="padding:8px;">${project.business_name}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold;">Email cliente:</td><td style="padding:8px;">${project.email}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold;">Sector:</td><td style="padding:8px;">${project.sector}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold;">ID Proyecto:</td><td style="padding:8px;">${project_id}</td></tr>
+              </table>
+              <p>Accede al panel de administración para gestionar este proyecto.</p>
+            `,
+          });
+          console.log("Admin notification email sent to", adminEmail);
+        }
+      } catch (emailError) {
+        console.error("Failed to send admin notification email:", emailError);
+        // Don't fail the payment verification because of email issues
+      }
 
       return new Response(
         JSON.stringify({ success: true, paid: true }),
