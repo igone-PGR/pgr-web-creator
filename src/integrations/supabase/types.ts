@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      projects: {
+        Row: {
+          address: string | null
+          business_hours: string | null
+          business_name: string
+          color_scheme: string
+          created_at: string
+          dark_mode: boolean
+          description: string
+          email: string
+          facebook: string | null
+          generated_content: Json | null
+          id: string
+          instagram: string | null
+          logo: string | null
+          paid: boolean
+          phone: string | null
+          photos: string[] | null
+          sector: string
+          services_list: Json | null
+          slogan: string | null
+          stripe_payment_status: string | null
+          stripe_session_id: string | null
+          trello_card_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_hours?: string | null
+          business_name: string
+          color_scheme?: string
+          created_at?: string
+          dark_mode?: boolean
+          description: string
+          email: string
+          facebook?: string | null
+          generated_content?: Json | null
+          id?: string
+          instagram?: string | null
+          logo?: string | null
+          paid?: boolean
+          phone?: string | null
+          photos?: string[] | null
+          sector: string
+          services_list?: Json | null
+          slogan?: string | null
+          stripe_payment_status?: string | null
+          stripe_session_id?: string | null
+          trello_card_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_hours?: string | null
+          business_name?: string
+          color_scheme?: string
+          created_at?: string
+          dark_mode?: boolean
+          description?: string
+          email?: string
+          facebook?: string | null
+          generated_content?: Json | null
+          id?: string
+          instagram?: string | null
+          logo?: string | null
+          paid?: boolean
+          phone?: string | null
+          photos?: string[] | null
+          sector?: string
+          services_list?: Json | null
+          slogan?: string | null
+          stripe_payment_status?: string | null
+          stripe_session_id?: string | null
+          trello_card_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
