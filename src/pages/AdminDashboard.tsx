@@ -40,6 +40,8 @@ interface Project {
   services_list: any;
   generated_content: any;
   contact_name: string | null;
+  business_email: string | null;
+  business_phone: string | null;
 }
 
 const AdminDashboard = () => {

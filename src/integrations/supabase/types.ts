@@ -38,8 +38,10 @@ export type Database = {
       projects: {
         Row: {
           address: string | null
+          business_email: string | null
           business_hours: string | null
           business_name: string
+          business_phone: string | null
           color_scheme: string
           contact_name: string | null
           created_at: string
@@ -64,8 +66,10 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          business_email?: string | null
           business_hours?: string | null
           business_name: string
+          business_phone?: string | null
           color_scheme?: string
           contact_name?: string | null
           created_at?: string
@@ -90,8 +94,10 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          business_email?: string | null
           business_hours?: string | null
           business_name?: string
+          business_phone?: string | null
           color_scheme?: string
           contact_name?: string | null
           created_at?: string

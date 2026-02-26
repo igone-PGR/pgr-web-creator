@@ -13,6 +13,8 @@ interface ProjectForZip {
   color_scheme: string;
   dark_mode: boolean;
   business_hours: string | null;
+  business_email: string | null;
+  business_phone: string | null;
   services_list: any;
   generated_content: any;
 }
@@ -55,9 +57,12 @@ export async function generateProjectZip(project: ProjectForZip): Promise<Blob> 
       <p>${f.description}</p>
     </div>`).join("");
 
+  const webEmail = project.business_email || project.email;
+  const webPhone = project.business_phone || project.phone;
+
   const contactItems = [
-    project.email ? `<a href="mailto:${project.email}" class="contact-item">📧 ${project.email}</a>` : "",
-    project.phone ? `<a href="tel:${project.phone}" class="contact-item">📞 ${project.phone}</a>` : "",
+    webEmail ? `<a href="mailto:${webEmail}" class="contact-item">📧 ${webEmail}</a>` : "",
+    webPhone ? `<a href="https://wa.me/${webPhone.replace(/\D/g, "")}" class="contact-item" target="_blank">💬 WhatsApp: ${webPhone}</a>` : "",
     project.address ? `<div class="contact-item">📍 ${project.address}</div>` : "",
     project.business_hours ? `<div class="contact-item">🕐 ${project.business_hours}</div>` : "",
   ].filter(Boolean).join("\n");
@@ -85,7 +90,7 @@ export async function generateProjectZip(project: ProjectForZip): Promise<Blob> 
       <a href="#services">Servicios</a>
       <a href="#contact">Contacto</a>
     </div>
-    <a href="mailto:${project.email}" class="nav-cta">Contactar →</a>
+    <a href="mailto:${webEmail}" class="nav-cta">Contactar →</a>
   </nav>
 
   <section class="hero">
