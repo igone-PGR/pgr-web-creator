@@ -8,6 +8,7 @@ export interface ProjectData {
   facebook: string;
   email: string;
   phone: string;
+  contactName: string;
   colorScheme: string;
   darkMode: boolean;
   slogan?: string;

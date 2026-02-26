@@ -41,6 +41,7 @@ export type Database = {
           business_hours: string | null
           business_name: string
           color_scheme: string
+          contact_name: string | null
           created_at: string
           dark_mode: boolean
           description: string
@@ -66,6 +67,7 @@ export type Database = {
           business_hours?: string | null
           business_name: string
           color_scheme?: string
+          contact_name?: string | null
           created_at?: string
           dark_mode?: boolean
           description: string
@@ -91,6 +93,7 @@ export type Database = {
           business_hours?: string | null
           business_name?: string
           color_scheme?: string
+          contact_name?: string | null
           created_at?: string
           dark_mode?: boolean
           description?: string
