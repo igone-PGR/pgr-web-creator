@@ -329,22 +329,26 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               </div>
             </div>
 
-            {/* Contact form */}
+            {/* CTA directo */}
             <motion.div {...fadeUp} transition={{ delay: 0.2 }}
-              className="p-8 md:p-10 rounded-3xl border" style={{ borderColor: border, backgroundColor: card }}>
-              <h3 className="font-bold text-lg mb-8">Envíanos un mensaje</h3>
-              <div className="space-y-5">
-                <input placeholder="Nombre" className="w-full px-5 py-4 rounded-2xl border text-sm outline-none transition-all focus:ring-2"
-                  style={{ borderColor: border, backgroundColor: bg, color: text1, ["--tw-ring-color" as string]: scheme.primary }} />
-                <input placeholder="Email" className="w-full px-5 py-4 rounded-2xl border text-sm outline-none transition-all focus:ring-2"
-                  style={{ borderColor: border, backgroundColor: bg, color: text1, ["--tw-ring-color" as string]: scheme.primary }} />
-                <textarea placeholder="Tu mensaje" rows={4}
-                  className="w-full px-5 py-4 rounded-2xl border text-sm outline-none resize-none transition-all focus:ring-2"
-                  style={{ borderColor: border, backgroundColor: bg, color: text1, ["--tw-ring-color" as string]: scheme.primary }} />
-                <button className="w-full py-4 rounded-2xl text-white text-sm font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
-                  style={{ backgroundColor: scheme.primary }}>
-                  Enviar mensaje
-                </button>
+              className="p-8 md:p-10 rounded-3xl border flex flex-col items-center justify-center text-center gap-6" style={{ borderColor: border, backgroundColor: card }}>
+              <h3 className="font-bold text-lg">¿Hablamos?</h3>
+              <p className="text-sm" style={{ color: text2 }}>Contáctanos directamente por email o WhatsApp</p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                {project.email && (
+                  <a href={`mailto:${project.email}`}
+                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all hover:scale-[1.02]"
+                    style={{ backgroundColor: `${scheme.primary}15`, color: scheme.primary }}>
+                    <Mail className="w-4 h-4" /> Email
+                  </a>
+                )}
+                {project.phone && (
+                  <a href={`https://wa.me/${project.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-white text-sm font-bold transition-all hover:scale-[1.02]"
+                    style={{ backgroundColor: "#25D366" }}>
+                    <MessageCircle className="w-4 h-4" /> WhatsApp
+                  </a>
+                )}
               </div>
             </motion.div>
           </div>
