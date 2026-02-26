@@ -12,22 +12,27 @@ serve(async (req) => {
   }
 
   try {
-    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList } = await req.json();
+    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList, hasPhotos, photoCount } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `Eres un copywriter profesional especializado en crear contenido web para pequeños negocios en España. 
-Generas textos persuasivos, profesionales y únicos que transmiten confianza y calidad.
-NUNCA uses textos genéricos como "Lorem ipsum" o frases vacías.
-Adapta el tono y vocabulario al sector del negocio.
-Responde SOLO con el JSON solicitado, sin explicaciones adicionales.`;
+    const systemPrompt = `Eres un diseñador web y copywriter de élite. Tu trabajo es crear webs únicas y memorables para pequeños negocios en España.
+NO REPITAS NUNCA el mismo estilo. Cada web debe tener una PERSONALIDAD VISUAL PROPIA basada en el negocio.
+Piensa como un diseñador de Dribbble/Awwwards: layouts creativos, tipografías con carácter, jerarquía visual potente.
+Adapta el tono, la energía y la estética al sector y la personalidad del negocio.
+Un café hipster necesita un diseño diferente a un bufete de abogados. Una peluquería urbana es diferente a un spa de lujo.
+Responde SOLO con el JSON solicitado, sin explicaciones.`;
 
     const servicesContext = servicesList?.length
-      ? `\n- Servicios que ofrece: ${servicesList.map((s: { name: string; description: string }) => `${s.name} (${s.description})`).join(", ")}`
+      ? `\n- Servicios: ${servicesList.map((s: { name: string; description: string }) => `${s.name} (${s.description})`).join(", ")}`
       : "";
 
-    const userPrompt = `Genera el contenido web profesional para este negocio:
+    const photosContext = hasPhotos
+      ? `\n- El cliente ha subido ${photoCount} fotos de su negocio. Diseña el layout para que las fotos sean PROTAGONISTAS.`
+      : `\n- No hay fotos propias. Usa un diseño que funcione sin imágenes del negocio (tipografía potente, colores, formas).`;
+
+    const userPrompt = `Diseña una web ÚNICA para este negocio:
 
 - Nombre: ${businessName}
 - Sector: ${sector}
@@ -36,31 +41,36 @@ Responde SOLO con el JSON solicitado, sin explicaciones adicionales.`;
 - Teléfono: ${phone || "No proporcionado"}
 - Email: ${email}
 - Slogan: ${slogan || "No proporcionado"}
-- Horario: ${businessHours || "No proporcionado"}${servicesContext}
+- Horario: ${businessHours || "No proporcionado"}${servicesContext}${photosContext}
 
-Devuelve un JSON con esta estructura exacta:
-{
-  "heroHeadline": "Título hero impactante de máximo 8 palabras",
-  "heroSubtitle": "Subtítulo de 1-2 frases que complementa el headline y genera confianza",
-  "heroCta": "Texto del botón CTA principal (máx 4 palabras)",
-  "aboutTitle": "Título sección sobre nosotros",
-  "aboutText": "Párrafo de 3-4 frases sobre el negocio, profesional y cercano",
-  "features": [
-    {"title": "Característica 1", "description": "Descripción breve y convincente"},
-    {"title": "Característica 2", "description": "Descripción breve y convincente"},
-    {"title": "Característica 3", "description": "Descripción breve y convincente"}
-  ],
-  "servicesTitle": "Título sección servicios",
-  "services": [
-    {"name": "Servicio 1", "description": "Descripción atractiva del servicio"},
-    {"name": "Servicio 2", "description": "Descripción atractiva del servicio"},
-    {"name": "Servicio 3", "description": "Descripción atractiva del servicio"},
-    {"name": "Servicio 4", "description": "Descripción atractiva del servicio"}
-  ],
-  "contactTitle": "Título sección contacto",
-  "contactSubtitle": "Subtítulo invitando al contacto",
-  "footerTagline": "Frase corta de cierre para el footer"
-}`;
+IMPORTANTE sobre el diseño:
+- heroStyle: elige el que mejor encaje con el negocio y sus fotos
+  · "fullscreen": imagen a pantalla completa con texto superpuesto (ideal si hay fotos)
+  · "split": mitad texto, mitad imagen, lado a lado
+  · "minimal-center": texto centrado sin imagen de fondo, muy limpio
+  · "text-left-image-right": asimétrico, texto grande a la izquierda
+  · "gradient-overlay": fondo con degradado de color intenso
+
+- layoutStyle: la personalidad general
+  · "editorial": elegante, mucho espacio, tipografía grande
+  · "bold": colores intensos, contrastes fuertes, impactante
+  · "minimal": limpio, mucho blanco, preciso
+  · "organic": formas suaves, colores cálidos, natural
+  · "brutalist": raw, tipografía oversized, dramático
+
+- fontPair: elige combinaciones que NO sean genéricas. Opciones de heading:
+  "Space Grotesk", "Playfair Display", "Clash Display", "Cabinet Grotesk", "Syne", "DM Serif Display", "Outfit", "Unbounded"
+  Body: "Inter", "DM Sans", "Satoshi", "General Sans", "Plus Jakarta Sans"
+
+- serviceLayout: varía según el número de servicios y el estilo
+- photoLayout: cómo se disponen las fotos del cliente
+- animationStyle: el estilo de animación de scroll
+- heroHeight: "full" (100vh), "tall" (85vh), "medium" (65vh)
+- borderRadius: "sharp" (4px), "rounded" (16-24px), "pill" (9999px)
+- accentGradient: si el estilo lo pide, un degradado CSS como "linear-gradient(135deg, #color1, #color2)". null si es mejor color sólido.
+- decorativeElements: true si el diseño se beneficia de formas abstractas decorativas
+
+Devuelve el JSON con textos Y decisiones de diseño.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -79,7 +89,7 @@ Devuelve un JSON con esta estructura exacta:
             type: "function",
             function: {
               name: "generate_web_content",
-              description: "Generate professional web content for a business",
+              description: "Generate professional web content and design decisions for a unique business website",
               parameters: {
                 type: "object",
                 properties: {
@@ -114,12 +124,37 @@ Devuelve un JSON con esta estructura exacta:
                   contactTitle: { type: "string" },
                   contactSubtitle: { type: "string" },
                   footerTagline: { type: "string" },
+                  design: {
+                    type: "object",
+                    properties: {
+                      heroStyle: { type: "string", enum: ["fullscreen", "split", "minimal-center", "text-left-image-right", "gradient-overlay"] },
+                      layoutStyle: { type: "string", enum: ["editorial", "bold", "minimal", "organic", "brutalist"] },
+                      fontPair: {
+                        type: "object",
+                        properties: {
+                          heading: { type: "string" },
+                          body: { type: "string" },
+                        },
+                        required: ["heading", "body"],
+                      },
+                      sectionOrder: { type: "array", items: { type: "string" } },
+                      serviceLayout: { type: "string", enum: ["cards", "list", "numbered-large", "timeline"] },
+                      photoLayout: { type: "string", enum: ["masonry", "fullbleed-alternating", "grid", "overlap-collage"] },
+                      animationStyle: { type: "string", enum: ["fade-up", "slide-in", "scale-pop", "stagger-cascade"] },
+                      heroHeight: { type: "string", enum: ["full", "tall", "medium"] },
+                      borderRadius: { type: "string", enum: ["sharp", "rounded", "pill"] },
+                      accentGradient: { type: ["string", "null"] },
+                      decorativeElements: { type: "boolean" },
+                    },
+                    required: ["heroStyle", "layoutStyle", "fontPair", "sectionOrder", "serviceLayout", "photoLayout", "animationStyle", "heroHeight", "borderRadius", "accentGradient", "decorativeElements"],
+                  },
                 },
                 required: [
                   "heroHeadline", "heroSubtitle", "heroCta",
                   "aboutTitle", "aboutText", "features",
                   "servicesTitle", "services",
                   "contactTitle", "contactSubtitle", "footerTagline",
+                  "design",
                 ],
               },
             },
@@ -156,7 +191,6 @@ Devuelve un JSON con esta estructura exacta:
         ? JSON.parse(toolCall.function.arguments) 
         : toolCall.function.arguments;
     } else {
-      // Fallback: try to parse from message content
       const msg = aiData.choices?.[0]?.message?.content || "";
       const jsonMatch = msg.match(/\{[\s\S]*\}/);
       if (jsonMatch) {

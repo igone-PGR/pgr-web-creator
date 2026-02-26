@@ -1,3 +1,17 @@
+export interface DesignDecisions {
+  heroStyle: "fullscreen" | "split" | "minimal-center" | "text-left-image-right" | "gradient-overlay";
+  layoutStyle: "editorial" | "bold" | "minimal" | "organic" | "brutalist";
+  fontPair: { heading: string; body: string };
+  sectionOrder: string[]; // e.g. ["hero","features","about","photos","services","contact"]
+  serviceLayout: "cards" | "list" | "numbered-large" | "timeline";
+  photoLayout: "masonry" | "fullbleed-alternating" | "grid" | "overlap-collage";
+  animationStyle: "fade-up" | "slide-in" | "scale-pop" | "stagger-cascade";
+  heroHeight: "full" | "tall" | "medium";
+  borderRadius: "sharp" | "rounded" | "pill";
+  accentGradient: string | null; // e.g. "linear-gradient(135deg, #FF6B4A, #FF3E8A)"
+  decorativeElements: boolean; // abstract shapes, blobs, lines
+}
+
 export interface WebContent {
   heroHeadline: string;
   heroSubtitle: string;
@@ -10,7 +24,22 @@ export interface WebContent {
   contactTitle: string;
   contactSubtitle: string;
   footerTagline: string;
+  design: DesignDecisions;
 }
+
+export const DEFAULT_DESIGN: DesignDecisions = {
+  heroStyle: "fullscreen",
+  layoutStyle: "editorial",
+  fontPair: { heading: "Space Grotesk", body: "Inter" },
+  sectionOrder: ["hero", "features", "about", "photos", "services", "contact"],
+  serviceLayout: "cards",
+  photoLayout: "grid",
+  animationStyle: "fade-up",
+  heroHeight: "tall",
+  borderRadius: "rounded",
+  accentGradient: null,
+  decorativeElements: false,
+};
 
 export const DEFAULT_CONTENT: WebContent = {
   heroHeadline: "Bienvenidos a tu negocio",
@@ -33,4 +62,5 @@ export const DEFAULT_CONTENT: WebContent = {
   contactTitle: "Hablemos",
   contactSubtitle: "Estamos aquí para ayudarte. Escríbenos y te respondemos en menos de 24h.",
   footerTagline: "Donde la excelencia se encuentra con la pasión.",
+  design: DEFAULT_DESIGN,
 };
