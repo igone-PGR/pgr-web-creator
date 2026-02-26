@@ -9,6 +9,8 @@ export interface ProjectData {
   email: string;
   phone: string;
   contactName: string;
+  businessEmail: string;
+  businessPhone: string;
   colorScheme: string;
   darkMode: boolean;
   slogan?: string;

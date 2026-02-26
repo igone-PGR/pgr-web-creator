@@ -138,7 +138,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           <a href="#services" className="hover:opacity-70 transition-opacity">Servicios</a>
           <a href="#contact" className="hover:opacity-70 transition-opacity">Contacto</a>
         </div>
-        <a href={`mailto:${project.email}`}
+        <a href={`mailto:${project.businessEmail || project.email}`}
           className="hidden md:flex items-center gap-1.5 text-xs font-semibold px-5 py-2.5 rounded-full transition-all hover:scale-105"
           style={{ backgroundColor: scheme.primary, color: "#fff" }}>
           Contactar <ArrowUpRight className="w-3 h-3" />
@@ -278,20 +278,20 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
                 {content.contactSubtitle}
               </motion.h2>
               <div className="space-y-5 mt-10">
-                {project.email && (
-                  <a href={`mailto:${project.email}`} className="flex items-center gap-4 group">
+                {(project.businessEmail || project.email) && (
+                  <a href={`mailto:${project.businessEmail || project.email}`} className="flex items-center gap-4 group">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${scheme.primary}15` }}>
                       <Mail className="w-4 h-4" style={{ color: scheme.primary }} />
                     </div>
-                    <span className="text-sm font-medium group-hover:underline" style={{ color: text2 }}>{project.email}</span>
+                    <span className="text-sm font-medium group-hover:underline" style={{ color: text2 }}>{project.businessEmail || project.email}</span>
                   </a>
                 )}
-                {project.phone && (
-                  <a href={`tel:${project.phone}`} className="flex items-center gap-4 group">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${scheme.primary}15` }}>
-                      <Phone className="w-4 h-4" style={{ color: scheme.primary }} />
+                {(project.businessPhone || project.phone) && (
+                  <a href={`https://wa.me/${(project.businessPhone || project.phone).replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="flex items-center gap-4 group">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "#25D36615" }}>
+                      <MessageCircle className="w-4 h-4" style={{ color: "#25D366" }} />
                     </div>
-                    <span className="text-sm font-medium group-hover:underline" style={{ color: text2 }}>{project.phone}</span>
+                    <span className="text-sm font-medium group-hover:underline" style={{ color: text2 }}>{project.businessPhone || project.phone}</span>
                   </a>
                 )}
                 {project.address && (
@@ -335,15 +335,15 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               <h3 className="font-bold text-lg">¿Hablamos?</h3>
               <p className="text-sm" style={{ color: text2 }}>Contáctanos directamente por email o WhatsApp</p>
               <div className="flex flex-col sm:flex-row gap-3 w-full">
-                {project.email && (
-                  <a href={`mailto:${project.email}`}
+                {(project.businessEmail || project.email) && (
+                  <a href={`mailto:${project.businessEmail || project.email}`}
                     className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all hover:scale-[1.02]"
                     style={{ backgroundColor: `${scheme.primary}15`, color: scheme.primary }}>
                     <Mail className="w-4 h-4" /> Email
                   </a>
                 )}
-                {project.phone && (
-                  <a href={`https://wa.me/${project.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
+                {(project.businessPhone || project.phone) && (
+                  <a href={`https://wa.me/${(project.businessPhone || project.phone).replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
                     className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-white text-sm font-bold transition-all hover:scale-[1.02]"
                     style={{ backgroundColor: "#25D366" }}>
                     <MessageCircle className="w-4 h-4" /> WhatsApp
@@ -375,8 +375,8 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       </footer>
 
       {/* WhatsApp */}
-      {project.phone && (
-        <a href={`https://wa.me/${project.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
+      {(project.businessPhone || project.phone) && (
+        <a href={`https://wa.me/${(project.businessPhone || project.phone).replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
           className="fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform z-50"
           style={{ backgroundColor: "#25D366" }}>
           <MessageCircle className="w-6 h-6 text-white" />

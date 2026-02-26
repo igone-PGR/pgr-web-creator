@@ -36,6 +36,8 @@ serve(async (req) => {
         email: project.email,
         phone: project.phone || null,
         contact_name: project.contactName || null,
+        business_email: project.businessEmail || null,
+        business_phone: project.businessPhone || null,
         business_hours: project.businessHours || null,
         services_list: project.servicesList || [],
         color_scheme: project.colorScheme || "Coral",

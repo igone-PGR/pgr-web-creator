@@ -28,6 +28,8 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     email: "",
     phone: "",
     contactName: "",
+    businessEmail: "",
+    businessPhone: "",
     slogan: "",
     businessHours: "",
     servicesList: [] as { name: string; description: string }[],
@@ -201,6 +203,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
             <div className="space-y-2">
               <Label htmlFor="address">Dirección (opcional)</Label>
               <Input id="address" placeholder="C/ Gran Vía 1, Madrid" value={form.address} onChange={(e) => update("address", e.target.value)} />
+            </div>
+
+            {/* Business email & WhatsApp phone for the website */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="businessEmail">Email corporativo (para tu web)</Label>
+                <Input id="businessEmail" type="email" placeholder="info@tunegocio.com" value={form.businessEmail} onChange={(e) => update("businessEmail", e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="businessPhone">Teléfono WhatsApp (para tu web)</Label>
+                <Input id="businessPhone" placeholder="+34 600 000 000" value={form.businessPhone} onChange={(e) => update("businessPhone", e.target.value)} />
+              </div>
             </div>
 
             {/* Social */}
