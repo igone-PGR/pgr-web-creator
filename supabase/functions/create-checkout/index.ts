@@ -35,6 +35,7 @@ serve(async (req) => {
         facebook: project.facebook || null,
         email: project.email,
         phone: project.phone || null,
+        contact_name: project.contactName || null,
         business_hours: project.businessHours || null,
         services_list: project.servicesList || [],
         color_scheme: project.colorScheme || "Coral",

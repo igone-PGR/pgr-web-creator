@@ -40,7 +40,7 @@ serve(async (req) => {
       // Fetch project details for email
       const { data: project } = await supabaseAdmin
         .from("projects")
-        .select("business_name, email, sector")
+        .select("business_name, email, sector, contact_name, phone")
         .eq("id", project_id)
         .single();
 
@@ -59,11 +59,13 @@ serve(async (req) => {
               <p>Se ha completado un pago para un nuevo proyecto web.</p>
               <table style="border-collapse:collapse;margin:16px 0;">
                 <tr><td style="padding:8px;font-weight:bold;">Negocio:</td><td style="padding:8px;">${project.business_name}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold;">Contacto:</td><td style="padding:8px;">${project.contact_name || "—"}</td></tr>
                 <tr><td style="padding:8px;font-weight:bold;">Email cliente:</td><td style="padding:8px;">${project.email}</td></tr>
+                <tr><td style="padding:8px;font-weight:bold;">Teléfono:</td><td style="padding:8px;">${project.phone || "—"}</td></tr>
                 <tr><td style="padding:8px;font-weight:bold;">Sector:</td><td style="padding:8px;">${project.sector}</td></tr>
                 <tr><td style="padding:8px;font-weight:bold;">ID Proyecto:</td><td style="padding:8px;">${project_id}</td></tr>
               </table>
-              <p>Accede al panel de administración para gestionar este proyecto.</p>
+              <p><a href="https://webcreator.pgrdigital.tech/admin/login" style="display:inline-block;padding:12px 24px;background-color:#FF6B4A;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">Ir al panel de administración</a></p>
             `,
           });
           console.log("Admin notification email sent to", adminEmail);

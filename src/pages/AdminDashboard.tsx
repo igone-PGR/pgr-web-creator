@@ -16,8 +16,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
-  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package,
+  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package, Download,
 } from "lucide-react";
+import { generateProjectZip } from "@/lib/generate-zip";
 
 interface Project {
   id: string;
@@ -38,6 +39,7 @@ interface Project {
   business_hours: string | null;
   services_list: any;
   generated_content: any;
+  contact_name: string | null;
 }
 
 const AdminDashboard = () => {
@@ -50,6 +52,7 @@ const AdminDashboard = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [saving, setSaving] = useState(false);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
@@ -82,6 +85,31 @@ const AdminDashboard = () => {
     if (!error) {
       toast({ title: "Proyecto marcado como entregado" });
       fetchProjects();
+    }
+  };
+
+  const handleDownloadZip = async (project: Project) => {
+    if (!project.generated_content) {
+      toast({ title: "Este proyecto no tiene contenido generado", variant: "destructive" });
+      return;
+    }
+    setDownloading(project.id);
+    try {
+      const blob = await generateProjectZip(project);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${project.business_name.replace(/[^a-zA-Z0-9]/g, "_")}_web.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast({ title: "ZIP descargado correctamente" });
+    } catch (err) {
+      console.error("ZIP error:", err);
+      toast({ title: "Error al generar el ZIP", variant: "destructive" });
+    } finally {
+      setDownloading(null);
     }
   };
 
@@ -179,6 +207,7 @@ const AdminDashboard = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Negocio</TableHead>
+                  <TableHead>Contacto</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Sector</TableHead>
                   <TableHead>Estado</TableHead>
@@ -190,6 +219,7 @@ const AdminDashboard = () => {
                 {filtered.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium">{p.business_name}</TableCell>
+                    <TableCell>{p.contact_name || "—"}</TableCell>
                     <TableCell>{p.email}</TableCell>
                     <TableCell className="capitalize">{p.sector}</TableCell>
                     <TableCell>
@@ -199,6 +229,12 @@ const AdminDashboard = () => {
                     </TableCell>
                     <TableCell>{new Date(p.created_at).toLocaleDateString("es-ES")}</TableCell>
                     <TableCell className="text-right space-x-1">
+                      {/* Download ZIP */}
+                      <Button variant="ghost" size="icon" onClick={() => handleDownloadZip(p)}
+                        disabled={downloading === p.id} title="Descargar ZIP">
+                        {downloading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                      </Button>
+
                       {/* View */}
                       <Dialog>
                         <DialogTrigger asChild>
@@ -212,6 +248,7 @@ const AdminDashboard = () => {
                           </DialogHeader>
                           {selectedProject && (
                             <div className="space-y-3 text-sm">
+                              <p><strong>Contacto:</strong> {selectedProject.contact_name || "—"}</p>
                               <p><strong>Email:</strong> {selectedProject.email}</p>
                               <p><strong>Teléfono:</strong> {selectedProject.phone || "—"}</p>
                               <p><strong>Dirección:</strong> {selectedProject.address || "—"}</p>
@@ -278,7 +315,7 @@ const AdminDashboard = () => {
                 ))}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                       No se encontraron proyectos
                     </TableCell>
                   </TableRow>
