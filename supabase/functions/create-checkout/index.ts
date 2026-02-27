@@ -80,7 +80,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("create-checkout error:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "No se pudo procesar la solicitud. Inténtalo de nuevo." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

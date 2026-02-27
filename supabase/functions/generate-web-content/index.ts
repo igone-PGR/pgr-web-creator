@@ -206,7 +206,7 @@ Devuelve el JSON con textos Y decisiones de diseño.`;
   } catch (e) {
     console.error("generate-web-content error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "Error al generar el contenido. Inténtalo de nuevo." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
