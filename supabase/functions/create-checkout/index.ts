@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { z } from "https://esm.sh/zod@3.23.8";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,13 +9,44 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const ServiceSchema = z.object({
+  name: z.string().max(100),
+  description: z.string().max(500),
+});
+
+const ProjectSchema = z.object({
+  businessName: z.string().min(1).max(200),
+  description: z.string().min(1).max(2000),
+  sector: z.string().min(1).max(100),
+  slogan: z.string().max(300).optional().nullable(),
+  logo: z.string().max(500).optional().nullable(),
+  address: z.string().max(500).optional().nullable(),
+  instagram: z.string().max(100).optional().nullable(),
+  facebook: z.string().max(200).optional().nullable(),
+  email: z.string().email().max(255),
+  phone: z.string().max(30).optional().nullable(),
+  contactName: z.string().max(200).optional().nullable(),
+  businessEmail: z.string().email().max(255).optional().nullable(),
+  businessPhone: z.string().max(30).optional().nullable(),
+  businessHours: z.string().max(500).optional().nullable(),
+  servicesList: z.array(ServiceSchema).max(50).optional().default([]),
+  colorScheme: z.string().max(50).optional().default("Coral"),
+  darkMode: z.boolean().optional().default(false),
+});
+
+const CheckoutRequestSchema = z.object({
+  project: ProjectSchema,
+  generatedContent: z.record(z.unknown()).optional().nullable(),
+});
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { project, generatedContent } = await req.json();
+    const body = await req.json();
+    const { project, generatedContent } = CheckoutRequestSchema.parse(body);
 
     // Save project to DB first
     const supabaseAdmin = createClient(
@@ -48,7 +80,7 @@ serve(async (req) => {
       .select("id")
       .single();
 
-    if (dbError) throw new Error(`DB error: ${dbError.message}`);
+    if (dbError) throw new Error("Database error");
 
     // Create Stripe checkout session
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -78,6 +110,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ error: "Datos del formulario inválidos. Revisa los campos e inténtalo de nuevo." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     console.error("create-checkout error:", error);
     return new Response(
       JSON.stringify({ error: "No se pudo procesar la solicitud. Inténtalo de nuevo." }),

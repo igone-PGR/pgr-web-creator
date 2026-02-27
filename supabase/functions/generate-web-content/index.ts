@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://esm.sh/zod@3.23.8";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,16 +7,36 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const ServiceSchema = z.object({
+  name: z.string().max(100),
+  description: z.string().max(500),
+});
+
+const GenerateContentSchema = z.object({
+  businessName: z.string().min(1).max(200),
+  description: z.string().min(1).max(2000),
+  sector: z.string().min(1).max(100),
+  address: z.string().max(500).optional().nullable(),
+  phone: z.string().max(30).optional().nullable(),
+  email: z.string().email().max(255),
+  slogan: z.string().max(300).optional().nullable(),
+  businessHours: z.string().max(500).optional().nullable(),
+  servicesList: z.array(ServiceSchema).max(50).optional().nullable(),
+  hasPhotos: z.boolean().optional().default(false),
+  photoCount: z.number().int().min(0).max(50).optional().default(0),
+});
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList, hasPhotos, photoCount } = await req.json();
+    const body = await req.json();
+    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList, hasPhotos, photoCount } = GenerateContentSchema.parse(body);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    if (!LOVABLE_API_KEY) throw new Error("API key not configured");
 
     const systemPrompt = `Eres un diseñador web y copywriter de élite. Tu trabajo es crear webs únicas y memorables para pequeños negocios en España.
 NO REPITAS NUNCA el mismo estilo. Cada web debe tener una PERSONALIDAD VISUAL PROPIA basada en el negocio.
@@ -25,7 +46,7 @@ Un café hipster necesita un diseño diferente a un bufete de abogados. Una pelu
 Responde SOLO con el JSON solicitado, sin explicaciones.`;
 
     const servicesContext = servicesList?.length
-      ? `\n- Servicios: ${servicesList.map((s: { name: string; description: string }) => `${s.name} (${s.description})`).join(", ")}`
+      ? `\n- Servicios: ${servicesList.map((s) => `${s.name} (${s.description})`).join(", ")}`
       : "";
 
     const photosContext = hasPhotos
@@ -165,21 +186,11 @@ Devuelve el JSON con textos Y decisiones de diseño.`;
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Demasiadas solicitudes. Inténtalo de nuevo en unos segundos." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Créditos agotados. Contacta con soporte." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
-      throw new Error("AI gateway error");
+      console.error("AI gateway error:", response.status);
+      return new Response(
+        JSON.stringify({ error: "Error al generar el contenido. Inténtalo de nuevo." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const aiData = await response.json();
@@ -204,6 +215,12 @@ Devuelve el JSON con textos Y decisiones de diseño.`;
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
+    if (e instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ error: "Datos del negocio inválidos. Revisa los campos e inténtalo de nuevo." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     console.error("generate-web-content error:", e);
     return new Response(
       JSON.stringify({ error: "Error al generar el contenido. Inténtalo de nuevo." }),
