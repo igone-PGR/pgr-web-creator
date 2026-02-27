@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { Resend } from "npm:resend@2.0.0";
+import { z } from "https://esm.sh/zod@3.23.8";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,13 +10,19 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const VerifyPaymentSchema = z.object({
+  session_id: z.string().min(1).max(500),
+  project_id: z.string().uuid(),
+});
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { session_id, project_id } = await req.json();
+    const body = await req.json();
+    const { session_id, project_id } = VerifyPaymentSchema.parse(body);
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -68,11 +75,9 @@ serve(async (req) => {
               <p><a href="https://webcreator.pgrdigital.tech/admin/login" style="display:inline-block;padding:12px 24px;background-color:#FF6B4A;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:bold;">Ir al panel de administración</a></p>
             `,
           });
-          console.log("Admin notification email sent to", adminEmail);
         }
       } catch (emailError) {
         console.error("Failed to send admin notification email:", emailError);
-        // Don't fail the payment verification because of email issues
       }
 
       return new Response(
@@ -86,6 +91,12 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ error: "Datos de verificación inválidos." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     console.error("verify-payment error:", error);
     return new Response(
       JSON.stringify({ error: "No se pudo verificar el pago. Inténtalo de nuevo." }),
