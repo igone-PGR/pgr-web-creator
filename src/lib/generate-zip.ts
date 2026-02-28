@@ -1,5 +1,28 @@
 import JSZip from "jszip";
 
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return "";
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return String(text).replace(/[&<>"']/g, (m) => map[m]);
+}
+
+function sanitizeHref(url: string): string {
+  try {
+    const raw = url.startsWith("http") ? url : `https://${url}`;
+    const parsed = new URL(raw);
+    if (!["http:", "https:", "mailto:"].includes(parsed.protocol)) return "#";
+    return escapeHtml(parsed.href);
+  } catch {
+    return "#";
+  }
+}
+
 interface ProjectForZip {
   business_name: string;
   description: string;
@@ -47,29 +70,29 @@ export async function generateProjectZip(project: ProjectForZip): Promise<Blob> 
   const servicesHtml = services.map((s: any, i: number) => `
     <div class="service-card">
       <span class="service-num">${String(i + 1).padStart(2, "0")}</span>
-      <h3>${s.name}</h3>
-      <p>${s.description}</p>
+      <h3>${escapeHtml(s.name)}</h3>
+      <p>${escapeHtml(s.description)}</p>
     </div>`).join("");
 
   const featuresHtml = features.map((f: any, i: number) => `
     <div class="feature-card ${i === 0 ? 'feature-wide' : ''}">
-      <h3>${f.title}</h3>
-      <p>${f.description}</p>
+      <h3>${escapeHtml(f.title)}</h3>
+      <p>${escapeHtml(f.description)}</p>
     </div>`).join("");
 
   const webEmail = project.business_email || project.email;
   const webPhone = project.business_phone || project.phone;
 
   const contactItems = [
-    webEmail ? `<a href="mailto:${webEmail}" class="contact-item">📧 ${webEmail}</a>` : "",
-    webPhone ? `<a href="https://wa.me/${webPhone.replace(/\D/g, "")}" class="contact-item" target="_blank">💬 WhatsApp: ${webPhone}</a>` : "",
-    project.address ? `<div class="contact-item">📍 ${project.address}</div>` : "",
-    project.business_hours ? `<div class="contact-item">🕐 ${project.business_hours}</div>` : "",
+    webEmail ? `<a href="mailto:${escapeHtml(webEmail)}" class="contact-item">📧 ${escapeHtml(webEmail)}</a>` : "",
+    webPhone ? `<a href="https://wa.me/${escapeHtml(webPhone.replace(/\D/g, ""))}" class="contact-item" target="_blank">💬 WhatsApp: ${escapeHtml(webPhone)}</a>` : "",
+    project.address ? `<div class="contact-item">📍 ${escapeHtml(project.address)}</div>` : "",
+    project.business_hours ? `<div class="contact-item">🕐 ${escapeHtml(project.business_hours)}</div>` : "",
   ].filter(Boolean).join("\n");
 
   const socialLinks = [
-    project.instagram ? `<a href="https://instagram.com/${project.instagram.replace("@", "")}" target="_blank">Instagram</a>` : "",
-    project.facebook ? `<a href="${project.facebook.startsWith("http") ? project.facebook : `https://${project.facebook}`}" target="_blank">Facebook</a>` : "",
+    project.instagram ? `<a href="${sanitizeHref(`https://instagram.com/${project.instagram.replace("@", "")}`)}" target="_blank">Instagram</a>` : "",
+    project.facebook ? `<a href="${sanitizeHref(project.facebook)}" target="_blank">Facebook</a>` : "",
   ].filter(Boolean).join(" · ");
 
   const html = `<!DOCTYPE html>
@@ -77,38 +100,38 @@ export async function generateProjectZip(project: ProjectForZip): Promise<Blob> 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${project.business_name}</title>
-  <meta name="description" content="${content.heroSubtitle || project.description}">
+  <title>${escapeHtml(project.business_name)}</title>
+  <meta name="description" content="${escapeHtml(content.heroSubtitle || project.description)}">
   <link rel="stylesheet" href="styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
   <nav>
-    <span class="logo">${project.business_name}</span>
+    <span class="logo">${escapeHtml(project.business_name)}</span>
     <div class="nav-links">
       <a href="#about">Nosotros</a>
       <a href="#services">Servicios</a>
       <a href="#contact">Contacto</a>
     </div>
-    <a href="mailto:${webEmail}" class="nav-cta">Contactar →</a>
+    <a href="mailto:${escapeHtml(webEmail)}" class="nav-cta">Contactar →</a>
   </nav>
 
   <section class="hero">
-    <p class="hero-tag">${project.slogan || project.sector}</p>
-    <h1>${content.heroHeadline || project.business_name}</h1>
-    <p class="hero-sub">${content.heroSubtitle || project.description}</p>
-    <a href="#contact" class="hero-btn">${content.heroCta || "Contactar"} →</a>
+    <p class="hero-tag">${escapeHtml(project.slogan || project.sector)}</p>
+    <h1>${escapeHtml(content.heroHeadline || project.business_name)}</h1>
+    <p class="hero-sub">${escapeHtml(content.heroSubtitle || project.description)}</p>
+    <a href="#contact" class="hero-btn">${escapeHtml(content.heroCta || "Contactar")} →</a>
   </section>
 
   <section class="features">${featuresHtml}</section>
 
   <section id="about" class="about">
-    <p class="section-tag">${content.aboutTitle || "Sobre nosotros"}</p>
-    <p class="about-text">${content.aboutText || project.description}</p>
+    <p class="section-tag">${escapeHtml(content.aboutTitle || "Sobre nosotros")}</p>
+    <p class="about-text">${escapeHtml(content.aboutText || project.description)}</p>
   </section>
 
   <section id="services" class="services">
-    <p class="section-tag">${content.servicesTitle || "Servicios"}</p>
+    <p class="section-tag">${escapeHtml(content.servicesTitle || "Servicios")}</p>
     <h2>Lo que ofrecemos</h2>
     <div class="services-grid">${servicesHtml}</div>
   </section>
@@ -116,8 +139,8 @@ export async function generateProjectZip(project: ProjectForZip): Promise<Blob> 
   <section id="contact" class="contact">
     <div class="contact-inner">
       <div>
-        <p class="section-tag">${content.contactTitle || "Contacto"}</p>
-        <h2>${content.contactSubtitle || "Hablemos"}</h2>
+        <p class="section-tag">${escapeHtml(content.contactTitle || "Contacto")}</p>
+        <h2>${escapeHtml(content.contactSubtitle || "Hablemos")}</h2>
         <div class="contact-list">${contactItems}</div>
         ${socialLinks ? `<div class="social-links">${socialLinks}</div>` : ""}
       </div>
@@ -125,7 +148,7 @@ export async function generateProjectZip(project: ProjectForZip): Promise<Blob> 
   </section>
 
   <footer>
-    <p>© ${new Date().getFullYear()} ${project.business_name}. Todos los derechos reservados.</p>
+    <p>© ${new Date().getFullYear()} ${escapeHtml(project.business_name)}. Todos los derechos reservados.</p>
   </footer>
 </body>
 </html>`;
