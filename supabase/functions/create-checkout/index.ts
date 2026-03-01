@@ -14,6 +14,11 @@ const ServiceSchema = z.object({
   description: z.string().max(500),
 });
 
+const OptionalEmailSchema = z.preprocess(
+  (value) => (value === "" ? null : value),
+  z.string().email().max(255).optional().nullable()
+);
+
 const ProjectSchema = z.object({
   businessName: z.string().min(1).max(200),
   description: z.string().min(1).max(2000),
@@ -26,7 +31,7 @@ const ProjectSchema = z.object({
   email: z.string().email().max(255),
   phone: z.string().max(30).optional().nullable(),
   contactName: z.string().max(200).optional().nullable(),
-  businessEmail: z.string().email().max(255).optional().nullable(),
+  businessEmail: OptionalEmailSchema,
   businessPhone: z.string().max(30).optional().nullable(),
   businessHours: z.string().max(500).optional().nullable(),
   servicesList: z.array(ServiceSchema).max(50).optional().default([]),
@@ -87,14 +92,27 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
+    const requestOrigin = req.headers.get("origin");
+    const referer = req.headers.get("referer");
+
+    const baseUrl = (() => {
+      try {
+        if (requestOrigin) return new URL(requestOrigin).origin;
+        if (referer) return new URL(referer).origin;
+      } catch {
+        // ignore and use fallback
+      }
+      return "https://pgr-web-creator.lovable.app";
+    })();
+
     const session = await stripe.checkout.sessions.create({
       customer_email: project.email,
       line_items: [
         { price: "price_1T4ezHL3Sa5XsYOcVNfsSnTm", quantity: 1 },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}&project_id=${savedProject.id}`,
-      cancel_url: `${req.headers.get("origin")}/?canceled=true`,
+      success_url: `${baseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}&project_id=${savedProject.id}`,
+      cancel_url: `${baseUrl}/?canceled=true`,
       metadata: {
         project_id: savedProject.id,
       },
