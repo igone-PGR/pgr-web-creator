@@ -61,7 +61,10 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
 
   useEffect(() => { generateContent(); }, []);
 
-  const withTimeout = async <T,>(promise: Promise<T>, ms = 20000): Promise<T> => {
+  const GENERATION_TIMEOUT_MS = 90000;
+  const CHECKOUT_TIMEOUT_MS = 45000;
+
+  const withTimeout = async <T,>(promise: Promise<T>, ms: number): Promise<T> => {
     return await Promise.race([
       promise,
       new Promise<T>((_, reject) =>
@@ -70,27 +73,48 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     ]);
   };
 
+  const isTimeoutError = (err: unknown) => {
+    return err instanceof Error && err.message.toLowerCase().includes("timeout");
+  };
+
+  const requestGeneratedContent = () =>
+    supabase.functions.invoke("generate-web-content", {
+      body: {
+        businessName: project.businessName,
+        description: project.description,
+        sector: project.sector,
+        address: project.address,
+        phone: project.phone,
+        email: project.email,
+        slogan: project.slogan,
+        businessHours: project.businessHours,
+        servicesList: project.servicesList,
+        hasPhotos: (project.photos?.length || 0) > 0,
+        photoCount: project.photos?.length || 0,
+      },
+    });
+
   const generateContent = async () => {
     try {
-      const { data: result, error } = await withTimeout(
-        supabase.functions.invoke("generate-web-content", {
-          body: {
-            businessName: project.businessName,
-            description: project.description,
-            sector: project.sector,
-            address: project.address,
-            phone: project.phone,
-            email: project.email,
-            slogan: project.slogan,
-            businessHours: project.businessHours,
-            servicesList: project.servicesList,
-            hasPhotos: (project.photos?.length || 0) > 0,
-            photoCount: project.photos?.length || 0,
-          },
-        })
-      );
+      let result;
 
-      if (error) throw error;
+      try {
+        const response = await withTimeout(requestGeneratedContent(), GENERATION_TIMEOUT_MS);
+        if (response.error) throw response.error;
+        result = response.data;
+      } catch (err) {
+        if (!isTimeoutError(err)) throw err;
+
+        toast({
+          title: "La generación está tardando más de lo normal",
+          description: "Estamos reintentando automáticamente una vez.",
+        });
+
+        const retryResponse = await withTimeout(requestGeneratedContent(), GENERATION_TIMEOUT_MS);
+        if (retryResponse.error) throw retryResponse.error;
+        result = retryResponse.data;
+      }
+
       if (result?.content) {
         setContent(result.content);
       } else {
@@ -104,7 +128,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       console.error("Error generating content:", err);
       toast({
         title: "Error al generar la web",
-        description: "La solicitud tardó demasiado o falló. Puedes reintentar.",
+        description: "El servicio está tardando o falló. Inténtalo de nuevo en unos segundos.",
         variant: "destructive",
       });
     } finally {
@@ -118,14 +142,20 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       const { data: result, error } = await withTimeout(
         supabase.functions.invoke("create-checkout", {
           body: { project: { ...project }, generatedContent: content },
-        })
+        }),
+        CHECKOUT_TIMEOUT_MS
       );
 
       if (error) throw error;
+
       if (result?.url) {
-        window.open(result.url, "_blank");
+        window.location.assign(result.url);
       } else {
-        toast({ title: "No se pudo abrir el pago", description: "Inténtalo de nuevo.", variant: "destructive" });
+        toast({
+          title: "No se pudo abrir el pago",
+          description: "No recibimos el enlace de pago. Inténtalo de nuevo.",
+          variant: "destructive",
+        });
       }
     } catch (err) {
       console.error("Checkout error:", err);
