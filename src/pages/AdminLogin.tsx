@@ -19,46 +19,29 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const withTimeout = async <T,>(promise: Promise<T>, ms = 15000): Promise<T> => {
-    return await Promise.race([
-      promise,
-      new Promise<T>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), ms)
-      ),
-    ]);
-  };
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await withTimeout(signIn(email, password));
+      const { error } = await signIn(email, password);
       if (error) {
         toast({ title: "Error de acceso", description: "Credenciales incorrectas o cuenta no autorizada.", variant: "destructive" });
         return;
       }
 
-      const userResult = await withTimeout<Awaited<ReturnType<typeof supabase.auth.getUser>>>(
-        supabase.auth.getUser()
-      );
-      const { data: userData, error: userError } = userResult;
+      const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData.user) {
         toast({ title: "No se pudo validar la sesión", description: "Inténtalo de nuevo.", variant: "destructive" });
         return;
       }
 
-      const roleResult = await withTimeout(
-        (async () =>
-          await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", userData.user.id)
-            .eq("role", "admin")
-            .maybeSingle()
-        )()
-      );
-      const { data: adminRole, error: roleError } = roleResult;
+      const { data: adminRole, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userData.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
 
       if (roleError) {
         toast({ title: "No se pudo validar permisos", description: "Inténtalo de nuevo.", variant: "destructive" });
@@ -72,8 +55,12 @@ const AdminLogin = () => {
       }
 
       navigate("/admin");
-    } catch {
-      toast({ title: "Tiempo de espera agotado", description: "La conexión tardó demasiado. Prueba de nuevo.", variant: "destructive" });
+    } catch (error) {
+      toast({
+        title: "Error al iniciar sesión",
+        description: error instanceof Error ? error.message : "Ha ocurrido un error inesperado. Prueba de nuevo.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
