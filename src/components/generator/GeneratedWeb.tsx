@@ -6,7 +6,6 @@ import {
   Clock, Sparkles, Check, Star, Zap, Heart, Shield, Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import type { ProjectData } from "@/types/project";
 import { COLOR_SCHEMES } from "@/types/project";
 import type { WebContent, DesignDecisions } from "@/types/web-content";
@@ -41,7 +40,6 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [content, setContent] = useState<WebContent>(DEFAULT_CONTENT);
   const [isGenerating, setIsGenerating] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const { toast } = useToast();
 
   const scheme = COLOR_SCHEMES.find((s) => s.name === project.colorScheme) || COLOR_SCHEMES[0];
   const heroImage = SECTOR_IMAGES[project.sector] || SECTOR_IMAGES["Otro"];
@@ -61,76 +59,27 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
 
   useEffect(() => { generateContent(); }, []);
 
-  const GENERATION_TIMEOUT_MS = 90000;
-  const CHECKOUT_TIMEOUT_MS = 45000;
-
-  const withTimeout = async <T,>(promise: Promise<T>, ms: number): Promise<T> => {
-    return await Promise.race([
-      promise,
-      new Promise<T>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), ms)
-      ),
-    ]);
-  };
-
-  const isTimeoutError = (err: unknown) => {
-    return err instanceof Error && err.message.toLowerCase().includes("timeout");
-  };
-
-  const requestGeneratedContent = () =>
-    supabase.functions.invoke("generate-web-content", {
-      body: {
-        businessName: project.businessName,
-        description: project.description,
-        sector: project.sector,
-        address: project.address,
-        phone: project.phone,
-        email: project.email,
-        slogan: project.slogan,
-        businessHours: project.businessHours,
-        servicesList: project.servicesList,
-        hasPhotos: (project.photos?.length || 0) > 0,
-        photoCount: project.photos?.length || 0,
-      },
-    });
-
   const generateContent = async () => {
     try {
-      let result;
-
-      try {
-        const response = await withTimeout(requestGeneratedContent(), GENERATION_TIMEOUT_MS);
-        if (response.error) throw response.error;
-        result = response.data;
-      } catch (err) {
-        if (!isTimeoutError(err)) throw err;
-
-        toast({
-          title: "La generación está tardando más de lo normal",
-          description: "Estamos reintentando automáticamente una vez.",
-        });
-
-        const retryResponse = await withTimeout(requestGeneratedContent(), GENERATION_TIMEOUT_MS);
-        if (retryResponse.error) throw retryResponse.error;
-        result = retryResponse.data;
-      }
-
-      if (result?.content) {
-        setContent(result.content);
-      } else {
-        toast({
-          title: "No se pudo generar el contenido",
-          description: "Se cargó una versión base para que puedas continuar.",
-          variant: "destructive",
-        });
-      }
+      const { data: result, error } = await supabase.functions.invoke("generate-web-content", {
+        body: {
+          businessName: project.businessName,
+          description: project.description,
+          sector: project.sector,
+          address: project.address,
+          phone: project.phone,
+          email: project.email,
+          slogan: project.slogan,
+          businessHours: project.businessHours,
+          servicesList: project.servicesList,
+          hasPhotos: (project.photos?.length || 0) > 0,
+          photoCount: project.photos?.length || 0,
+        },
+      });
+      if (error) throw error;
+      if (result?.content) setContent(result.content);
     } catch (err) {
       console.error("Error generating content:", err);
-      toast({
-        title: "Error al generar la web",
-        description: "El servicio está tardando o falló. Inténtalo de nuevo en unos segundos.",
-        variant: "destructive",
-      });
     } finally {
       setIsGenerating(false);
     }
@@ -139,31 +88,13 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
-      const { data: result, error } = await withTimeout(
-        supabase.functions.invoke("create-checkout", {
-          body: { project: { ...project }, generatedContent: content },
-        }),
-        CHECKOUT_TIMEOUT_MS
-      );
-
+      const { data: result, error } = await supabase.functions.invoke("create-checkout", {
+        body: { project: { ...project }, generatedContent: content },
+      });
       if (error) throw error;
-
-      if (result?.url) {
-        window.location.assign(result.url);
-      } else {
-        toast({
-          title: "No se pudo abrir el pago",
-          description: "No recibimos el enlace de pago. Inténtalo de nuevo.",
-          variant: "destructive",
-        });
-      }
+      if (result?.url) window.open(result.url, "_blank");
     } catch (err) {
       console.error("Checkout error:", err);
-      toast({
-        title: "Error al iniciar el pago",
-        description: "La conexión tardó demasiado o falló. Inténtalo de nuevo.",
-        variant: "destructive",
-      });
     } finally {
       setIsCheckingOut(false);
     }

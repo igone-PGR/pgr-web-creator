@@ -22,47 +22,13 @@ const AdminLogin = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const { error } = await signIn(email, password);
+    setLoading(false);
 
-    try {
-      const { error } = await signIn(email, password);
-      if (error) {
-        toast({ title: "Error de acceso", description: "Credenciales incorrectas o cuenta no autorizada.", variant: "destructive" });
-        return;
-      }
-
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError || !userData.user) {
-        toast({ title: "No se pudo validar la sesión", description: "Inténtalo de nuevo.", variant: "destructive" });
-        return;
-      }
-
-      const { data: adminRole, error: roleError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userData.user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-
-      if (roleError) {
-        toast({ title: "No se pudo validar permisos", description: "Inténtalo de nuevo.", variant: "destructive" });
-        return;
-      }
-
-      if (!adminRole) {
-        await supabase.auth.signOut();
-        toast({ title: "Acceso denegado", description: "Tu cuenta no tiene permisos de administrador.", variant: "destructive" });
-        return;
-      }
-
+    if (error) {
+      toast({ title: "Error de acceso", description: "Credenciales incorrectas o cuenta no autorizada.", variant: "destructive" });
+    } else {
       navigate("/admin");
-    } catch (error) {
-      toast({
-        title: "Error al iniciar sesión",
-        description: error instanceof Error ? error.message : "Ha ocurrido un error inesperado. Prueba de nuevo.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
