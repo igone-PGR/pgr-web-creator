@@ -11,6 +11,7 @@ import type { WebContent, DesignDecisions, ColorPalette } from "@/types/web-cont
 import { DEFAULT_CONTENT, DEFAULT_DESIGN, DEFAULT_COLORS } from "@/types/web-content";
 import { SECTOR_IMAGES } from "@/lib/sector-images";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface GeneratedWebProps {
   data: ProjectData;
@@ -39,6 +40,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [content, setContent] = useState<WebContent>(DEFAULT_CONTENT);
   const [isGenerating, setIsGenerating] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const { toast } = useToast();
 
   const heroImage = SECTOR_IMAGES[project.sector] || SECTOR_IMAGES["Otro"];
   const design: DesignDecisions = content.design || DEFAULT_DESIGN;
@@ -108,9 +110,18 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         body: { project: { ...project }, generatedContent: content },
       });
       if (error) throw error;
-      if (result?.url) window.open(result.url, "_blank");
-    } catch (err) {
+      if (result?.url) {
+        window.open(result.url, "_blank");
+      } else {
+        throw new Error(result?.error || "No se recibió la URL de pago");
+      }
+    } catch (err: any) {
       console.error("Checkout error:", err);
+      toast({
+        title: "Error al procesar el pago",
+        description: err?.message || "No se pudo conectar con la pasarela de pago. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
     } finally {
       setIsCheckingOut(false);
     }
