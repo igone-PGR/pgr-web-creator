@@ -1,15 +1,30 @@
+export interface ColorPalette {
+  bg: string;         // page background
+  bgAlt: string;      // alternate section background
+  card: string;       // card/surface background
+  text1: string;      // primary text
+  text2: string;      // secondary/muted text
+  border: string;     // borders
+  accent: string;     // primary accent color
+  accentText: string; // text on accent bg (usually white or dark)
+}
+
 export interface DesignDecisions {
   heroStyle: "fullscreen" | "split" | "minimal-center" | "text-left-image-right" | "gradient-overlay";
   layoutStyle: "editorial" | "bold" | "minimal" | "organic" | "brutalist";
+  navStyle: "transparent" | "solid" | "minimal" | "centered" | "hidden";
+  footerStyle: "minimal" | "columns" | "centered" | "banner";
   fontPair: { heading: string; body: string };
-  sectionOrder: string[]; // e.g. ["hero","features","about","photos","services","contact"]
+  sectionOrder: string[];
   serviceLayout: "cards" | "list" | "numbered-large" | "timeline";
   photoLayout: "masonry" | "fullbleed-alternating" | "grid" | "overlap-collage";
   animationStyle: "fade-up" | "slide-in" | "scale-pop" | "stagger-cascade";
   heroHeight: "full" | "tall" | "medium";
   borderRadius: "sharp" | "rounded" | "pill";
-  accentGradient: string | null; // e.g. "linear-gradient(135deg, #FF6B4A, #FF3E8A)"
-  decorativeElements: boolean; // abstract shapes, blobs, lines
+  accentGradient: string | null;
+  decorativeElements: boolean;
+  colors: ColorPalette;
+  darkMode: boolean;
 }
 
 export interface WebContent {
@@ -27,9 +42,22 @@ export interface WebContent {
   design: DesignDecisions;
 }
 
+export const DEFAULT_COLORS: ColorPalette = {
+  bg: "#fafaf9",
+  bgAlt: "#f3f2ef",
+  card: "#ffffff",
+  text1: "#1a1a17",
+  text2: "#6b6b63",
+  border: "#e8e7e3",
+  accent: "#FF6B4A",
+  accentText: "#ffffff",
+};
+
 export const DEFAULT_DESIGN: DesignDecisions = {
   heroStyle: "fullscreen",
   layoutStyle: "editorial",
+  navStyle: "transparent",
+  footerStyle: "minimal",
   fontPair: { heading: "Space Grotesk", body: "Inter" },
   sectionOrder: ["hero", "features", "about", "photos", "services", "contact"],
   serviceLayout: "cards",
@@ -39,6 +67,8 @@ export const DEFAULT_DESIGN: DesignDecisions = {
   borderRadius: "rounded",
   accentGradient: null,
   decorativeElements: false,
+  colors: DEFAULT_COLORS,
+  darkMode: false,
 };
 
 export const DEFAULT_CONTENT: WebContent = {

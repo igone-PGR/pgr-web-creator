@@ -95,7 +95,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
       darkMode: false,
       servicesList: form.servicesList.filter((s) => s.name.trim()),
       photos: form.photos,
-    });
+    } as any);
   };
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));

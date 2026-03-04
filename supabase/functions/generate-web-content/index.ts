@@ -26,6 +26,50 @@ const GenerateContentSchema = z.object({
   photoCount: z.number().int().min(0).max(50).optional().default(0),
 });
 
+const colorPaletteSchema = {
+  type: "object" as const,
+  properties: {
+    bg: { type: "string" as const, description: "Page background color (hex)" },
+    bgAlt: { type: "string" as const, description: "Alternate section background (hex)" },
+    card: { type: "string" as const, description: "Card/surface background (hex)" },
+    text1: { type: "string" as const, description: "Primary text color (hex)" },
+    text2: { type: "string" as const, description: "Secondary/muted text color (hex)" },
+    border: { type: "string" as const, description: "Border color (hex)" },
+    accent: { type: "string" as const, description: "Primary accent/brand color (hex)" },
+    accentText: { type: "string" as const, description: "Text color on accent background (hex)" },
+  },
+  required: ["bg", "bgAlt", "card", "text1", "text2", "border", "accent", "accentText"],
+};
+
+const designSchema = {
+  type: "object" as const,
+  properties: {
+    heroStyle: { type: "string" as const, enum: ["fullscreen", "split", "minimal-center", "text-left-image-right", "gradient-overlay"] },
+    layoutStyle: { type: "string" as const, enum: ["editorial", "bold", "minimal", "organic", "brutalist"] },
+    navStyle: { type: "string" as const, enum: ["transparent", "solid", "minimal", "centered", "hidden"] },
+    footerStyle: { type: "string" as const, enum: ["minimal", "columns", "centered", "banner"] },
+    fontPair: {
+      type: "object" as const,
+      properties: {
+        heading: { type: "string" as const },
+        body: { type: "string" as const },
+      },
+      required: ["heading", "body"],
+    },
+    sectionOrder: { type: "array" as const, items: { type: "string" as const } },
+    serviceLayout: { type: "string" as const, enum: ["cards", "list", "numbered-large", "timeline"] },
+    photoLayout: { type: "string" as const, enum: ["masonry", "fullbleed-alternating", "grid", "overlap-collage"] },
+    animationStyle: { type: "string" as const, enum: ["fade-up", "slide-in", "scale-pop", "stagger-cascade"] },
+    heroHeight: { type: "string" as const, enum: ["full", "tall", "medium"] },
+    borderRadius: { type: "string" as const, enum: ["sharp", "rounded", "pill"] },
+    accentGradient: { type: ["string", "null"] as const },
+    decorativeElements: { type: "boolean" as const },
+    colors: colorPaletteSchema,
+    darkMode: { type: "boolean" as const, description: "Whether to use a dark color scheme" },
+  },
+  required: ["heroStyle", "layoutStyle", "navStyle", "footerStyle", "fontPair", "sectionOrder", "serviceLayout", "photoLayout", "animationStyle", "heroHeight", "borderRadius", "accentGradient", "decorativeElements", "colors", "darkMode"],
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -38,11 +82,21 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("API key not configured");
 
-    const systemPrompt = `Eres un diseñador web y copywriter de élite. Tu trabajo es crear webs únicas y memorables para pequeños negocios en España.
-NO REPITAS NUNCA el mismo estilo. Cada web debe tener una PERSONALIDAD VISUAL PROPIA basada en el negocio.
-Piensa como un diseñador de Dribbble/Awwwards: layouts creativos, tipografías con carácter, jerarquía visual potente.
-Adapta el tono, la energía y la estética al sector y la personalidad del negocio.
-Un café hipster necesita un diseño diferente a un bufete de abogados. Una peluquería urbana es diferente a un spa de lujo.
+    const systemPrompt = `Eres un diseñador web y copywriter de élite. Tu trabajo es crear webs RADICALMENTE DIFERENTES y memorables para cada negocio.
+CADA WEB DEBE SER TOTALMENTE ÚNICA. No hay plantilla. Tú decides TODO: colores, si es oscura o clara, la estructura, el orden de las secciones, qué secciones incluir o excluir.
+
+REGLAS DE DISEÑO LIBRE:
+- Elige una paleta de colores COMPLETA y ÚNICA para cada negocio. No uses siempre los mismos colores.
+- Decide si el sitio es oscuro o claro según la personalidad del negocio.
+- Un bar de copas nocturno → paleta oscura, neones. Una floristería → tonos cálidos naturales. Un estudio de diseño → monocromático minimalista. Un restaurante mexicano → colores vibrantes saturados.
+- Varía SIEMPRE el orden de las secciones. No pongas siempre hero→features→about.
+- Puedes OMITIR secciones que no aporten (ej: si no tiene sentido "features" para un bar, no la incluyas).
+- Secciones disponibles: hero, features, about, photos, services, contact. Usa mínimo 3, máximo 6.
+- Varía navStyle: "transparent" (sin fondo), "solid" (fondo sólido), "minimal" (solo logo+cta), "centered" (logo centrado), "hidden" (sin nav visible).
+- Varía footerStyle: "minimal" (una línea), "columns" (info organizada en columnas), "centered" (centrado con tagline), "banner" (gran banner de cierre).
+- Experimenta con combinaciones tipográficas arriesgadas.
+- Los colores del accent deben tener buen contraste con accentText.
+- Piensa como un diseñador de Dribbble/Awwwards: cada web debe sorprender.
 Responde SOLO con el JSON solicitado, sin explicaciones.`;
 
     const servicesContext = servicesList?.length
@@ -64,34 +118,49 @@ Responde SOLO con el JSON solicitado, sin explicaciones.`;
 - Slogan: ${slogan || "No proporcionado"}
 - Horario: ${businessHours || "No proporcionado"}${servicesContext}${photosContext}
 
-IMPORTANTE sobre el diseño:
-- heroStyle: elige el que mejor encaje con el negocio y sus fotos
-  · "fullscreen": imagen a pantalla completa con texto superpuesto (ideal si hay fotos)
-  · "split": mitad texto, mitad imagen, lado a lado
-  · "minimal-center": texto centrado sin imagen de fondo, muy limpio
-  · "text-left-image-right": asimétrico, texto grande a la izquierda
-  · "gradient-overlay": fondo con degradado de color intenso
+DECISIONES DE DISEÑO que debes tomar:
 
-- layoutStyle: la personalidad general
-  · "editorial": elegante, mucho espacio, tipografía grande
-  · "bold": colores intensos, contrastes fuertes, impactante
-  · "minimal": limpio, mucho blanco, preciso
-  · "organic": formas suaves, colores cálidos, natural
-  · "brutalist": raw, tipografía oversized, dramático
+1. PALETA DE COLORES (colors): Crea una paleta COMPLETA y ÚNICA.
+   - bg: color de fondo principal
+   - bgAlt: fondo de secciones alternas
+   - card: fondo de tarjetas
+   - text1: color de texto principal
+   - text2: color de texto secundario
+   - border: color de bordes
+   - accent: color de acento/marca (el más importante, define la identidad)
+   - accentText: texto sobre el acento
+   IMPORTANTE: Los colores deben ser COHERENTES entre sí y reflejar la personalidad del negocio.
 
-- fontPair: elige combinaciones que NO sean genéricas. Opciones de heading:
-  "Space Grotesk", "Playfair Display", "Clash Display", "Cabinet Grotesk", "Syne", "DM Serif Display", "Outfit", "Unbounded"
-  Body: "Inter", "DM Sans", "Satoshi", "General Sans", "Plus Jakarta Sans"
+2. darkMode: true/false - ¿es un sitio oscuro o claro? Decide según el negocio.
 
-- serviceLayout: varía según el número de servicios y el estilo
-- photoLayout: cómo se disponen las fotos del cliente
-- animationStyle: el estilo de animación de scroll
-- heroHeight: "full" (100vh), "tall" (85vh), "medium" (65vh)
-- borderRadius: "sharp" (4px), "rounded" (16-24px), "pill" (9999px)
-- accentGradient: si el estilo lo pide, un degradado CSS como "linear-gradient(135deg, #color1, #color2)". null si es mejor color sólido.
-- decorativeElements: true si el diseño se beneficia de formas abstractas decorativas
+3. heroStyle: elige el que mejor encaje
+   · "fullscreen": imagen a pantalla completa con texto superpuesto
+   · "split": mitad texto, mitad imagen
+   · "minimal-center": texto centrado, muy limpio
+   · "text-left-image-right": asimétrico
+   · "gradient-overlay": fondo con degradado de color intenso
 
-Devuelve el JSON con textos Y decisiones de diseño.`;
+4. layoutStyle: "editorial" | "bold" | "minimal" | "organic" | "brutalist"
+
+5. navStyle: "transparent" | "solid" | "minimal" | "centered" | "hidden"
+
+6. footerStyle: "minimal" | "columns" | "centered" | "banner"
+
+7. fontPair: combinaciones NO genéricas.
+   Headings: "Space Grotesk", "Playfair Display", "Syne", "DM Serif Display", "Outfit", "Unbounded"
+   Body: "Inter", "DM Sans", "Plus Jakarta Sans"
+
+8. sectionOrder: el ORDEN y SELECCIÓN de secciones. No uses siempre el mismo. Mínimo 3 secciones.
+
+9. serviceLayout: "cards" | "list" | "numbered-large" | "timeline"
+10. photoLayout: "masonry" | "fullbleed-alternating" | "grid" | "overlap-collage"
+11. animationStyle: "fade-up" | "slide-in" | "scale-pop" | "stagger-cascade"
+12. heroHeight: "full" | "tall" | "medium"
+13. borderRadius: "sharp" | "rounded" | "pill"
+14. accentGradient: CSS gradient o null
+15. decorativeElements: true/false
+
+Devuelve textos Y todas las decisiones de diseño.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -110,7 +179,7 @@ Devuelve el JSON con textos Y decisiones de diseño.`;
             type: "function",
             function: {
               name: "generate_web_content",
-              description: "Generate professional web content and design decisions for a unique business website",
+              description: "Generate unique web content and design decisions",
               parameters: {
                 type: "object",
                 properties: {
@@ -145,30 +214,7 @@ Devuelve el JSON con textos Y decisiones de diseño.`;
                   contactTitle: { type: "string" },
                   contactSubtitle: { type: "string" },
                   footerTagline: { type: "string" },
-                  design: {
-                    type: "object",
-                    properties: {
-                      heroStyle: { type: "string", enum: ["fullscreen", "split", "minimal-center", "text-left-image-right", "gradient-overlay"] },
-                      layoutStyle: { type: "string", enum: ["editorial", "bold", "minimal", "organic", "brutalist"] },
-                      fontPair: {
-                        type: "object",
-                        properties: {
-                          heading: { type: "string" },
-                          body: { type: "string" },
-                        },
-                        required: ["heading", "body"],
-                      },
-                      sectionOrder: { type: "array", items: { type: "string" } },
-                      serviceLayout: { type: "string", enum: ["cards", "list", "numbered-large", "timeline"] },
-                      photoLayout: { type: "string", enum: ["masonry", "fullbleed-alternating", "grid", "overlap-collage"] },
-                      animationStyle: { type: "string", enum: ["fade-up", "slide-in", "scale-pop", "stagger-cascade"] },
-                      heroHeight: { type: "string", enum: ["full", "tall", "medium"] },
-                      borderRadius: { type: "string", enum: ["sharp", "rounded", "pill"] },
-                      accentGradient: { type: ["string", "null"] },
-                      decorativeElements: { type: "boolean" },
-                    },
-                    required: ["heroStyle", "layoutStyle", "fontPair", "sectionOrder", "serviceLayout", "photoLayout", "animationStyle", "heroHeight", "borderRadius", "accentGradient", "decorativeElements"],
-                  },
+                  design: designSchema,
                 },
                 required: [
                   "heroHeadline", "heroSubtitle", "heroCta",
@@ -186,7 +232,20 @@ Devuelve el JSON con textos Y decisiones de diseño.`;
     });
 
     if (!response.ok) {
-      console.error("AI gateway error:", response.status);
+      const status = response.status;
+      if (status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Demasiadas solicitudes. Inténtalo de nuevo en unos segundos." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (status === 402) {
+        return new Response(
+          JSON.stringify({ error: "Créditos agotados. Contacta con soporte." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      console.error("AI gateway error:", status);
       return new Response(
         JSON.stringify({ error: "Error al generar el contenido. Inténtalo de nuevo." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -195,11 +254,11 @@ Devuelve el JSON con textos Y decisiones de diseño.`;
 
     const aiData = await response.json();
     const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    
+
     let content;
     if (toolCall?.function?.arguments) {
-      content = typeof toolCall.function.arguments === "string" 
-        ? JSON.parse(toolCall.function.arguments) 
+      content = typeof toolCall.function.arguments === "string"
+        ? JSON.parse(toolCall.function.arguments)
         : toolCall.function.arguments;
     } else {
       const msg = aiData.choices?.[0]?.message?.content || "";
