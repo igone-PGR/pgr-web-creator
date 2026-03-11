@@ -52,10 +52,12 @@ export type Database = {
           generated_content: Json | null
           id: string
           instagram: string | null
+          language: string
           logo: string | null
           paid: boolean
           phone: string | null
           photos: string[] | null
+          preferred_domain: string | null
           sector: string
           services_list: Json | null
           slogan: string | null
@@ -80,10 +82,12 @@ export type Database = {
           generated_content?: Json | null
           id?: string
           instagram?: string | null
+          language?: string
           logo?: string | null
           paid?: boolean
           phone?: string | null
           photos?: string[] | null
+          preferred_domain?: string | null
           sector: string
           services_list?: Json | null
           slogan?: string | null
@@ -108,10 +112,12 @@ export type Database = {
           generated_content?: Json | null
           id?: string
           instagram?: string | null
+          language?: string
           logo?: string | null
           paid?: boolean
           phone?: string | null
           photos?: string[] | null
+          preferred_domain?: string | null
           sector?: string
           services_list?: Json | null
           slogan?: string | null
