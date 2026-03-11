@@ -78,7 +78,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList, hasPhotos, photoCount } = GenerateContentSchema.parse(body);
+    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList, hasPhotos, photoCount, language } = GenerateContentSchema.parse(body);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("API key not configured");
