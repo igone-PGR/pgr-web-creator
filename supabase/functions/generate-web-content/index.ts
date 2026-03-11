@@ -24,6 +24,7 @@ const GenerateContentSchema = z.object({
   servicesList: z.array(ServiceSchema).max(50).optional().nullable(),
   hasPhotos: z.boolean().optional().default(false),
   photoCount: z.number().int().min(0).max(50).optional().default(0),
+  language: z.string().max(10).optional().default("es"),
 });
 
 const colorPaletteSchema = {
