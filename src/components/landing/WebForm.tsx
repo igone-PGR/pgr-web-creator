@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Upload, Plus, Trash2, ChevronDown, User, Mail, Phone } from "lucide-react";
+import { ArrowRight, Upload, Plus, Trash2, User, Mail, Globe } from "lucide-react";
 import type { ProjectData } from "@/types/project";
+import { LANGUAGES } from "@/types/project";
 
 interface WebFormProps {
   onSubmit: (data: ProjectData) => void;
@@ -34,10 +35,11 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     businessHours: "",
     servicesList: [] as { name: string; description: string }[],
     photos: [] as string[],
+    preferredDomain: "",
+    language: "es",
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [showExtras, setShowExtras] = useState(false);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -187,6 +189,12 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
               <Textarea id="description" placeholder="Cuéntanos sobre tu negocio, qué ofrecéis, qué os hace especiales..." value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} required />
             </div>
 
+            {/* Slogan */}
+            <div className="space-y-2">
+              <Label htmlFor="slogan">Slogan o lema</Label>
+              <Input id="slogan" placeholder="Ej: Donde el sabor se encuentra con la tradición" value={form.slogan} onChange={(e) => update("slogan", e.target.value)} />
+            </div>
+
             {/* Logo */}
             <div className="space-y-2">
               <Label>Logo (opcional)</Label>
@@ -203,6 +211,12 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
             <div className="space-y-2">
               <Label htmlFor="address">Dirección (opcional)</Label>
               <Input id="address" placeholder="C/ Gran Vía 1, Madrid" value={form.address} onChange={(e) => update("address", e.target.value)} />
+            </div>
+
+            {/* Business hours */}
+            <div className="space-y-2">
+              <Label htmlFor="businessHours">Horario de apertura</Label>
+              <Input id="businessHours" placeholder="Ej: Lunes a Viernes 9:00 - 20:00" value={form.businessHours} onChange={(e) => update("businessHours", e.target.value)} />
             </div>
 
             {/* Business email & WhatsApp phone for the website */}
@@ -228,80 +242,86 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                 <Input id="facebook" placeholder="facebook.com/tunegocio" value={form.facebook} onChange={(e) => update("facebook", e.target.value)} />
               </div>
             </div>
+
+            {/* Services list */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Servicios destacados</Label>
+                {form.servicesList.length < 6 && (
+                  <button type="button" onClick={addService} className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
+                    <Plus className="w-3.5 h-3.5" /> Añadir
+                  </button>
+                )}
+              </div>
+              {form.servicesList.map((service, idx) => (
+                <div key={idx} className="flex gap-2 items-start">
+                  <div className="flex-1 space-y-2">
+                    <Input placeholder="Nombre del servicio" value={service.name} onChange={(e) => updateService(idx, "name", e.target.value)} />
+                    <Input placeholder="Breve descripción" value={service.description} onChange={(e) => updateService(idx, "description", e.target.value)} />
+                  </div>
+                  <button type="button" onClick={() => removeService(idx)} className="p-2 text-muted-foreground hover:text-destructive transition-colors mt-1">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {form.servicesList.length === 0 && (
+                <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
+              )}
+            </div>
+
+            {/* Photos */}
+            <div className="space-y-2">
+              <Label>Fotos del negocio</Label>
+              <p className="text-xs text-muted-foreground -mt-1">Se usarán en la cabecera y como galería deslizante</p>
+              <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
+                <Upload className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Sube fotos de tu negocio (máx. 5)</span>
+                <input type="file" accept="image/*" multiple onChange={handlePhotosUpload} className="hidden" />
+              </label>
+              {form.photos.length > 0 && (
+                <div className="flex gap-2 flex-wrap mt-2">
+                  {form.photos.map((photo, idx) => (
+                    <div key={idx} className="relative group">
+                      <img src={photo} alt={`Foto ${idx + 1}`} className="w-20 h-20 object-cover rounded-lg" />
+                      <button type="button"
+                        onClick={() => setForm((f) => ({ ...f, photos: f.photos.filter((_, i) => i !== idx) }))}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                      >×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Extras toggle */}
-          <button type="button" onClick={() => setShowExtras(!showExtras)}
-            className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors w-full"
-          >
-            <ChevronDown className={`w-4 h-4 transition-transform ${showExtras ? "rotate-180" : ""}`} />
-            Datos adicionales para mejorar tu web
-          </button>
+          <div className="border-t border-border" />
 
-          {showExtras && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="space-y-6 pt-2">
-              {/* Slogan */}
-              <div className="space-y-2">
-                <Label htmlFor="slogan">Slogan o lema</Label>
-                <Input id="slogan" placeholder="Ej: Donde el sabor se encuentra con la tradición" value={form.slogan} onChange={(e) => update("slogan", e.target.value)} />
-              </div>
+          {/* ===== WEB CONFIG SECTION ===== */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-1">
+              <Globe className="w-4 h-4 text-accent" />
+              <h3 className="text-sm font-bold uppercase tracking-wider text-accent">Configuración de la web</h3>
+            </div>
 
-              {/* Business hours */}
-              <div className="space-y-2">
-                <Label htmlFor="businessHours">Horario de apertura</Label>
-                <Input id="businessHours" placeholder="Ej: Lunes a Viernes 9:00 - 20:00" value={form.businessHours} onChange={(e) => update("businessHours", e.target.value)} />
-              </div>
+            {/* Preferred domain */}
+            <div className="space-y-2">
+              <Label htmlFor="preferredDomain">Dominio preferido</Label>
+              <Input id="preferredDomain" placeholder="Ej: www.tunegocio.com" value={form.preferredDomain} onChange={(e) => update("preferredDomain", e.target.value)} />
+              <p className="text-xs text-muted-foreground">*Sujeto a disponibilidad</p>
+            </div>
 
-              {/* Services list */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label>Servicios destacados</Label>
-                  {form.servicesList.length < 6 && (
-                    <button type="button" onClick={addService} className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
-                      <Plus className="w-3.5 h-3.5" /> Añadir
-                    </button>
-                  )}
-                </div>
-                {form.servicesList.map((service, idx) => (
-                  <div key={idx} className="flex gap-2 items-start">
-                    <div className="flex-1 space-y-2">
-                      <Input placeholder="Nombre del servicio" value={service.name} onChange={(e) => updateService(idx, "name", e.target.value)} />
-                      <Input placeholder="Breve descripción" value={service.description} onChange={(e) => updateService(idx, "description", e.target.value)} />
-                    </div>
-                    <button type="button" onClick={() => removeService(idx)} className="p-2 text-muted-foreground hover:text-destructive transition-colors mt-1">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+            {/* Language selector */}
+            <div className="space-y-2">
+              <Label>Idioma de la web</Label>
+              <div className="flex flex-wrap gap-2">
+                {LANGUAGES.map((lang) => (
+                  <button key={lang.value} type="button" onClick={() => update("language", lang.value)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${form.language === lang.value ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
+                  >{lang.label}</button>
                 ))}
-                {form.servicesList.length === 0 && (
-                  <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
-                )}
               </div>
-
-              {/* Photos */}
-              <div className="space-y-2">
-                <Label>Fotos del negocio</Label>
-                <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
-                  <Upload className="w-5 h-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Sube fotos de tu negocio (máx. 5)</span>
-                  <input type="file" accept="image/*" multiple onChange={handlePhotosUpload} className="hidden" />
-                </label>
-                {form.photos.length > 0 && (
-                  <div className="flex gap-2 flex-wrap mt-2">
-                    {form.photos.map((photo, idx) => (
-                      <div key={idx} className="relative group">
-                        <img src={photo} alt={`Foto ${idx + 1}`} className="w-20 h-20 object-cover rounded-lg" />
-                        <button type="button"
-                          onClick={() => setForm((f) => ({ ...f, photos: f.photos.filter((_, i) => i !== idx) }))}
-                          className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        >×</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          )}
+            </div>
+          </div>
 
           <Button type="submit" variant="hero" size="lg" className="w-full text-base py-6" disabled={!isValid}>
             Generar mi web
@@ -311,6 +331,14 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
           <p className="text-xs text-center text-muted-foreground">
             Solo pagas si te gusta el resultado. Sin compromiso.
           </p>
+
+          {/* PGR Contact */}
+          <div className="text-center pt-2 border-t border-border">
+            <p className="text-xs text-muted-foreground">
+              ¿Dudas? Escríbenos a{" "}
+              <a href="mailto:hello@pgrdigital.tech" className="text-accent hover:underline font-medium">hello@pgrdigital.tech</a>
+            </p>
+          </div>
         </motion.form>
       </div>
     </section>
