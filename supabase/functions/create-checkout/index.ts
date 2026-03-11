@@ -32,6 +32,8 @@ const ProjectSchema = z.object({
   servicesList: z.array(ServiceSchema).max(50).optional().default([]),
   colorScheme: z.string().max(50).optional().default("Coral"),
   darkMode: z.boolean().optional().default(false),
+  preferredDomain: z.string().max(253).optional().nullable(),
+  language: z.string().max(10).optional().default("es"),
 });
 
 const CheckoutRequestSchema = z.object({
@@ -75,12 +77,17 @@ serve(async (req) => {
         color_scheme: project.colorScheme || "Coral",
         dark_mode: project.darkMode || false,
         generated_content: generatedContent,
+        preferred_domain: project.preferredDomain || null,
+        language: project.language || "es",
         paid: false,
       })
       .select("id")
       .single();
 
-    if (dbError) throw new Error("Database error");
+    if (dbError) {
+      console.error("DB error:", dbError);
+      throw new Error("Database error");
+    }
 
     // Create Stripe checkout session
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -111,6 +118,7 @@ serve(async (req) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("Zod validation error:", JSON.stringify(error.errors));
       return new Response(
         JSON.stringify({ error: "Datos del formulario inválidos. Revisa los campos e inténtalo de nuevo." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -118,7 +126,7 @@ serve(async (req) => {
     }
     console.error("create-checkout error:", error);
     return new Response(
-      JSON.stringify({ error: "No se pudo procesar la solicitud. Inténtalo de nuevo." }),
+      JSON.stringify({ error: error?.message || "No se pudo procesar la solicitud. Inténtalo de nuevo." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

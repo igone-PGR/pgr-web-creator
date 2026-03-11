@@ -17,6 +17,8 @@ export interface ProjectData {
   businessHours?: string;
   servicesList?: { name: string; description: string }[];
   photos?: string[];
+  preferredDomain?: string;
+  language?: string;
 }
 
 export const COLOR_SCHEMES = [
@@ -26,4 +28,11 @@ export const COLOR_SCHEMES = [
   { name: "Violeta", primary: "#8B5CF6", secondary: "#F5F3FF" },
   { name: "Rosa", primary: "#EC4899", secondary: "#FDF2F8" },
   { name: "Ámbar", primary: "#F59E0B", secondary: "#FFFBEB" },
+] as const;
+
+export const LANGUAGES = [
+  { value: "es", label: "Español" },
+  { value: "en", label: "English" },
+  { value: "fr", label: "Français" },
+  { value: "multi", label: "Multilingüe" },
 ] as const;

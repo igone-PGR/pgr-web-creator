@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, CreditCard, Instagram, Facebook,
   Mail, Phone, MapPin, MessageCircle, ArrowUpRight, Loader2,
   Clock, Sparkles, Check, Star, Zap, Heart, Shield, Award,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProjectData } from "@/types/project";
@@ -40,13 +41,13 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [content, setContent] = useState<WebContent>(DEFAULT_CONTENT);
   const [isGenerating, setIsGenerating] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const { toast } = useToast();
 
   const heroImage = SECTOR_IMAGES[project.sector] || SECTOR_IMAGES["Otro"];
   const design: DesignDecisions = content.design || DEFAULT_DESIGN;
   const colors: ColorPalette = design.colors || DEFAULT_COLORS;
 
-  // Use AI-generated colors
   const bg = colors.bg;
   const bgAlt = colors.bgAlt;
   const card = colors.card;
@@ -64,6 +65,9 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const headingFont = design.fontPair.heading || "Space Grotesk";
   const bodyFont = design.fontPair.body || "Inter";
 
+  const photos = project.photos || [];
+  const hasPhotos = photos.length > 0;
+
   useEffect(() => {
     const fonts = [design.fontPair.heading, design.fontPair.body];
     const unique = [...new Set(fonts)];
@@ -76,6 +80,15 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   }, [design.fontPair]);
 
   useEffect(() => { generateContent(); }, []);
+
+  // Auto-advance slider
+  useEffect(() => {
+    if (photos.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % photos.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [photos.length]);
 
   const generateContent = async () => {
     try {
@@ -90,8 +103,9 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           slogan: project.slogan,
           businessHours: project.businessHours,
           servicesList: project.servicesList,
-          hasPhotos: (project.photos?.length || 0) > 0,
-          photoCount: project.photos?.length || 0,
+          hasPhotos: hasPhotos,
+          photoCount: photos.length,
+          language: project.language || "es",
         },
       });
       if (error) throw error;
@@ -106,8 +120,10 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
+      // Strip photos (base64) from the checkout payload to avoid body size limits
+      const { photos: _photos, logo: _logo, ...projectWithoutBinaries } = project;
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
-        body: { project: { ...project }, generatedContent: content },
+        body: { project: { ...projectWithoutBinaries, logo: null }, generatedContent: content },
       });
       if (error) throw error;
       if (result?.url) {
@@ -141,8 +157,55 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     }
   };
 
+  // ====== PHOTO SLIDER ======
+  const renderPhotoSlider = () => {
+    if (!hasPhotos || photos.length <= 1) return null;
+    return (
+      <section className="relative overflow-hidden" style={{ backgroundColor: bgAlt }}>
+        <div className="relative w-full" style={{ height: "60vh" }}>
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={currentSlide}
+              src={photos[currentSlide]}
+              alt={`${project.businessName} ${currentSlide + 1}`}
+              className="absolute inset-0 w-full h-full object-cover"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+            />
+          </AnimatePresence>
+          {/* Slider controls */}
+          <div className="absolute inset-0 flex items-center justify-between px-4 z-10">
+            <button onClick={() => setCurrentSlide((prev) => (prev - 1 + photos.length) % photos.length)}
+              className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all hover:scale-110"
+              style={{ backgroundColor: `${bg}99` }}>
+              <ChevronLeft className="w-5 h-5" style={{ color: text1 }} />
+            </button>
+            <button onClick={() => setCurrentSlide((prev) => (prev + 1) % photos.length)}
+              className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all hover:scale-110"
+              style={{ backgroundColor: `${bg}99` }}>
+              <ChevronRight className="w-5 h-5" style={{ color: text1 }} />
+            </button>
+          </div>
+          {/* Dots */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+            {photos.map((_, i) => (
+              <button key={i} onClick={() => setCurrentSlide(i)}
+                className="w-2 h-2 rounded-full transition-all"
+                style={{ backgroundColor: i === currentSlide ? accent : `${bg}80` }} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  };
+
   // ====== HERO ======
   const renderHero = () => {
+    // Use first photo as hero image
+    const heroImg = photos[0] || heroImage;
+
     switch (design.heroStyle) {
       case "split":
         return (
@@ -167,7 +230,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               </motion.div>
             </div>
             <div className="flex-1 relative min-h-[40vh]">
-              <img src={project.photos?.[0] || heroImage} alt={project.sector} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={heroImg} alt={project.sector} className="absolute inset-0 w-full h-full object-cover" />
             </div>
           </section>
         );
@@ -217,7 +280,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               </div>
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.5 }}
                 className="lg:col-span-5 aspect-[3/4] overflow-hidden" style={{ borderRadius: radius }}>
-                <img src={project.photos?.[0] || heroImage} alt={project.sector} className="w-full h-full object-cover" />
+                <img src={heroImg} alt={project.sector} className="w-full h-full object-cover" />
               </motion.div>
             </div>
           </section>
@@ -253,7 +316,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         return (
           <section className="relative overflow-hidden">
             <div className="w-full relative" style={{ height: heroH }}>
-              <img src={project.photos?.[0] || heroImage} alt={project.sector} className="absolute inset-0 w-full h-full object-cover" />
+              <img src={heroImg} alt={project.sector} className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute inset-0" style={{
                 background: design.darkMode
                   ? `linear-gradient(180deg, ${bg}33 0%, ${bg}f2 100%)`
@@ -319,70 +382,16 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           className="text-xs font-bold uppercase tracking-[0.3em] mb-8" style={{ color: accent, fontFamily: bodyFont }}>{content.aboutTitle}</motion.p>
         <motion.p {...getAnim(1)}
           contentEditable suppressContentEditableWarning
-          className={`font-bold leading-[1.1] tracking-tight max-w-5xl outline-none ${design.layoutStyle === "brutalist" ? "text-4xl md:text-6xl lg:text-8xl" : "text-3xl md:text-5xl lg:text-6xl"}`}
+          className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug tracking-tight max-w-5xl outline-none"
           style={{ fontFamily: headingFont }}>{content.aboutText}</motion.p>
       </div>
     </section>
   );
 
-  // ====== PHOTOS ======
+  // ====== PHOTOS (slider only) ======
   const renderPhotos = () => {
-    if (!project.photos || project.photos.length === 0) return null;
-    switch (design.photoLayout) {
-      case "fullbleed-alternating":
-        return (
-          <section className="py-8">
-            {project.photos.map((photo, i) => (
-              <motion.div key={i} {...getAnim(i)} className={`w-full ${i % 2 === 0 ? "" : "max-w-5xl mx-auto px-6"}`}>
-                <div className={`overflow-hidden ${i % 2 === 0 ? "aspect-[21/9]" : "aspect-[16/9]"}`} style={{ borderRadius: i % 2 === 0 ? "0" : radius }}>
-                  <img src={photo} alt={`${project.businessName} ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000" />
-                </div>
-              </motion.div>
-            ))}
-          </section>
-        );
-      case "masonry":
-        return (
-          <section className="max-w-7xl mx-auto px-6 md:px-12 py-16">
-            <div className="columns-2 md:columns-3 gap-4 space-y-4">
-              {project.photos.map((photo, i) => (
-                <motion.div key={i} {...getAnim(i)} className="break-inside-avoid overflow-hidden" style={{ borderRadius: radius }}>
-                  <img src={photo} alt={`${project.businessName} ${i + 1}`} className="w-full object-cover hover:scale-105 transition-transform duration-700" />
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        );
-      case "overlap-collage":
-        return (
-          <section className="max-w-6xl mx-auto px-6 md:px-12 py-16 relative" style={{ minHeight: "500px" }}>
-            <div className="relative" style={{ height: `${Math.min(project.photos.length * 150 + 200, 600)}px` }}>
-              {project.photos.map((photo, i) => (
-                <motion.div key={i} {...getAnim(i)} className="absolute shadow-2xl overflow-hidden"
-                  style={{
-                    borderRadius: radius, width: i === 0 ? "60%" : "45%", aspectRatio: i === 0 ? "4/3" : "3/4",
-                    top: `${i * 15}%`, left: i % 2 === 0 ? `${i * 5}%` : "auto", right: i % 2 !== 0 ? `${i * 3}%` : "auto",
-                    zIndex: project.photos!.length - i,
-                  }}>
-                  <img src={photo} alt={`${project.businessName} ${i + 1}`} className="w-full h-full object-cover" />
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        );
-      default:
-        return (
-          <section className="max-w-7xl mx-auto px-6 md:px-12 py-16">
-            <div className={`grid gap-4 ${project.photos.length === 1 ? "grid-cols-1" : project.photos.length === 2 ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3"}`}>
-              {project.photos.map((photo, i) => (
-                <motion.div key={i} {...getAnim(i)} className="aspect-[4/3] overflow-hidden" style={{ borderRadius: radius }}>
-                  <img src={photo} alt={`${project.businessName} ${i + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        );
-    }
+    if (!hasPhotos) return null;
+    return renderPhotoSlider();
   };
 
   // ====== SERVICES ======
@@ -396,8 +405,8 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               {content.services.map((service, i) => (
                 <motion.div key={i} {...getAnim(i)} className="group py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-center gap-6">
-                    <span className="text-5xl font-black tracking-tighter opacity-20" style={{ color: accent, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
-                    <h3 contentEditable suppressContentEditableWarning className="text-2xl font-bold outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
+                    <span className="text-3xl font-black tracking-tighter opacity-20" style={{ color: accent, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
+                    <h3 contentEditable suppressContentEditableWarning className="text-lg font-bold outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
                   </div>
                   <p contentEditable suppressContentEditableWarning className="text-sm max-w-md leading-relaxed outline-none md:text-right" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
                 </motion.div>
@@ -412,10 +421,10 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
             <div className="mt-12 space-y-16">
               {content.services.map((service, i) => (
                 <motion.div key={i} {...getAnim(i)} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                  <span className="md:col-span-2 text-8xl font-black tracking-tighter" style={{ color: `${accent}20`, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
+                  <span className="md:col-span-2 text-6xl font-black tracking-tighter" style={{ color: `${accent}20`, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
                   <div className="md:col-span-10">
-                    <h3 contentEditable suppressContentEditableWarning className="text-3xl font-bold mb-4 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
-                    <p contentEditable suppressContentEditableWarning className="text-base leading-relaxed max-w-2xl outline-none" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
+                    <h3 contentEditable suppressContentEditableWarning className="text-xl font-bold mb-3 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
+                    <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed max-w-2xl outline-none" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -431,18 +440,18 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               {content.services.map((service, i) => (
                 <motion.div key={i} {...getAnim(i)} className="relative pl-16 pb-12 last:pb-0">
                   <div className="absolute left-4 top-1 w-5 h-5 rounded-full border-2" style={{ borderColor: accent, backgroundColor: card }} />
-                  <h3 contentEditable suppressContentEditableWarning className="text-lg font-bold mb-2 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
+                  <h3 contentEditable suppressContentEditableWarning className="text-base font-bold mb-2 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
                   <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
                 </motion.div>
               ))}
             </div>
           </section>
         );
-      default:
+      default: // cards
         return (
           <section id="services" className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
             <motion.p {...getAnim()} className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: accent }}>{content.servicesTitle}</motion.p>
-            <motion.h2 {...getAnim(1)} className="text-3xl md:text-4xl font-bold mb-14 tracking-tight" style={{ fontFamily: headingFont }}>
+            <motion.h2 {...getAnim(1)} className="text-2xl md:text-3xl font-bold mb-14 tracking-tight" style={{ fontFamily: headingFont }}>
               Lo que ofrecemos
             </motion.h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -450,10 +459,10 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
                 <motion.div key={i} {...getAnim(i)} className="group p-8 transition-all hover:shadow-lg"
                   style={{ border: `1px solid ${border}`, backgroundColor: card, borderRadius: radius }}>
                   <div className="flex items-start justify-between mb-5">
-                    <span className="text-4xl font-black tracking-tighter" style={{ color: `${accent}30`, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
+                    <span className="text-3xl font-black tracking-tighter" style={{ color: `${accent}30`, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
                     <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: accent }} />
                   </div>
-                  <h3 contentEditable suppressContentEditableWarning className="text-lg font-bold mb-2 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
+                  <h3 contentEditable suppressContentEditableWarning className="text-base font-bold mb-2 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
                   <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
                 </motion.div>
               ))}
@@ -471,7 +480,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           <div>
             <motion.p {...getAnim()} className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: accent }}>{content.contactTitle}</motion.p>
             <motion.h2 {...getAnim(1)} contentEditable suppressContentEditableWarning
-              className="text-3xl md:text-5xl font-bold mb-8 tracking-tight leading-tight outline-none" style={{ fontFamily: headingFont }}>{content.contactSubtitle}</motion.h2>
+              className="text-3xl md:text-4xl font-bold mb-8 tracking-tight leading-tight outline-none" style={{ fontFamily: headingFont }}>{content.contactSubtitle}</motion.h2>
             <div className="space-y-5 mt-10">
               {(project.businessEmail || project.email) && (
                 <a href={`mailto:${project.businessEmail || project.email}`} className="flex items-center gap-4 group">
@@ -711,11 +720,16 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           <Button variant="ghost" size="sm" onClick={onBack} className="text-xs gap-1.5">
             <ArrowLeft className="w-3.5 h-3.5" /> Volver
           </Button>
-          <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm" className="text-xs font-semibold rounded-full px-5"
-            style={{ backgroundColor: accent, color: accentText }}>
-            {isCheckingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <CreditCard className="w-3.5 h-3.5 mr-1.5" />}
-            Publicar · 500€
-          </Button>
+          <div className="flex items-center gap-3">
+            <a href="mailto:hello@pgrdigital.tech" className="text-xs hover:underline" style={{ color: text2 }}>
+              hello@pgrdigital.tech
+            </a>
+            <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm" className="text-xs font-semibold rounded-full px-5"
+              style={{ backgroundColor: accent, color: accentText }}>
+              {isCheckingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <CreditCard className="w-3.5 h-3.5 mr-1.5" />}
+              Publicar · 500€
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -755,12 +769,18 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         </a>
       )}
 
-      {/* Edit hint */}
-      <div className="fixed bottom-6 left-6 z-50">
-        <div className="backdrop-blur-xl border px-4 py-2 text-xs shadow-lg" style={{ backgroundColor: `${card}dd`, borderColor: border, color: text2, borderRadius: radius }}>
-          💡 Haz clic en los textos para editarlos
+      {/* Edit hint - more visible */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2, duration: 0.5 }}
+        className="fixed bottom-6 left-6 z-50"
+      >
+        <div className="flex items-center gap-3 px-5 py-3 text-sm font-semibold shadow-2xl border-2"
+          style={{ backgroundColor: accent, color: accentText, borderColor: accent, borderRadius: radius }}>
+          ✏️ Haz clic en cualquier texto para editarlo antes de publicar
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

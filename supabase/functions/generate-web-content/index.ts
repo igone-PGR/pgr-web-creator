@@ -24,6 +24,7 @@ const GenerateContentSchema = z.object({
   servicesList: z.array(ServiceSchema).max(50).optional().nullable(),
   hasPhotos: z.boolean().optional().default(false),
   photoCount: z.number().int().min(0).max(50).optional().default(0),
+  language: z.string().max(10).optional().default("es"),
 });
 
 const colorPaletteSchema = {
@@ -77,13 +78,20 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList, hasPhotos, photoCount } = GenerateContentSchema.parse(body);
+    const { businessName, description, sector, address, phone, email, slogan, businessHours, servicesList, hasPhotos, photoCount, language } = GenerateContentSchema.parse(body);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("API key not configured");
 
+    const langMap: Record<string, string> = {
+      es: "español", en: "inglés (English)", fr: "francés (Français)", multi: "multilingüe (secciones en español con traducción al inglés y francés)",
+    };
+    const langInstruction = `IDIOMA: Escribe TODOS los textos de la web en ${langMap[language || "es"] || "español"}.`;
+
     const systemPrompt = `Eres un diseñador web y copywriter de élite. Tu trabajo es crear webs RADICALMENTE DIFERENTES y memorables para cada negocio.
 CADA WEB DEBE SER TOTALMENTE ÚNICA. No hay plantilla. Tú decides TODO: colores, si es oscura o clara, la estructura, el orden de las secciones, qué secciones incluir o excluir.
+
+${langInstruction}
 
 REGLAS DE DISEÑO LIBRE:
 - Elige una paleta de colores COMPLETA y ÚNICA para cada negocio. No uses siempre los mismos colores.
@@ -96,6 +104,7 @@ REGLAS DE DISEÑO LIBRE:
 - Varía footerStyle: "minimal" (una línea), "columns" (info organizada en columnas), "centered" (centrado con tagline), "banner" (gran banner de cierre).
 - Experimenta con combinaciones tipográficas arriesgadas.
 - Los colores del accent deben tener buen contraste con accentText.
+- Los textos de servicios deben ser concisos y de tamaño estándar, NUNCA como cabeceras grandes.
 - Piensa como un diseñador de Dribbble/Awwwards: cada web debe sorprender.
 Responde SOLO con el JSON solicitado, sin explicaciones.`;
 
