@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
-import { FileText, Eye, CreditCard, Rocket } from "lucide-react";
+import { FileText, Eye, Rocket } from "lucide-react";
 
 const steps = [
-  { icon: FileText, title: "Rellena el formulario", description: "Nombre, descripción, logo y datos de contacto" },
-  { icon: Eye, title: "Previsualiza tu web", description: "Generamos una web profesional al instante" },
-  { icon: CreditCard, title: "Paga y publica", description: "Solo 500€ para tener tu web online" },
-  { icon: Rocket, title: "¡Tu web está lista!", description: "Nosotras nos encargamos del resto" },
+  { icon: FileText, num: "01", title: "Rellena el formulario", description: "Introduce los datos de tu negocio: nombre, sector, servicios, fotos y estilo visual." },
+  { icon: Eye, num: "02", title: "Revisa tu web", description: "Visualiza una preview completa y edita textos, imágenes y colores a tu gusto." },
+  { icon: Rocket, num: "03", title: "Publica tu web", description: "Realiza el pago y tu web estará online en segundos con tu propio dominio." },
 ];
 
 const HowItWorks = () => {
@@ -23,11 +22,11 @@ const HowItWorks = () => {
             Así de <span className="text-gradient">fácil</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-md mx-auto">
-            4 pasos y tu negocio tendrá presencia profesional en internet
+            3 pasos y tu negocio tendrá presencia profesional en internet
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {steps.map((step, i) => (
             <motion.div
               key={step.title}
@@ -37,12 +36,11 @@ const HowItWorks = () => {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="text-center"
             >
-              <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
-                <step.icon className="w-7 h-7 text-accent" />
+              <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-content mx-auto mb-5 text-accent-foreground font-bold text-lg flex items-center justify-center">
+                {step.num}
               </div>
-              <div className="text-xs font-bold text-accent mb-2">Paso {i + 1}</div>
               <h3 className="text-lg font-bold mb-2">{step.title}</h3>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
             </motion.div>
           ))}
         </div>
