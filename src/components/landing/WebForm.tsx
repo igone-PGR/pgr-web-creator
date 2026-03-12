@@ -333,6 +333,43 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                         <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
                       )}
                     </div>
+
+                    {/* Corporate Colors */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label>Colores corporativos</Label>
+                          <p className="text-xs text-muted-foreground mt-0.5">Añade los colores de tu marca para personalizar la web</p>
+                        </div>
+                        {form.corporateColors.length < 5 && (
+                          <button type="button" onClick={addCorporateColor} className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
+                            <Plus className="w-3.5 h-3.5" /> Añadir
+                          </button>
+                        )}
+                      </div>
+                      {form.corporateColors.length > 0 && (
+                        <div className="flex flex-wrap gap-3">
+                          {form.corporateColors.map((color, idx) => (
+                            <div key={idx} className="flex items-center gap-2 bg-secondary rounded-lg px-3 py-2">
+                              <input
+                                type="color"
+                                value={color}
+                                onChange={(e) => updateCorporateColor(idx, e.target.value)}
+                                className="w-8 h-8 rounded-md border border-border cursor-pointer"
+                                style={{ padding: 0 }}
+                              />
+                              <span className="text-xs font-mono text-muted-foreground uppercase">{color}</span>
+                              <button type="button" onClick={() => removeCorporateColor(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {form.corporateColors.length === 0 && (
+                        <p className="text-xs text-muted-foreground">Si no añades colores, la IA elegirá una paleta ideal para tu sector</p>
+                      )}
+                    </div>
                   </div>
                 )}
 
