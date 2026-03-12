@@ -43,6 +43,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     servicesList: [] as { name: string; description: string }[],
     photos: [] as string[],
     preferredDomain: "",
+    corporateColors: [] as string[],
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
