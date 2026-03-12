@@ -100,8 +100,15 @@ serve(async (req) => {
         console.error("Failed to send admin notification email:", emailError);
       }
 
+      // Fetch deployed URL
+      const { data: updatedProject } = await supabaseAdmin
+        .from("projects")
+        .select("vercel_url")
+        .eq("id", project_id)
+        .single();
+
       return new Response(
-        JSON.stringify({ success: true, paid: true }),
+        JSON.stringify({ success: true, paid: true, deployed_url: updatedProject?.vercel_url || null }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
