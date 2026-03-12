@@ -54,7 +54,15 @@ const PaymentSuccess = () => {
             <CheckCircle className="w-16 h-16 mx-auto text-green-500" />
             <h1 className="text-2xl font-bold">¡Pago completado!</h1>
             <p className="text-muted-foreground">
-              Hemos recibido tu pago. Nuestro equipo se pondrá en marcha para crear tu web profesional.
+              Hemos recibido tu pago. Tu web se está desplegando automáticamente.
+            </p>
+            {deployedUrl && (
+              <a href={deployedUrl} target="_blank" rel="noopener noreferrer"
+                className="inline-block mt-2 text-accent font-semibold underline">
+                🌐 {deployedUrl}
+              </a>
+            )}
+            <p className="text-sm text-muted-foreground mt-2">
               Te contactaremos por email con los próximos pasos.
             </p>
             <Link to="/">
