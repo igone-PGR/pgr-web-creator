@@ -44,7 +44,27 @@ serve(async (req) => {
         })
         .eq("id", project_id);
 
-      // Fetch project details for email
+      // Trigger automatic deployment to Vercel
+      try {
+        const deployUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/deploy-to-vercel`;
+        const deployRes = await fetch(deployUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+          },
+          body: JSON.stringify({ project_id }),
+        });
+        const deployData = await deployRes.json();
+        if (deployData.success) {
+          console.log(`Auto-deployed to: ${deployData.url}`);
+        } else {
+          console.error("Auto-deploy failed:", deployData.error);
+        }
+      } catch (deployErr) {
+        console.error("Failed to trigger auto-deploy:", deployErr);
+      }
+
       const { data: project } = await supabaseAdmin
         .from("projects")
         .select("business_name, email, sector, contact_name, phone")
