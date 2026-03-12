@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
+  const [deployedUrl, setDeployedUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const sessionId = searchParams.get("session_id");
@@ -24,7 +25,12 @@ const PaymentSuccess = () => {
           body: { session_id: sessionId, project_id: projectId },
         });
         if (error) throw error;
-        setStatus(data?.paid ? "success" : "error");
+        if (data?.paid) {
+          setStatus("success");
+          if (data?.deployed_url) setDeployedUrl(data.deployed_url);
+        } else {
+          setStatus("error");
+        }
       } catch {
         setStatus("error");
       }
