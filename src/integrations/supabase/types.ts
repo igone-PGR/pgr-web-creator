@@ -65,6 +65,8 @@ export type Database = {
           stripe_payment_status: string | null
           stripe_session_id: string | null
           trello_card_id: string | null
+          vercel_project_id: string | null
+          vercel_url: string | null
         }
         Insert: {
           address?: string | null
@@ -95,6 +97,8 @@ export type Database = {
           stripe_payment_status?: string | null
           stripe_session_id?: string | null
           trello_card_id?: string | null
+          vercel_project_id?: string | null
+          vercel_url?: string | null
         }
         Update: {
           address?: string | null
@@ -125,6 +129,8 @@ export type Database = {
           stripe_payment_status?: string | null
           stripe_session_id?: string | null
           trello_card_id?: string | null
+          vercel_project_id?: string | null
+          vercel_url?: string | null
         }
         Relationships: []
       }
