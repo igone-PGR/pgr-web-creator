@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, Upload, Plus, Trash2, User, Mail, Globe } from "lucide-react";
+import { ArrowRight, ArrowLeft, Upload, Plus, Trash2, User, Building2, Palette, Settings } from "lucide-react";
 import type { ProjectData } from "@/types/project";
-import { LANGUAGES } from "@/types/project";
 
 interface WebFormProps {
   onSubmit: (data: ProjectData) => void;
@@ -17,7 +16,15 @@ const SECTORS = [
   "Fitness", "Educación", "Salud", "Comercio", "Fotografía", "Otro",
 ];
 
+const STEPS = [
+  { key: "contacto", label: "Contacto", icon: User },
+  { key: "negocio", label: "Negocio", icon: Building2 },
+  { key: "diseno", label: "Diseño", icon: Palette },
+  { key: "config", label: "Configuración", icon: Settings },
+];
+
 const WebForm = ({ onSubmit }: WebFormProps) => {
+  const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     businessName: "",
     description: "",
@@ -36,7 +43,6 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     servicesList: [] as { name: string; description: string }[],
     photos: [] as string[],
     preferredDomain: "",
-    language: "es",
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -97,12 +103,23 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
       darkMode: false,
       servicesList: form.servicesList.filter((s) => s.name.trim()),
       photos: form.photos,
+      language: "es",
     } as any);
   };
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
-  const isValid = form.businessName && form.description && form.sector && form.email && form.contactName;
+  const canAdvance = () => {
+    switch (step) {
+      case 0: return !!(form.contactName && form.email);
+      case 1: return !!(form.businessName && form.sector && form.description);
+      case 2: return true;
+      case 3: return true;
+      default: return false;
+    }
+  };
+
+  const isLastStep = step === STEPS.length - 1;
 
   return (
     <section id="formulario" className="py-24 md:py-32">
@@ -128,212 +145,248 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
           onSubmit={handleSubmit}
-          className="max-w-2xl mx-auto space-y-8 bg-card p-8 md:p-10 rounded-2xl shadow-elevated"
+          className="max-w-3xl mx-auto bg-card rounded-2xl shadow-elevated overflow-hidden"
         >
-          {/* ===== CONTACT SECTION ===== */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-1">
-              <User className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-accent">Tus datos de contacto</h3>
-            </div>
-            <p className="text-xs text-muted-foreground -mt-2">Esta información es solo para que podamos contactarte tras la compra. No aparecerá en tu web.</p>
-
-            <div className="space-y-2">
-              <Label htmlFor="contactName">Nombre de contacto *</Label>
-              <Input id="contactName" placeholder="Ej: María García" value={form.contactName} onChange={(e) => update("contactName", e.target.value)} required />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input id="email" type="email" placeholder="tu@email.com" value={form.email} onChange={(e) => update("email", e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Teléfono</Label>
-                <Input id="phone" placeholder="+34 600 000 000" value={form.phone} onChange={(e) => update("phone", e.target.value)} />
-              </div>
-            </div>
+          {/* Step indicator */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3 py-6 px-4 border-b border-border">
+            {STEPS.map((s, i) => {
+              const Icon = s.icon;
+              const isActive = i === step;
+              const isDone = i < step;
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  onClick={() => { if (isDone) setStep(i); }}
+                  className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
+                    isActive
+                      ? "bg-accent text-accent-foreground shadow-accent"
+                      : isDone
+                        ? "bg-accent/10 text-accent cursor-pointer hover:bg-accent/20"
+                        : "bg-secondary text-muted-foreground"
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{s.label}</span>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="border-t border-border" />
-
-          {/* ===== WEB DATA SECTION ===== */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Mail className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-accent">Datos de tu negocio</h3>
-            </div>
-            <p className="text-xs text-muted-foreground -mt-4">Esta información se usará para generar el contenido de tu web.</p>
-
-            {/* Business name */}
-            <div className="space-y-2">
-              <Label htmlFor="businessName">Nombre del negocio *</Label>
-              <Input id="businessName" placeholder="Ej: Café Libertad" value={form.businessName} onChange={(e) => update("businessName", e.target.value)} required />
-            </div>
-
-            {/* Sector */}
-            <div className="space-y-2">
-              <Label>Sector *</Label>
-              <div className="flex flex-wrap gap-2">
-                {SECTORS.map((s) => (
-                  <button key={s} type="button" onClick={() => update("sector", s)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${form.sector === s ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
-                  >{s}</button>
-                ))}
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description">Descripción del negocio *</Label>
-              <Textarea id="description" placeholder="Cuéntanos sobre tu negocio, qué ofrecéis, qué os hace especiales..." value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} required />
-            </div>
-
-            {/* Slogan */}
-            <div className="space-y-2">
-              <Label htmlFor="slogan">Slogan o lema</Label>
-              <Input id="slogan" placeholder="Ej: Donde el sabor se encuentra con la tradición" value={form.slogan} onChange={(e) => update("slogan", e.target.value)} />
-            </div>
-
-            {/* Logo */}
-            <div className="space-y-2">
-              <Label>Logo (opcional)</Label>
-              <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
-                {logoPreview ? (
-                  <img src={logoPreview} alt="Logo" className="w-16 h-16 object-contain rounded-lg" />
-                ) : (
-                  <><Upload className="w-5 h-5 text-muted-foreground" /><span className="text-sm text-muted-foreground">Sube tu logo</span></>
-                )}
-                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-              </label>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="address">Dirección (opcional)</Label>
-              <Input id="address" placeholder="C/ Gran Vía 1, Madrid" value={form.address} onChange={(e) => update("address", e.target.value)} />
-            </div>
-
-            {/* Business hours */}
-            <div className="space-y-2">
-              <Label htmlFor="businessHours">Horario de apertura</Label>
-              <Input id="businessHours" placeholder="Ej: Lunes a Viernes 9:00 - 20:00" value={form.businessHours} onChange={(e) => update("businessHours", e.target.value)} />
-            </div>
-
-            {/* Business email & WhatsApp phone for the website */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="businessEmail">Email corporativo (para tu web)</Label>
-                <Input id="businessEmail" type="email" placeholder="info@tunegocio.com" value={form.businessEmail} onChange={(e) => update("businessEmail", e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="businessPhone">Teléfono WhatsApp (para tu web)</Label>
-                <Input id="businessPhone" placeholder="+34 600 000 000" value={form.businessPhone} onChange={(e) => update("businessPhone", e.target.value)} />
-              </div>
-            </div>
-
-            {/* Social */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="instagram">Instagram</Label>
-                <Input id="instagram" placeholder="@tunegocio" value={form.instagram} onChange={(e) => update("instagram", e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="facebook">Facebook</Label>
-                <Input id="facebook" placeholder="facebook.com/tunegocio" value={form.facebook} onChange={(e) => update("facebook", e.target.value)} />
-              </div>
-            </div>
-
-            {/* Services list */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label>Servicios destacados</Label>
-                {form.servicesList.length < 6 && (
-                  <button type="button" onClick={addService} className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
-                    <Plus className="w-3.5 h-3.5" /> Añadir
-                  </button>
-                )}
-              </div>
-              {form.servicesList.map((service, idx) => (
-                <div key={idx} className="flex gap-2 items-start">
-                  <div className="flex-1 space-y-2">
-                    <Input placeholder="Nombre del servicio" value={service.name} onChange={(e) => updateService(idx, "name", e.target.value)} />
-                    <Input placeholder="Breve descripción" value={service.description} onChange={(e) => updateService(idx, "description", e.target.value)} />
-                  </div>
-                  <button type="button" onClick={() => removeService(idx)} className="p-2 text-muted-foreground hover:text-destructive transition-colors mt-1">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-              {form.servicesList.length === 0 && (
-                <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
-              )}
-            </div>
-
-            {/* Photos */}
-            <div className="space-y-2">
-              <Label>Fotos del negocio</Label>
-              <p className="text-xs text-muted-foreground -mt-1">Se usarán en la cabecera y como galería deslizante</p>
-              <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
-                <Upload className="w-5 h-5 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Sube fotos de tu negocio (máx. 5)</span>
-                <input type="file" accept="image/*" multiple onChange={handlePhotosUpload} className="hidden" />
-              </label>
-              {form.photos.length > 0 && (
-                <div className="flex gap-2 flex-wrap mt-2">
-                  {form.photos.map((photo, idx) => (
-                    <div key={idx} className="relative group">
-                      <img src={photo} alt={`Foto ${idx + 1}`} className="w-20 h-20 object-cover rounded-lg" />
-                      <button type="button"
-                        onClick={() => setForm((f) => ({ ...f, photos: f.photos.filter((_, i) => i !== idx) }))}
-                        className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                      >×</button>
+          {/* Step content */}
+          <div className="p-8 md:p-10 min-h-[400px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.25 }}
+              >
+                {step === 0 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">Datos de contacto</h3>
+                      <p className="text-sm text-muted-foreground">Tu información personal para contacto.</p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contactName">Nombre *</Label>
+                      <Input id="contactName" placeholder="Tu nombre completo" value={form.contactName} onChange={(e) => update("contactName", e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email *</Label>
+                      <Input id="email" type="email" placeholder="tu@email.com" value={form.email} onChange={(e) => update("email", e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Teléfono</Label>
+                      <Input id="phone" placeholder="+34 600 000 000" value={form.phone} onChange={(e) => update("phone", e.target.value)} />
+                    </div>
+                  </div>
+                )}
+
+                {step === 1 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">Tu negocio</h3>
+                      <p className="text-sm text-muted-foreground">Cuéntanos sobre tu actividad para generar el contenido.</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="businessName">Nombre del negocio *</Label>
+                      <Input id="businessName" placeholder="Ej: Café Libertad" value={form.businessName} onChange={(e) => update("businessName", e.target.value)} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Sector *</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {SECTORS.map((s) => (
+                          <button key={s} type="button" onClick={() => update("sector", s)}
+                            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${form.sector === s ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
+                          >{s}</button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Descripción del negocio *</Label>
+                      <Textarea id="description" placeholder="Cuéntanos sobre tu negocio, qué ofrecéis, qué os hace especiales..." value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} required />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="slogan">Slogan o lema</Label>
+                      <Input id="slogan" placeholder="Ej: Donde el sabor se encuentra con la tradición" value={form.slogan} onChange={(e) => update("slogan", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Dirección</Label>
+                      <Input id="address" placeholder="C/ Gran Vía 1, Madrid" value={form.address} onChange={(e) => update("address", e.target.value)} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="businessHours">Horario de apertura</Label>
+                      <Input id="businessHours" placeholder="Ej: Lunes a Viernes 9:00 - 20:00" value={form.businessHours} onChange={(e) => update("businessHours", e.target.value)} />
+                    </div>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">Diseño y contenido</h3>
+                      <p className="text-sm text-muted-foreground">Logo, fotos y servicios para personalizar tu web.</p>
+                    </div>
+
+                    {/* Logo */}
+                    <div className="space-y-2">
+                      <Label>Logo (opcional)</Label>
+                      <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
+                        {logoPreview ? (
+                          <img src={logoPreview} alt="Logo" className="w-16 h-16 object-contain rounded-lg" />
+                        ) : (
+                          <><Upload className="w-5 h-5 text-muted-foreground" /><span className="text-sm text-muted-foreground">Sube tu logo</span></>
+                        )}
+                        <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                      </label>
+                    </div>
+
+                    {/* Photos */}
+                    <div className="space-y-2">
+                      <Label>Fotos del negocio</Label>
+                      <p className="text-xs text-muted-foreground -mt-1">Se usarán en la cabecera y como galería deslizante</p>
+                      <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
+                        <Upload className="w-5 h-5 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Sube fotos de tu negocio (máx. 5)</span>
+                        <input type="file" accept="image/*" multiple onChange={handlePhotosUpload} className="hidden" />
+                      </label>
+                      {form.photos.length > 0 && (
+                        <div className="flex gap-2 flex-wrap mt-2">
+                          {form.photos.map((photo, idx) => (
+                            <div key={idx} className="relative group">
+                              <img src={photo} alt={`Foto ${idx + 1}`} className="w-20 h-20 object-cover rounded-lg" />
+                              <button type="button"
+                                onClick={() => setForm((f) => ({ ...f, photos: f.photos.filter((_, i) => i !== idx) }))}
+                                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              >×</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Services */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Label>Servicios destacados</Label>
+                        {form.servicesList.length < 6 && (
+                          <button type="button" onClick={addService} className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
+                            <Plus className="w-3.5 h-3.5" /> Añadir
+                          </button>
+                        )}
+                      </div>
+                      {form.servicesList.map((service, idx) => (
+                        <div key={idx} className="flex gap-2 items-start">
+                          <div className="flex-1 space-y-2">
+                            <Input placeholder="Nombre del servicio" value={service.name} onChange={(e) => updateService(idx, "name", e.target.value)} />
+                            <Input placeholder="Breve descripción" value={service.description} onChange={(e) => updateService(idx, "description", e.target.value)} />
+                          </div>
+                          <button type="button" onClick={() => removeService(idx)} className="p-2 text-muted-foreground hover:text-destructive transition-colors mt-1">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                      {form.servicesList.length === 0 && (
+                        <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">Configuración</h3>
+                      <p className="text-sm text-muted-foreground">Datos de contacto para tu web y redes sociales.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="businessEmail">Email corporativo (para tu web)</Label>
+                        <Input id="businessEmail" type="email" placeholder="info@tunegocio.com" value={form.businessEmail} onChange={(e) => update("businessEmail", e.target.value)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="businessPhone">Teléfono WhatsApp (para tu web)</Label>
+                        <Input id="businessPhone" placeholder="+34 600 000 000" value={form.businessPhone} onChange={(e) => update("businessPhone", e.target.value)} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="instagram">Instagram</Label>
+                        <Input id="instagram" placeholder="@tunegocio" value={form.instagram} onChange={(e) => update("instagram", e.target.value)} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="facebook">Facebook</Label>
+                        <Input id="facebook" placeholder="facebook.com/tunegocio" value={form.facebook} onChange={(e) => update("facebook", e.target.value)} />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="preferredDomain">Dominio preferido</Label>
+                      <Input id="preferredDomain" placeholder="Ej: www.tunegocio.com" value={form.preferredDomain} onChange={(e) => update("preferredDomain", e.target.value)} />
+                      <p className="text-xs text-muted-foreground">*Sujeto a disponibilidad</p>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          <div className="border-t border-border" />
+          {/* Navigation */}
+          <div className="flex items-center justify-between px-8 md:px-10 pb-8">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setStep((s) => s - 1)}
+              disabled={step === 0}
+              className="gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Anterior
+            </Button>
 
-          {/* ===== WEB CONFIG SECTION ===== */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-1">
-              <Globe className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-accent">Configuración de la web</h3>
-            </div>
-
-            {/* Preferred domain */}
-            <div className="space-y-2">
-              <Label htmlFor="preferredDomain">Dominio preferido</Label>
-              <Input id="preferredDomain" placeholder="Ej: www.tunegocio.com" value={form.preferredDomain} onChange={(e) => update("preferredDomain", e.target.value)} />
-              <p className="text-xs text-muted-foreground">*Sujeto a disponibilidad</p>
-            </div>
-
-            {/* Language selector */}
-            <div className="space-y-2">
-              <Label>Idioma de la web</Label>
-              <div className="flex flex-wrap gap-2">
-                {LANGUAGES.map((lang) => (
-                  <button key={lang.value} type="button" onClick={() => update("language", lang.value)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${form.language === lang.value ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
-                  >{lang.label}</button>
-                ))}
-              </div>
-            </div>
+            {isLastStep ? (
+              <Button type="submit" variant="hero" size="lg" className="gap-2" disabled={!canAdvance()}>
+                Generar mi web
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="hero"
+                size="lg"
+                className="gap-2"
+                disabled={!canAdvance()}
+                onClick={() => setStep((s) => s + 1)}
+              >
+                Siguiente
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            )}
           </div>
-
-          <Button type="submit" variant="hero" size="lg" className="w-full text-base py-6" disabled={!isValid}>
-            Generar mi web
-            <ArrowRight className="w-5 h-5 ml-1" />
-          </Button>
-
-          <p className="text-xs text-center text-muted-foreground">
-            Solo pagas si te gusta el resultado. Sin compromiso.
-          </p>
 
           {/* PGR Contact */}
-          <div className="text-center pt-2 border-t border-border">
+          <div className="text-center pb-6 px-8">
             <p className="text-xs text-muted-foreground">
               ¿Dudas? Escríbenos a{" "}
               <a href="mailto:hello@pgrdigital.tech" className="text-accent hover:underline font-medium">hello@pgrdigital.tech</a>
