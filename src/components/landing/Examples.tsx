@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import exampleCafe from "@/assets/example-cafe.jpg";
-import exampleSalon from "@/assets/example-salon.jpg";
-import exampleRestaurant from "@/assets/example-restaurant.jpg";
+import exampleRestaurante from "@/assets/example-restaurante.png";
+import exampleEstetica from "@/assets/example-estetica.png";
+import exampleFitness from "@/assets/example-fitness.png";
 
 const examples = [
-  { image: exampleCafe, title: "Cafetería & Coworking", sector: "Hostelería" },
-  { image: exampleSalon, title: "Salón de Belleza", sector: "Estética" },
-  { image: exampleRestaurant, title: "Restaurante Gourmet", sector: "Restauración" },
+  { image: exampleRestaurante, title: "Restaurante", sector: "Hostelería" },
+  { image: exampleEstetica, title: "Salón de Belleza", sector: "Estética" },
+  { image: exampleFitness, title: "Gym", sector: "Fitness" },
 ];
 
 const Examples = () => {
