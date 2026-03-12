@@ -96,6 +96,26 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     }));
   };
 
+  const addCorporateColor = () => {
+    if (form.corporateColors.length < 5) {
+      setForm((f) => ({ ...f, corporateColors: [...f.corporateColors, "#7c3aed"] }));
+    }
+  };
+
+  const updateCorporateColor = (idx: number, value: string) => {
+    setForm((f) => ({
+      ...f,
+      corporateColors: f.corporateColors.map((c, i) => (i === idx ? value : c)),
+    }));
+  };
+
+  const removeCorporateColor = (idx: number) => {
+    setForm((f) => ({
+      ...f,
+      corporateColors: f.corporateColors.filter((_, i) => i !== idx),
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
