@@ -102,6 +102,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           hasPhotos: hasPhotos,
           photoCount: photos.length,
           language: project.language || "es",
+          corporateColors: project.corporateColors || [],
         },
       });
       if (error) throw error;
