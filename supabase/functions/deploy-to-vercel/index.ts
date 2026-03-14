@@ -268,7 +268,9 @@ serve(async (req) => {
 
     console.log(`Deploying project ${projectName} to Vercel...`);
 
-    const deployRes = await fetch("https://api.vercel.com/v13/deployments", {
+    const teamQuery = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : "";
+
+    const deployRes = await fetch(`https://api.vercel.com/v13/deployments${teamQuery}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${VERCEL_TOKEN}`,
