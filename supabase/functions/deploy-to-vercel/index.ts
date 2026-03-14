@@ -45,19 +45,19 @@ const COLOR_MAP: Record<string, { primary: string; secondary: string }> = {
 
 function generateSiteFiles(project: any) {
   const content = project.generated_content || {};
-  const design = content.design || {};
-  const colors = design.colors || {};
-  const dark = design.darkMode ?? project.dark_mode;
+  const colors = content.colors || content.design?.colors || {};
+  const dark = content.design?.darkMode ?? project.dark_mode;
   const scheme = COLOR_MAP[project.color_scheme] || COLOR_MAP.Coral;
 
-  const bg = colors.bg || (dark ? "#0a0a0f" : "#fafaf9");
-  const bgAlt = colors.bgAlt || (dark ? "#111118" : "#f3f2ef");
-  const card = colors.card || (dark ? "#16161f" : "#ffffff");
-  const text1 = colors.text1 || (dark ? "#f5f5f0" : "#1a1a17");
-  const text2 = colors.text2 || (dark ? "#8a8a95" : "#6b6b63");
-  const border = colors.border || (dark ? "#222230" : "#e8e7e3");
+  const bg = colors.bg || (dark ? "#0A0A0F" : "#FAFAF9");
+  const bgAlt = colors.bgAlt || (dark ? "#111118" : "#F3F2EF");
+  const card = colors.card || (dark ? "#16161F" : "#FFFFFF");
+  const text1 = colors.text1 || (dark ? "#F5F5F0" : "#131313");
+  const text2 = colors.text2 || (dark ? "#8A8A95" : "#5F5F5F");
+  const border = colors.border || (dark ? "#222230" : "#E8E7E3");
   const accent = colors.accent || scheme.primary;
-  const accentText = colors.accentText || "#ffffff";
+  const accentText = colors.accentText || "#FFFFFF";
+  const accentDark = "#131313";
 
   const fontPair = design.fontPair || { heading: "Inter", body: "Inter" };
   const borderRadius = design.borderRadius === "sharp" ? "0" : design.borderRadius === "pill" ? "9999px" : "1.5rem";
