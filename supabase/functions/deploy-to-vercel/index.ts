@@ -58,7 +58,6 @@ function generateSiteFiles(project: any) {
   const border = colors.border || (dark ? "#222230" : "#E8E7E3");
   const accent = colors.accent || scheme.primary;
   const accentText = colors.accentText || "#FFFFFF";
-  const accentDark = "#131313";
 
   const fontPair = design.fontPair || { heading: "Inter", body: "Inter" };
   const borderRadius = design.borderRadius === "sharp" ? "0" : design.borderRadius === "pill" ? "9999px" : "1.5rem";
