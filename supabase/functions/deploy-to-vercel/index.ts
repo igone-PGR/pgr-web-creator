@@ -45,8 +45,9 @@ const COLOR_MAP: Record<string, { primary: string; secondary: string }> = {
 
 function generateSiteFiles(project: any) {
   const content = project.generated_content || {};
-  const colors = content.colors || content.design?.colors || {};
-  const dark = content.design?.darkMode ?? project.dark_mode;
+  const design = content.design || {};
+  const colors = content.colors || design.colors || {};
+  const dark = design.darkMode ?? project.dark_mode;
   const scheme = COLOR_MAP[project.color_scheme] || COLOR_MAP.Coral;
 
   const bg = colors.bg || (dark ? "#0A0A0F" : "#FAFAF9");
