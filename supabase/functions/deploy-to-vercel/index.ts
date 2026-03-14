@@ -219,6 +219,7 @@ serve(async (req) => {
     if (!project_id) throw new Error("project_id is required");
 
     const VERCEL_TOKEN = Deno.env.get("VERCEL_API_TOKEN");
+    const VERCEL_TEAM_ID = Deno.env.get("VERCEL_TEAM_ID") || "";
     if (!VERCEL_TOKEN) throw new Error("VERCEL_API_TOKEN not configured");
 
     const supabaseAdmin = createClient(
