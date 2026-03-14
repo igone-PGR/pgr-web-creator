@@ -219,6 +219,7 @@ serve(async (req) => {
     if (!project_id) throw new Error("project_id is required");
 
     const VERCEL_TOKEN = Deno.env.get("VERCEL_API_TOKEN");
+    const VERCEL_TEAM_ID = Deno.env.get("VERCEL_TEAM_ID") || "";
     if (!VERCEL_TOKEN) throw new Error("VERCEL_API_TOKEN not configured");
 
     const supabaseAdmin = createClient(
@@ -267,7 +268,9 @@ serve(async (req) => {
 
     console.log(`Deploying project ${projectName} to Vercel...`);
 
-    const deployRes = await fetch("https://api.vercel.com/v13/deployments", {
+    const teamQuery = VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : "";
+
+    const deployRes = await fetch(`https://api.vercel.com/v13/deployments${teamQuery}`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${VERCEL_TOKEN}`,
@@ -296,7 +299,7 @@ serve(async (req) => {
     // Add custom domain to the Vercel project
     try {
       const domainRes = await fetch(
-        `https://api.vercel.com/v10/projects/${vercelProjectId}/domains`,
+        `https://api.vercel.com/v10/projects/${vercelProjectId}/domains${teamQuery}`,
         {
           method: "POST",
           headers: {
