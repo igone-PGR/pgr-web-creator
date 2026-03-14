@@ -41,12 +41,12 @@ export const DEFAULT_COLORS: ColorPalette = {
   bg: "#fafaf9",
   bgAlt: "#f3f2ef",
   card: "#ffffff",
-  text1: "#1a1a17",
-  text2: "#6b6b63",
+  text1: "#131313",
+  text2: "#5f5f5f",
   border: "#e8e7e3",
-  accent: "#1B5E3B",
+  accent: "#F48763",
   accentText: "#ffffff",
-  accentDark: "#143D2B",
+  accentDark: "#131313",
 };
 
 export const DEFAULT_CONTENT: WebContent = {

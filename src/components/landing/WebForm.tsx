@@ -23,6 +23,16 @@ const STEPS = [
   { key: "config", label: "Configuración", icon: Settings },
 ];
 
+const CORPORATE_PALETTES = [
+  { name: "Verde Premium & Peach", colors: ["#1E5D4F", "#D9D6D4", "#F48763"] },
+  { name: "Azul Noche & Oro", colors: ["#042451", "#D1D4DA", "#E7B60A"] },
+  { name: "Negro & Violeta", colors: ["#0A0A0D", "#D2D3D8", "#7B57E8"] },
+  { name: "Brisa Minimalista", colors: ["#D1D4D9", "#0B1A40", "#4A84E8"] },
+] as const;
+
+const areSamePalette = (a: string[], b: readonly string[]) =>
+  a.length === b.length && a.every((color, idx) => color.toLowerCase() === b[idx].toLowerCase());
+
 const WebForm = ({ onSubmit }: WebFormProps) => {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -43,7 +53,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     servicesList: [] as { name: string; description: string }[],
     photos: [] as string[],
     preferredDomain: "",
-    corporateColors: [] as string[],
+    corporateColors: [...CORPORATE_PALETTES[0].colors] as string[],
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -98,7 +108,8 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
 
   const addCorporateColor = () => {
     if (form.corporateColors.length < 5) {
-      setForm((f) => ({ ...f, corporateColors: [...f.corporateColors, "#7c3aed"] }));
+      const fallback = form.corporateColors[0] || CORPORATE_PALETTES[0].colors[0];
+      setForm((f) => ({ ...f, corporateColors: [...f.corporateColors, fallback] }));
     }
   };
 
@@ -110,11 +121,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
   };
 
   const removeCorporateColor = (idx: number) => {
+    if (form.corporateColors.length <= 1) return;
     setForm((f) => ({
       ...f,
       corporateColors: f.corporateColors.filter((_, i) => i !== idx),
     }));
   };
+
+  const selectCorporatePalette = (paletteColors: readonly string[]) => {
+    setForm((f) => ({ ...f, corporateColors: [...paletteColors] }));
+  };
+
+  const selectedPalette = CORPORATE_PALETTES.find((palette) => areSamePalette(form.corporateColors, palette.colors));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -335,19 +353,55 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                     </div>
 
                     {/* Corporate Colors */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label>Colores corporativos</Label>
-                          <p className="text-xs text-muted-foreground mt-0.5">Añade los colores de tu marca para personalizar la web</p>
-                        </div>
-                        {form.corporateColors.length < 5 && (
-                          <button type="button" onClick={addCorporateColor} className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
-                            <Plus className="w-3.5 h-3.5" /> Añadir
-                          </button>
-                        )}
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Paleta de colores</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">Elige una paleta y, si quieres, ajusta los tonos manualmente.</p>
                       </div>
-                      {form.corporateColors.length > 0 && (
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {CORPORATE_PALETTES.map((palette) => {
+                          const isSelected = areSamePalette(form.corporateColors, palette.colors);
+                          return (
+                            <button
+                              key={palette.name}
+                              type="button"
+                              onClick={() => selectCorporatePalette(palette.colors)}
+                              className={`rounded-2xl border p-3 text-left transition-all ${
+                                isSelected
+                                  ? "border-accent bg-accent/10 shadow-accent"
+                                  : "border-border bg-card hover:border-accent/40"
+                              }`}
+                            >
+                              <div className="h-9 overflow-hidden rounded-xl border border-border flex">
+                                {palette.colors.map((color) => (
+                                  <span key={color} className="flex-1" style={{ backgroundColor: color }} />
+                                ))}
+                              </div>
+                              <p className="mt-3 text-sm font-semibold">{palette.name}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-muted-foreground">
+                            {selectedPalette
+                              ? `Paleta seleccionada: ${selectedPalette.name}`
+                              : "Paleta personalizada"}
+                          </p>
+                          {form.corporateColors.length < 5 && (
+                            <button
+                              type="button"
+                              onClick={addCorporateColor}
+                              className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors"
+                            >
+                              <Plus className="w-3.5 h-3.5" /> Añadir tono
+                            </button>
+                          )}
+                        </div>
+
                         <div className="flex flex-wrap gap-3">
                           {form.corporateColors.map((color, idx) => (
                             <div key={idx} className="flex items-center gap-2 bg-secondary rounded-lg px-3 py-2">
@@ -359,16 +413,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                                 style={{ padding: 0 }}
                               />
                               <span className="text-xs font-mono text-muted-foreground uppercase">{color}</span>
-                              <button type="button" onClick={() => removeCorporateColor(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                              <button
+                                type="button"
+                                onClick={() => removeCorporateColor(idx)}
+                                className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40"
+                                disabled={form.corporateColors.length <= 1}
+                              >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           ))}
                         </div>
-                      )}
-                      {form.corporateColors.length === 0 && (
-                        <p className="text-xs text-muted-foreground">Si no añades colores, la IA elegirá una paleta ideal para tu sector</p>
-                      )}
+                      </div>
                     </div>
                   </div>
                 )}

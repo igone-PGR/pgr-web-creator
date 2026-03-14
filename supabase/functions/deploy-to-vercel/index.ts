@@ -46,18 +46,18 @@ const COLOR_MAP: Record<string, { primary: string; secondary: string }> = {
 function generateSiteFiles(project: any) {
   const content = project.generated_content || {};
   const design = content.design || {};
-  const colors = design.colors || {};
+  const colors = content.colors || design.colors || {};
   const dark = design.darkMode ?? project.dark_mode;
   const scheme = COLOR_MAP[project.color_scheme] || COLOR_MAP.Coral;
 
-  const bg = colors.bg || (dark ? "#0a0a0f" : "#fafaf9");
-  const bgAlt = colors.bgAlt || (dark ? "#111118" : "#f3f2ef");
-  const card = colors.card || (dark ? "#16161f" : "#ffffff");
-  const text1 = colors.text1 || (dark ? "#f5f5f0" : "#1a1a17");
-  const text2 = colors.text2 || (dark ? "#8a8a95" : "#6b6b63");
-  const border = colors.border || (dark ? "#222230" : "#e8e7e3");
+  const bg = colors.bg || (dark ? "#0A0A0F" : "#FAFAF9");
+  const bgAlt = colors.bgAlt || (dark ? "#111118" : "#F3F2EF");
+  const card = colors.card || (dark ? "#16161F" : "#FFFFFF");
+  const text1 = colors.text1 || (dark ? "#F5F5F0" : "#131313");
+  const text2 = colors.text2 || (dark ? "#8A8A95" : "#5F5F5F");
+  const border = colors.border || (dark ? "#222230" : "#E8E7E3");
   const accent = colors.accent || scheme.primary;
-  const accentText = colors.accentText || "#ffffff";
+  const accentText = colors.accentText || "#FFFFFF";
 
   const fontPair = design.fontPair || { heading: "Inter", body: "Inter" };
   const borderRadius = design.borderRadius === "sharp" ? "0" : design.borderRadius === "pill" ? "9999px" : "1.5rem";
@@ -280,7 +280,12 @@ serve(async (req) => {
 
     if (!deployRes.ok) {
       console.error("Vercel deploy error:", JSON.stringify(deployData));
-      throw new Error(`Vercel deploy failed: ${deployData.error?.message || deployRes.statusText}`);
+      const code = deployData?.error?.code;
+      const message = deployData?.error?.message || deployRes.statusText;
+      if (deployRes.status === 403 || code === "forbidden") {
+        throw new Error("Vercel rechazó el despliegue por permisos insuficientes para crear proyectos (API token sin acceso write). Actualiza VERCEL_API_TOKEN con permisos de creación de proyectos en el equipo correcto.");
+      }
+      throw new Error(`Vercel deploy failed: ${message}`);
     }
 
     const vercelProjectId = deployData.projectId;
