@@ -280,7 +280,12 @@ serve(async (req) => {
 
     if (!deployRes.ok) {
       console.error("Vercel deploy error:", JSON.stringify(deployData));
-      throw new Error(`Vercel deploy failed: ${deployData.error?.message || deployRes.statusText}`);
+      const code = deployData?.error?.code;
+      const message = deployData?.error?.message || deployRes.statusText;
+      if (deployRes.status === 403 || code === "forbidden") {
+        throw new Error("Vercel rechazó el despliegue por permisos insuficientes para crear proyectos (API token sin acceso write). Actualiza VERCEL_API_TOKEN con permisos de creación de proyectos en el equipo correcto.");
+      }
+      throw new Error(`Vercel deploy failed: ${message}`);
     }
 
     const vercelProjectId = deployData.projectId;
