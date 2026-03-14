@@ -299,7 +299,7 @@ serve(async (req) => {
     // Add custom domain to the Vercel project
     try {
       const domainRes = await fetch(
-        `https://api.vercel.com/v10/projects/${vercelProjectId}/domains`,
+        `https://api.vercel.com/v10/projects/${vercelProjectId}/domains${teamQuery}`,
         {
           method: "POST",
           headers: {
