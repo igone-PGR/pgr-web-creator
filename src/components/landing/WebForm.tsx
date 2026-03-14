@@ -23,6 +23,16 @@ const STEPS = [
   { key: "config", label: "Configuración", icon: Settings },
 ];
 
+const CORPORATE_PALETTES = [
+  { name: "Verde Premium & Peach", colors: ["#1E5D4F", "#D9D6D4", "#F48763"] },
+  { name: "Azul Noche & Oro", colors: ["#042451", "#D1D4DA", "#E7B60A"] },
+  { name: "Negro & Violeta", colors: ["#0A0A0D", "#D2D3D8", "#7B57E8"] },
+  { name: "Brisa Minimalista", colors: ["#D1D4D9", "#0B1A40", "#4A84E8"] },
+] as const;
+
+const areSamePalette = (a: string[], b: readonly string[]) =>
+  a.length === b.length && a.every((color, idx) => color.toLowerCase() === b[idx].toLowerCase());
+
 const WebForm = ({ onSubmit }: WebFormProps) => {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
@@ -43,7 +53,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     servicesList: [] as { name: string; description: string }[],
     photos: [] as string[],
     preferredDomain: "",
-    corporateColors: [] as string[],
+    corporateColors: [...CORPORATE_PALETTES[0].colors] as string[],
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
