@@ -1,45 +1,40 @@
 export interface ColorPalette {
-  bg: string;         // page background
-  bgAlt: string;      // alternate section background
-  card: string;       // card/surface background
-  text1: string;      // primary text
-  text2: string;      // secondary/muted text
-  border: string;     // borders
-  accent: string;     // primary accent color
-  accentText: string; // text on accent bg (usually white or dark)
-}
-
-export interface DesignDecisions {
-  heroStyle: "fullscreen" | "split" | "minimal-center" | "text-left-image-right" | "gradient-overlay";
-  layoutStyle: "editorial" | "bold" | "minimal" | "organic" | "brutalist";
-  navStyle: "transparent" | "solid" | "minimal" | "centered" | "hidden";
-  footerStyle: "minimal" | "columns" | "centered" | "banner";
-  fontPair: { heading: string; body: string };
-  sectionOrder: string[];
-  serviceLayout: "cards" | "list" | "numbered-large" | "timeline";
-  photoLayout: "masonry" | "fullbleed-alternating" | "grid" | "overlap-collage";
-  animationStyle: "fade-up" | "slide-in" | "scale-pop" | "stagger-cascade";
-  heroHeight: "full" | "tall" | "medium";
-  borderRadius: "sharp" | "rounded" | "pill";
-  accentGradient: string | null;
-  decorativeElements: boolean;
-  colors: ColorPalette;
-  darkMode: boolean;
+  bg: string;
+  bgAlt: string;
+  card: string;
+  text1: string;
+  text2: string;
+  border: string;
+  accent: string;
+  accentText: string;
+  accentDark: string;
 }
 
 export interface WebContent {
   heroHeadline: string;
   heroSubtitle: string;
   heroCta: string;
+  heroStats: { value: string; label: string }[];
+  categories: { title: string; icon: string }[];
   aboutTitle: string;
   aboutText: string;
-  features: { title: string; description: string }[];
+  aboutHighlights: { title: string; description: string }[];
   servicesTitle: string;
+  servicesSubtitle: string;
   services: { name: string; description: string }[];
+  ctaTitle: string;
+  ctaSubtitle: string;
+  ctaCta: string;
+  ctaStats: { value: string; label: string }[];
+  features: { title: string; description: string }[];
+  featuresTitle: string;
+  featuresSubtitle: string;
+  testimonials: { name: string; text: string; rating: number }[];
+  faq: { question: string; answer: string }[];
   contactTitle: string;
   contactSubtitle: string;
   footerTagline: string;
-  design: DesignDecisions;
+  colors: ColorPalette;
 }
 
 export const DEFAULT_COLORS: ColorPalette = {
@@ -49,48 +44,56 @@ export const DEFAULT_COLORS: ColorPalette = {
   text1: "#1a1a17",
   text2: "#6b6b63",
   border: "#e8e7e3",
-  accent: "#FF6B4A",
+  accent: "#1B5E3B",
   accentText: "#ffffff",
-};
-
-export const DEFAULT_DESIGN: DesignDecisions = {
-  heroStyle: "fullscreen",
-  layoutStyle: "editorial",
-  navStyle: "transparent",
-  footerStyle: "minimal",
-  fontPair: { heading: "Space Grotesk", body: "Inter" },
-  sectionOrder: ["hero", "features", "about", "photos", "services", "contact"],
-  serviceLayout: "cards",
-  photoLayout: "grid",
-  animationStyle: "fade-up",
-  heroHeight: "tall",
-  borderRadius: "rounded",
-  accentGradient: null,
-  decorativeElements: false,
-  colors: DEFAULT_COLORS,
-  darkMode: false,
+  accentDark: "#143D2B",
 };
 
 export const DEFAULT_CONTENT: WebContent = {
   heroHeadline: "Bienvenidos a tu negocio",
   heroSubtitle: "Un espacio donde la calidad y la atención se unen para ofrecerte la mejor experiencia.",
   heroCta: "Descúbrenos",
+  heroStats: [{ value: "98%", label: "Clientes satisfechos" }],
+  categories: [
+    { title: "Calidad premium", icon: "star" },
+    { title: "Atención personalizada", icon: "heart" },
+    { title: "Experiencia", icon: "award" },
+    { title: "Confianza", icon: "shield" },
+  ],
   aboutTitle: "Nuestra historia",
-  aboutText: "Somos un equipo apasionado dedicado a ofrecer la mejor experiencia a nuestros clientes. Cada detalle cuenta y trabajamos para que tu visita sea inolvidable.",
-  features: [
-    { title: "Calidad premium", description: "Cuidamos cada detalle para ofrecerte una experiencia excepcional." },
-    { title: "Atención personalizada", description: "Nos adaptamos a tus necesidades con un trato cercano y profesional." },
-    { title: "Experiencia contrastada", description: "Años de dedicación nos avalan como referentes en nuestro sector." },
+  aboutText: "Somos un equipo apasionado dedicado a ofrecer la mejor experiencia a nuestros clientes.",
+  aboutHighlights: [
+    { title: "Profesionalidad", description: "Equipo cualificado y dedicado." },
+    { title: "Cercanía", description: "Trato personal y humano." },
+    { title: "Resultados", description: "Compromiso con la excelencia." },
   ],
   servicesTitle: "Nuestros servicios",
+  servicesSubtitle: "Descubre todo lo que podemos hacer por ti",
   services: [
-    { name: "Servicio principal", description: "Nuestra especialidad estrella con la máxima calidad." },
-    { name: "Asesoramiento", description: "Te guiamos para encontrar exactamente lo que necesitas." },
-    { name: "Experiencia exclusiva", description: "Vive momentos únicos diseñados para ti." },
-    { name: "Atención premium", description: "Servicio personalizado que supera expectativas." },
+    { name: "Servicio principal", description: "Nuestra especialidad estrella." },
+    { name: "Asesoramiento", description: "Te guiamos profesionalmente." },
+    { name: "Experiencia exclusiva", description: "Momentos únicos para ti." },
   ],
-  contactTitle: "Hablemos",
-  contactSubtitle: "Estamos aquí para ayudarte. Escríbenos y te respondemos en menos de 24h.",
+  ctaTitle: "Transforma tu experiencia con nuestros servicios",
+  ctaSubtitle: "Contacta con nosotros y descubre cómo podemos ayudarte.",
+  ctaCta: "Empieza ahora",
+  ctaStats: [{ value: "500+", label: "Clientes" }, { value: "10+", label: "Años" }],
+  features: [
+    { title: "Calidad premium", description: "Cuidamos cada detalle." },
+    { title: "Atención personalizada", description: "Nos adaptamos a ti." },
+    { title: "Experiencia contrastada", description: "Años de dedicación." },
+  ],
+  featuresTitle: "¿Por qué elegirnos?",
+  featuresSubtitle: "Descubre lo que nos hace diferentes",
+  testimonials: [
+    { name: "María G.", text: "Excelente servicio, muy profesionales.", rating: 5 },
+  ],
+  faq: [
+    { question: "¿Cómo puedo contactaros?", answer: "Puedes escribirnos por email o WhatsApp." },
+    { question: "¿Cuáles son vuestros horarios?", answer: "Consulta nuestra sección de contacto." },
+  ],
+  contactTitle: "Contacto",
+  contactSubtitle: "Estamos aquí para ayudarte",
   footerTagline: "Donde la excelencia se encuentra con la pasión.",
-  design: DEFAULT_DESIGN,
+  colors: DEFAULT_COLORS,
 };

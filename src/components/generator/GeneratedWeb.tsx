@@ -1,16 +1,15 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft, CreditCard, Instagram, Facebook,
-  Mail, Phone, MapPin, MessageCircle, ArrowUpRight, Loader2,
-  Clock, Sparkles, Check, Star, Zap, Heart, Shield, Award,
-  ChevronLeft, ChevronRight,
+  ArrowLeft, CreditCard, Mail, Phone, MapPin, MessageCircle,
+  ArrowUpRight, Loader2, Clock, Sparkles, Star, Heart, Shield, Award,
+  ChevronLeft, ChevronRight, ChevronDown, Zap, Check, Users, Target,
+  Instagram, Facebook,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProjectData } from "@/types/project";
-import type { WebContent, DesignDecisions, ColorPalette } from "@/types/web-content";
-import { DEFAULT_CONTENT, DEFAULT_DESIGN, DEFAULT_COLORS } from "@/types/web-content";
-import { SECTOR_IMAGES } from "@/lib/sector-images";
+import type { WebContent, ColorPalette } from "@/types/web-content";
+import { DEFAULT_CONTENT, DEFAULT_COLORS } from "@/types/web-content";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,74 +18,39 @@ interface GeneratedWebProps {
   onBack: () => void;
 }
 
-const FEATURE_ICONS = [Sparkles, Star, Shield, Zap, Heart, Award, Check];
-
-const GOOGLE_FONTS_BASE = "https://fonts.googleapis.com/css2?display=swap";
-const FONT_MAP: Record<string, string> = {
-  "Space Grotesk": "Space+Grotesk:wght@400;500;600;700",
-  "Playfair Display": "Playfair+Display:wght@400;500;600;700;900",
-  "Clash Display": "Space+Grotesk:wght@400;500;600;700",
-  "Cabinet Grotesk": "Space+Grotesk:wght@400;500;600;700",
-  "Syne": "Syne:wght@400;500;600;700;800",
-  "DM Serif Display": "DM+Serif+Display:wght@400",
-  "Outfit": "Outfit:wght@400;500;600;700;800;900",
-  "Unbounded": "Unbounded:wght@400;500;600;700;800;900",
-  "Inter": "Inter:wght@400;500;600;700;800;900",
-  "DM Sans": "DM+Sans:wght@400;500;600;700",
-  "Plus Jakarta Sans": "Plus+Jakarta+Sans:wght@400;500;600;700;800",
+const ICON_MAP: Record<string, any> = {
+  star: Star, heart: Heart, shield: Shield, award: Award,
+  zap: Zap, check: Check, users: Users, target: Target, sparkles: Sparkles,
 };
 
+const GOOGLE_FONTS = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap";
+
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
-  const [project, setProject] = useState<ProjectData>(data);
+  const [project] = useState<ProjectData>(data);
   const [content, setContent] = useState<WebContent>(DEFAULT_CONTENT);
   const [isGenerating, setIsGenerating] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const heroImage = SECTOR_IMAGES[project.sector] || SECTOR_IMAGES["Otro"];
-  const design: DesignDecisions = content.design || DEFAULT_DESIGN;
-  const colors: ColorPalette = design.colors || DEFAULT_COLORS;
-
-  const bg = colors.bg;
-  const bgAlt = colors.bgAlt;
-  const card = colors.card;
-  const text1 = colors.text1;
-  const text2 = colors.text2;
-  const border = colors.border;
-  const accent = colors.accent;
-  const accentText = colors.accentText;
-  const accentBg = design.accentGradient || accent;
-  const isGradient = !!design.accentGradient;
-
-  const radius = design.borderRadius === "sharp" ? "8px" : design.borderRadius === "pill" ? "9999px" : "20px";
-  const radiusSm = design.borderRadius === "sharp" ? "4px" : design.borderRadius === "pill" ? "9999px" : "12px";
-  const heroH = design.heroHeight === "full" ? "100vh" : design.heroHeight === "tall" ? "85vh" : "65vh";
-  const headingFont = design.fontPair.heading || "Space Grotesk";
-  const bodyFont = design.fontPair.body || "Inter";
-
+  const colors: ColorPalette = content.colors || DEFAULT_COLORS;
   const photos = project.photos || [];
   const hasPhotos = photos.length > 0;
 
   useEffect(() => {
-    const fonts = [design.fontPair.heading, design.fontPair.body];
-    const unique = [...new Set(fonts)];
-    const families = unique.map(f => FONT_MAP[f] || FONT_MAP["Inter"]).join("&family=");
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = `${GOOGLE_FONTS_BASE}&family=${families}`;
+    link.href = GOOGLE_FONTS;
     document.head.appendChild(link);
     return () => { document.head.removeChild(link); };
-  }, [design.fontPair]);
+  }, []);
 
   useEffect(() => { generateContent(); }, []);
 
-  // Auto-advance slider
   useEffect(() => {
     if (photos.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % photos.length);
-    }, 4000);
+    const interval = setInterval(() => setCurrentSlide(prev => (prev + 1) % photos.length), 4000);
     return () => clearInterval(interval);
   }, [photos.length]);
 
@@ -120,7 +84,6 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
-      // Strip photos (base64) from the checkout payload to avoid body size limits
       const { photos: _photos, logo: _logo, ...projectWithoutBinaries } = project;
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
         body: { project: { ...projectWithoutBinaries, logo: null }, generatedContent: content },
@@ -135,7 +98,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       console.error("Checkout error:", err);
       toast({
         title: "Error al procesar el pago",
-        description: err?.message || "No se pudo conectar con la pasarela de pago. Inténtalo de nuevo.",
+        description: err?.message || "No se pudo conectar con la pasarela de pago.",
         variant: "destructive",
       });
     } finally {
@@ -143,57 +106,300 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     }
   };
 
-  const getAnim = (i: number = 0) => {
-    const delay = i * 0.1;
-    switch (design.animationStyle) {
-      case "slide-in":
-        return { initial: { opacity: 0, x: -40 }, whileInView: { opacity: 1, x: 0 }, viewport: { once: true }, transition: { duration: 0.7, delay } };
-      case "scale-pop":
-        return { initial: { opacity: 0, scale: 0.85 }, whileInView: { opacity: 1, scale: 1 }, viewport: { once: true }, transition: { duration: 0.5, delay } };
-      case "stagger-cascade":
-        return { initial: { opacity: 0, y: 60 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.8, delay: delay + i * 0.08 } };
-      default:
-        return { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.6, delay } };
-    }
+  const webEmail = project.businessEmail || project.email;
+  const webPhone = project.businessPhone || project.phone;
+
+  // ====== NAV ======
+  const renderNav = () => (
+    <nav className="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        {project.logo && <img src={project.logo} alt="Logo" className="w-8 h-8 object-contain rounded-lg" />}
+        <span className="font-bold text-base tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans'" }}>{project.businessName}</span>
+      </div>
+      <div className="hidden md:flex items-center gap-8 text-sm font-medium" style={{ color: colors.text2 }}>
+        <a href="#about" className="hover:opacity-70 transition-opacity">Nosotros</a>
+        <a href="#services" className="hover:opacity-70 transition-opacity">Servicios</a>
+        <a href="#faq" className="hover:opacity-70 transition-opacity">FAQ</a>
+        <a href="#contact" className="hover:opacity-70 transition-opacity">Contacto</a>
+      </div>
+      <a href="#contact" className="hidden md:flex items-center gap-1.5 text-sm font-semibold px-5 py-2.5 rounded-full transition-all hover:scale-105"
+        style={{ background: colors.accent, color: colors.accentText }}>
+        Contactar <ArrowUpRight className="w-3.5 h-3.5" />
+      </a>
+    </nav>
+  );
+
+  // ====== HERO ======
+  const renderHero = () => {
+    const heroImg = photos[0];
+    return (
+      <section className="relative overflow-hidden" style={{ background: colors.accentDark }}>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 md:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+                className="text-xs font-bold uppercase tracking-[0.25em] mb-6" style={{ color: `${colors.accentText}99` }}>
+                {project.slogan || project.sector}
+              </motion.p>
+              <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
+                contentEditable suppressContentEditableWarning
+                className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight outline-none"
+                style={{ color: colors.accentText, fontFamily: "'Plus Jakarta Sans'" }}>
+                {content.heroHeadline}
+              </motion.h1>
+              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                contentEditable suppressContentEditableWarning
+                className="mt-6 text-base md:text-lg max-w-md leading-relaxed outline-none"
+                style={{ color: `${colors.accentText}cc` }}>
+                {content.heroSubtitle}
+              </motion.p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+                className="mt-8 flex flex-wrap items-center gap-4">
+                <a href="#contact" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold transition-all hover:scale-105"
+                  style={{ background: colors.accent, color: colors.accentText, border: `2px solid ${colors.accentText}33` }}>
+                  {content.heroCta} <ArrowUpRight className="w-4 h-4" />
+                </a>
+              </motion.div>
+              {/* Stats */}
+              {content.heroStats?.length > 0 && (
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }}
+                  className="mt-8 flex items-center gap-6">
+                  {content.heroStats.map((stat, i) => (
+                    <div key={i} className="text-center">
+                      <div className="text-2xl font-extrabold" style={{ color: colors.accentText }}>{stat.value}</div>
+                      <div className="text-xs mt-1" style={{ color: `${colors.accentText}88` }}>{stat.label}</div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </div>
+            {/* Hero images */}
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.4 }}
+              className="relative hidden lg:block">
+              {heroImg ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <img src={heroImg} alt={project.businessName} className="w-full h-64 object-cover rounded-2xl col-span-2" />
+                  {photos[1] && <img src={photos[1]} alt="" className="w-full h-40 object-cover rounded-2xl" />}
+                  {photos[2] && <img src={photos[2]} alt="" className="w-full h-40 object-cover rounded-2xl" />}
+                </div>
+              ) : (
+                <div className="w-full h-80 rounded-2xl flex items-center justify-center" style={{ background: `${colors.accent}44` }}>
+                  <Sparkles className="w-16 h-16" style={{ color: `${colors.accentText}44` }} />
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+    );
   };
 
-  // ====== PHOTO SLIDER ======
-  const renderPhotoSlider = () => {
-    if (!hasPhotos || photos.length <= 1) return null;
-    return (
-      <section className="relative overflow-hidden" style={{ backgroundColor: bgAlt }}>
-        <div className="relative w-full" style={{ height: "60vh" }}>
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentSlide}
-              src={photos[currentSlide]}
-              alt={`${project.businessName} ${currentSlide + 1}`}
-              className="absolute inset-0 w-full h-full object-cover"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6 }}
-            />
-          </AnimatePresence>
-          {/* Slider controls */}
-          <div className="absolute inset-0 flex items-center justify-between px-4 z-10">
-            <button onClick={() => setCurrentSlide((prev) => (prev - 1 + photos.length) % photos.length)}
-              className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all hover:scale-110"
-              style={{ backgroundColor: `${bg}99` }}>
-              <ChevronLeft className="w-5 h-5" style={{ color: text1 }} />
-            </button>
-            <button onClick={() => setCurrentSlide((prev) => (prev + 1) % photos.length)}
-              className="w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all hover:scale-110"
-              style={{ backgroundColor: `${bg}99` }}>
-              <ChevronRight className="w-5 h-5" style={{ color: text1 }} />
-            </button>
+  // ====== CATEGORIES ======
+  const renderCategories = () => (
+    <section className="py-20" style={{ backgroundColor: colors.bg }}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {content.categories.map((cat, i) => {
+            const IconComp = ICON_MAP[cat.icon] || Star;
+            return (
+              <motion.div key={i}
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all hover:shadow-lg"
+                style={{ borderColor: colors.border, backgroundColor: colors.card }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${colors.accent}15` }}>
+                  <IconComp className="w-5 h-5" style={{ color: colors.accent }} />
+                </div>
+                <span className="text-sm font-semibold text-center" style={{ color: colors.text1 }}>{cat.title}</span>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+
+  // ====== ABOUT ======
+  const renderAbout = () => (
+    <section id="about" className="py-20" style={{ backgroundColor: colors.bgAlt }}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Image */}
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            {photos[0] ? (
+              <img src={photos[Math.min(1, photos.length - 1)]} alt={project.businessName} className="w-full h-80 md:h-[420px] object-cover rounded-2xl" />
+            ) : (
+              <div className="w-full h-80 md:h-[420px] rounded-2xl flex items-center justify-center" style={{ background: `${colors.accent}10` }}>
+                <Award className="w-20 h-20" style={{ color: `${colors.accent}33` }} />
+              </div>
+            )}
+          </motion.div>
+          {/* Text */}
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: colors.accent }}>{content.aboutTitle}</p>
+            <p contentEditable suppressContentEditableWarning
+              className="text-2xl md:text-3xl font-bold leading-snug tracking-tight outline-none mb-8"
+              style={{ fontFamily: "'Plus Jakarta Sans'", color: colors.text1 }}>
+              {content.aboutText}
+            </p>
+            <div className="space-y-4">
+              {content.aboutHighlights.map((h, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="mt-1 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: colors.accent }}>
+                    <Check className="w-3 h-3" style={{ color: colors.accentText }} />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: colors.text1 }}>{h.title}</p>
+                    <p className="text-sm" style={{ color: colors.text2 }}>{h.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+
+  // ====== SERVICES GRID ======
+  const renderServices = () => (
+    <section id="services" className="py-20" style={{ backgroundColor: colors.bg }}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="text-center mb-14">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: colors.accent }}>{content.servicesTitle}</p>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans'", color: colors.text1 }}>
+            {content.servicesSubtitle}
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {content.services.map((service, i) => (
+            <motion.div key={i}
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="rounded-2xl overflow-hidden border transition-all hover:shadow-xl group"
+              style={{ borderColor: colors.border, backgroundColor: colors.card }}>
+              {/* Service image from photos */}
+              {photos[i % photos.length] ? (
+                <div className="h-48 overflow-hidden">
+                  <img src={photos[i % photos.length]} alt={service.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                </div>
+              ) : (
+                <div className="h-48 flex items-center justify-center" style={{ background: `${colors.accent}10` }}>
+                  <Sparkles className="w-10 h-10" style={{ color: `${colors.accent}33` }} />
+                </div>
+              )}
+              <div className="p-6">
+                <h3 contentEditable suppressContentEditableWarning className="font-bold text-lg mb-2 outline-none" style={{ color: colors.text1 }}>{service.name}</h3>
+                <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed outline-none" style={{ color: colors.text2 }}>{service.description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  // ====== CTA BANNER ======
+  const renderCtaBanner = () => (
+    <section className="py-20" style={{ backgroundColor: colors.accentDark }}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 contentEditable suppressContentEditableWarning
+              className="text-3xl md:text-4xl font-bold leading-snug tracking-tight outline-none mb-6"
+              style={{ color: colors.accentText, fontFamily: "'Plus Jakarta Sans'" }}>
+              {content.ctaTitle}
+            </h2>
+            <p className="text-base leading-relaxed mb-8" style={{ color: `${colors.accentText}cc` }}>
+              {content.ctaSubtitle}
+            </p>
+            {content.ctaStats?.length > 0 && (
+              <div className="flex items-center gap-8 mb-8">
+                {content.ctaStats.map((stat, i) => (
+                  <div key={i}>
+                    <div className="text-2xl font-extrabold" style={{ color: colors.accentText }}>{stat.value}</div>
+                    <div className="text-xs" style={{ color: `${colors.accentText}88` }}>{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <a href="#contact" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold transition-all hover:scale-105"
+              style={{ background: colors.accent, color: colors.accentText }}>
+              {content.ctaCta} <ArrowUpRight className="w-4 h-4" />
+            </a>
           </div>
-          {/* Dots */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-            {photos.map((_, i) => (
-              <button key={i} onClick={() => setCurrentSlide(i)}
-                className="w-2 h-2 rounded-full transition-all"
-                style={{ backgroundColor: i === currentSlide ? accent : `${bg}80` }} />
+          {hasPhotos && (
+            <div className="hidden lg:grid grid-cols-2 gap-3">
+              {photos.slice(0, 4).map((p, i) => (
+                <img key={i} src={p} alt="" className="w-full h-40 object-cover rounded-2xl" />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+
+  // ====== FEATURES ======
+  const renderFeatures = () => (
+    <section className="py-20" style={{ backgroundColor: colors.bg }}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="text-center mb-14">
+          <p className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: colors.accent }}>{content.featuresTitle}</p>
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans'", color: colors.text1 }}>
+            {content.featuresSubtitle}
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {content.features.map((feat, i) => {
+            const icons = [Star, Shield, Heart, Zap, Award, Target];
+            const Icon = icons[i % icons.length];
+            return (
+              <motion.div key={i}
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-2xl border text-center transition-all hover:shadow-lg"
+                style={{ borderColor: colors.border, backgroundColor: colors.card }}>
+                <div className="w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: `${colors.accent}15` }}>
+                  <Icon className="w-6 h-6" style={{ color: colors.accent }} />
+                </div>
+                <h3 className="font-bold text-sm mb-2" style={{ color: colors.text1 }}>{feat.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: colors.text2 }}>{feat.description}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+
+  // ====== TESTIMONIALS ======
+  const renderTestimonials = () => {
+    if (!content.testimonials?.length) return null;
+    return (
+      <section className="py-20" style={{ backgroundColor: colors.bgAlt }}>
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="text-center mb-14">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: colors.accent }}>Opiniones</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans'", color: colors.text1 }}>
+              Lo que dicen nuestros clientes
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {content.testimonials.map((t, i) => (
+              <motion.div key={i}
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-2xl border" style={{ borderColor: colors.border, backgroundColor: colors.card }}>
+                <div className="flex gap-1 mb-4">
+                  {Array.from({ length: t.rating }).map((_, si) => (
+                    <Star key={si} className="w-4 h-4 fill-current" style={{ color: "#F59E0B" }} />
+                  ))}
+                </div>
+                <p className="text-sm leading-relaxed mb-4" style={{ color: colors.text2 }}>"{t.text}"</p>
+                <p className="font-semibold text-sm" style={{ color: colors.text1 }}>{t.name}</p>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -201,531 +407,143 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     );
   };
 
-  // ====== HERO ======
-  const renderHero = () => {
-    // Use first photo as hero image
-    const heroImg = photos[0] || heroImage;
-
-    switch (design.heroStyle) {
-      case "split":
-        return (
-          <section className="flex flex-col md:flex-row min-h-[65vh]">
-            <div className="flex-1 flex flex-col justify-center px-8 md:px-16 py-16">
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                className="text-xs font-bold uppercase tracking-[0.3em] mb-6" style={{ color: accent, fontFamily: bodyFont }}>
-                {project.slogan || project.sector}
-              </motion.p>
-              <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.4 }}
-                contentEditable suppressContentEditableWarning
-                className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.92] outline-none"
-                style={{ fontFamily: headingFont }}>{content.heroHeadline}</motion.h1>
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-                contentEditable suppressContentEditableWarning
-                className="mt-6 text-lg max-w-md leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{content.heroSubtitle}</motion.p>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mt-10">
-                <a href="#contact" className="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold transition-all hover:scale-105"
-                  style={{ background: isGradient ? accentBg : accent, color: accentText, borderRadius: radius }}>
-                  {content.heroCta} <ArrowUpRight className="w-4 h-4" />
-                </a>
-              </motion.div>
-            </div>
-            <div className="flex-1 relative min-h-[40vh]">
-              <img src={heroImg} alt={project.sector} className="absolute inset-0 w-full h-full object-cover" />
-            </div>
-          </section>
-        );
-      case "minimal-center":
-        return (
-          <section className="flex flex-col items-center justify-center text-center px-6 py-32 md:py-40" style={{ minHeight: heroH }}>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-              className="text-xs font-bold uppercase tracking-[0.3em] mb-8" style={{ color: accent, fontFamily: bodyFont }}>
-              {project.slogan || project.sector}
-            </motion.p>
-            <motion.h1 initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.4 }}
-              contentEditable suppressContentEditableWarning
-              className="text-5xl md:text-7xl lg:text-9xl font-black tracking-tighter leading-[0.9] max-w-5xl outline-none"
-              style={{ fontFamily: headingFont }}>{content.heroHeadline}</motion.h1>
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
-              contentEditable suppressContentEditableWarning
-              className="mt-8 text-xl max-w-xl leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{content.heroSubtitle}</motion.p>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="mt-12">
-              <a href="#contact" className="px-10 py-4 text-sm font-bold transition-all hover:scale-105"
-                style={{ background: isGradient ? accentBg : accent, color: accentText, borderRadius: radius }}>
-                {content.heroCta}
-              </a>
-            </motion.div>
-          </section>
-        );
-      case "text-left-image-right":
-        return (
-          <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-32">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              <div className="lg:col-span-7">
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                  className="text-xs font-bold uppercase tracking-[0.3em] mb-6" style={{ color: accent }}>{project.slogan || project.sector}</motion.p>
-                <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.4 }}
-                  contentEditable suppressContentEditableWarning
-                  className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.9] outline-none"
-                  style={{ fontFamily: headingFont }}>{content.heroHeadline}</motion.h1>
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
-                  contentEditable suppressContentEditableWarning
-                  className="mt-6 text-lg max-w-lg leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{content.heroSubtitle}</motion.p>
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mt-10 flex gap-4 items-center">
-                  <a href="#contact" className="px-8 py-4 text-sm font-bold transition-all hover:scale-105"
-                    style={{ background: isGradient ? accentBg : accent, color: accentText, borderRadius: radius }}>
-                    {content.heroCta} <ArrowUpRight className="w-4 h-4 inline ml-1" />
-                  </a>
-                  {project.businessHours && <span className="flex items-center gap-2 text-xs font-medium" style={{ color: text2 }}><Clock className="w-3.5 h-3.5" /> {project.businessHours}</span>}
-                </motion.div>
+  // ====== FAQ ======
+  const renderFaq = () => {
+    if (!content.faq?.length) return null;
+    return (
+      <section id="faq" className="py-20" style={{ backgroundColor: colors.bg }}>
+        <div className="max-w-3xl mx-auto px-6 md:px-12">
+          <div className="text-center mb-14">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] mb-3" style={{ color: colors.accent }}>FAQ</p>
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: "'Plus Jakarta Sans'", color: colors.text1 }}>
+              Preguntas frecuentes
+            </h2>
+          </div>
+          <div className="space-y-3">
+            {content.faq.map((item, i) => (
+              <div key={i} className="rounded-xl border overflow-hidden" style={{ borderColor: colors.border, backgroundColor: colors.card }}>
+                <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full flex items-center justify-between p-5 text-left font-semibold text-sm transition-all"
+                  style={{ color: colors.text1 }}>
+                  {item.question}
+                  <ChevronDown className={`w-4 h-4 transition-transform flex-shrink-0 ${openFaq === i ? 'rotate-180' : ''}`} style={{ color: colors.text2 }} />
+                </button>
+                <AnimatePresence>
+                  {openFaq === i && (
+                    <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden">
+                      <p className="px-5 pb-5 text-sm leading-relaxed" style={{ color: colors.text2 }}>{item.answer}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.5 }}
-                className="lg:col-span-5 aspect-[3/4] overflow-hidden" style={{ borderRadius: radius }}>
-                <img src={heroImg} alt={project.sector} className="w-full h-full object-cover" />
-              </motion.div>
-            </div>
-          </section>
-        );
-      case "gradient-overlay":
-        return (
-          <section className="relative overflow-hidden flex items-end" style={{ minHeight: heroH }}>
-            <div className="absolute inset-0" style={{ background: isGradient ? accentBg : `linear-gradient(135deg, ${accent}, ${accent}cc)` }} />
-            {design.decorativeElements && (
-              <>
-                <div className="absolute top-20 right-20 w-64 h-64 rounded-full opacity-20" style={{ background: "#fff" }} />
-                <div className="absolute bottom-40 left-10 w-32 h-32 rounded-full opacity-10" style={{ background: "#fff" }} />
-              </>
-            )}
-            <div className="relative max-w-7xl mx-auto px-6 md:px-12 pb-20 md:pb-32 pt-32 w-full">
-              <motion.h1 initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}
-                contentEditable suppressContentEditableWarning
-                className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.92] max-w-4xl outline-none"
-                style={{ fontFamily: headingFont, color: accentText }}>{content.heroHeadline}</motion.h1>
-              <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                contentEditable suppressContentEditableWarning
-                className="mt-6 text-xl max-w-xl leading-relaxed outline-none" style={{ fontFamily: bodyFont, color: `${accentText}cc` }}>{content.heroSubtitle}</motion.p>
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="mt-10">
-                <a href="#contact" className="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold transition-all hover:scale-105"
-                  style={{ background: bg, color: accent, borderRadius: radius }}>
-                  {content.heroCta} <ArrowUpRight className="w-4 h-4" />
-                </a>
-              </motion.div>
-            </div>
-          </section>
-        );
-      default: // fullscreen
-        return (
-          <section className="relative overflow-hidden">
-            <div className="w-full relative" style={{ height: heroH }}>
-              <img src={heroImg} alt={project.sector} className="absolute inset-0 w-full h-full object-cover" />
-              <div className="absolute inset-0" style={{
-                background: design.darkMode
-                  ? `linear-gradient(180deg, ${bg}33 0%, ${bg}f2 100%)`
-                  : `linear-gradient(180deg, ${bg}0d 0%, ${bg}f8 100%)`,
-              }} />
-              <div className="absolute inset-0 flex flex-col justify-end max-w-7xl mx-auto px-6 md:px-12 pb-16 md:pb-24">
-                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-                  className="text-xs font-bold uppercase tracking-[0.3em] mb-6" style={{ color: accent }}>{project.slogan || project.sector}</motion.p>
-                <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.4 }}
-                  contentEditable suppressContentEditableWarning
-                  className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.95] max-w-4xl outline-none"
-                  style={{ fontFamily: headingFont }}>{content.heroHeadline}</motion.h1>
-                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
-                  contentEditable suppressContentEditableWarning
-                  className="mt-6 text-base md:text-xl max-w-xl leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{content.heroSubtitle}</motion.p>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-                  className="flex items-center gap-4 mt-10">
-                  <a href="#contact" className="px-8 py-4 text-sm font-bold transition-all hover:scale-105 hover:shadow-xl"
-                    style={{ background: isGradient ? accentBg : accent, color: accentText, borderRadius: radius }}>
-                    {content.heroCta} <ArrowUpRight className="w-4 h-4 inline ml-1 -mt-0.5" />
-                  </a>
-                  {project.businessHours && <span className="flex items-center gap-2 text-xs font-medium" style={{ color: text2 }}><Clock className="w-3.5 h-3.5" /> {project.businessHours}</span>}
-                </motion.div>
-              </div>
-            </div>
-          </section>
-        );
-    }
-  };
-
-  // ====== FEATURES ======
-  const renderFeatures = () => (
-    <section className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-      <div className={`grid gap-5 ${design.layoutStyle === "brutalist" ? "grid-cols-1" : "grid-cols-1 md:grid-cols-3"}`}>
-        {content.features.map((feat, i) => {
-          const Icon = FEATURE_ICONS[i % FEATURE_ICONS.length];
-          const isWide = i === 0 && design.layoutStyle !== "brutalist";
-          return (
-            <motion.div key={i} {...getAnim(i)}
-              className={`relative p-8 md:p-10 overflow-hidden transition-all hover:shadow-lg group ${isWide ? "md:col-span-2" : ""}`}
-              style={{ border: `1px solid ${border}`, backgroundColor: card, borderRadius: radius }}>
-              {design.decorativeElements && (
-                <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-10" style={{ background: accent }} />
-              )}
-              <div className="w-12 h-12 flex items-center justify-center mb-6 transition-transform group-hover:scale-110"
-                style={{ backgroundColor: `${accent}15`, borderRadius: radiusSm }}>
-                <Icon className="w-5 h-5" style={{ color: accent }} />
-              </div>
-              <h3 contentEditable suppressContentEditableWarning className="text-xl font-bold mb-3 outline-none" style={{ fontFamily: headingFont }}>{feat.title}</h3>
-              <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{feat.description}</p>
-            </motion.div>
-          );
-        })}
-      </div>
-    </section>
-  );
-
-  // ====== ABOUT ======
-  const renderAbout = () => (
-    <section id="about" className="py-24 md:py-32" style={{ backgroundColor: bgAlt }}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <motion.p {...getAnim()}
-          className="text-xs font-bold uppercase tracking-[0.3em] mb-8" style={{ color: accent, fontFamily: bodyFont }}>{content.aboutTitle}</motion.p>
-        <motion.p {...getAnim(1)}
-          contentEditable suppressContentEditableWarning
-          className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug tracking-tight max-w-5xl outline-none"
-          style={{ fontFamily: headingFont }}>{content.aboutText}</motion.p>
-      </div>
-    </section>
-  );
-
-  // ====== PHOTOS (slider only) ======
-  const renderPhotos = () => {
-    if (!hasPhotos) return null;
-    return renderPhotoSlider();
-  };
-
-  // ====== SERVICES ======
-  const renderServices = () => {
-    switch (design.serviceLayout) {
-      case "list":
-        return (
-          <section id="services" className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-            <motion.p {...getAnim()} className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: accent }}>{content.servicesTitle}</motion.p>
-            <div className="mt-10 divide-y" style={{ borderColor: border }}>
-              {content.services.map((service, i) => (
-                <motion.div key={i} {...getAnim(i)} className="group py-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex items-center gap-6">
-                    <span className="text-3xl font-black tracking-tighter opacity-20" style={{ color: accent, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
-                    <h3 contentEditable suppressContentEditableWarning className="text-lg font-bold outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
-                  </div>
-                  <p contentEditable suppressContentEditableWarning className="text-sm max-w-md leading-relaxed outline-none md:text-right" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        );
-      case "numbered-large":
-        return (
-          <section id="services" className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-            <motion.p {...getAnim()} className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: accent }}>{content.servicesTitle}</motion.p>
-            <div className="mt-12 space-y-16">
-              {content.services.map((service, i) => (
-                <motion.div key={i} {...getAnim(i)} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-                  <span className="md:col-span-2 text-6xl font-black tracking-tighter" style={{ color: `${accent}20`, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
-                  <div className="md:col-span-10">
-                    <h3 contentEditable suppressContentEditableWarning className="text-xl font-bold mb-3 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
-                    <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed max-w-2xl outline-none" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        );
-      case "timeline":
-        return (
-          <section id="services" className="max-w-4xl mx-auto px-6 md:px-12 py-24 md:py-32">
-            <motion.p {...getAnim()} className="text-xs font-bold uppercase tracking-[0.3em] mb-12 text-center" style={{ color: accent }}>{content.servicesTitle}</motion.p>
-            <div className="relative">
-              <div className="absolute left-6 top-0 bottom-0 w-px" style={{ backgroundColor: `${accent}30` }} />
-              {content.services.map((service, i) => (
-                <motion.div key={i} {...getAnim(i)} className="relative pl-16 pb-12 last:pb-0">
-                  <div className="absolute left-4 top-1 w-5 h-5 rounded-full border-2" style={{ borderColor: accent, backgroundColor: card }} />
-                  <h3 contentEditable suppressContentEditableWarning className="text-base font-bold mb-2 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
-                  <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        );
-      default: // cards
-        return (
-          <section id="services" className="max-w-7xl mx-auto px-6 md:px-12 py-24 md:py-32">
-            <motion.p {...getAnim()} className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: accent }}>{content.servicesTitle}</motion.p>
-            <motion.h2 {...getAnim(1)} className="text-2xl md:text-3xl font-bold mb-14 tracking-tight" style={{ fontFamily: headingFont }}>
-              Lo que ofrecemos
-            </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {content.services.map((service, i) => (
-                <motion.div key={i} {...getAnim(i)} className="group p-8 transition-all hover:shadow-lg"
-                  style={{ border: `1px solid ${border}`, backgroundColor: card, borderRadius: radius }}>
-                  <div className="flex items-start justify-between mb-5">
-                    <span className="text-3xl font-black tracking-tighter" style={{ color: `${accent}30`, fontFamily: headingFont }}>{String(i + 1).padStart(2, "0")}</span>
-                    <ArrowUpRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: accent }} />
-                  </div>
-                  <h3 contentEditable suppressContentEditableWarning className="text-base font-bold mb-2 outline-none" style={{ fontFamily: headingFont }}>{service.name}</h3>
-                  <p contentEditable suppressContentEditableWarning className="text-sm leading-relaxed outline-none" style={{ color: text2, fontFamily: bodyFont }}>{service.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        );
-    }
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   };
 
   // ====== CONTACT ======
   const renderContact = () => (
-    <section id="contact" className="py-24 md:py-32" style={{ backgroundColor: bgAlt }}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-          <div>
-            <motion.p {...getAnim()} className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: accent }}>{content.contactTitle}</motion.p>
-            <motion.h2 {...getAnim(1)} contentEditable suppressContentEditableWarning
-              className="text-3xl md:text-4xl font-bold mb-8 tracking-tight leading-tight outline-none" style={{ fontFamily: headingFont }}>{content.contactSubtitle}</motion.h2>
-            <div className="space-y-5 mt-10">
-              {(project.businessEmail || project.email) && (
-                <a href={`mailto:${project.businessEmail || project.email}`} className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 flex items-center justify-center" style={{ backgroundColor: `${accent}15`, borderRadius: radiusSm }}>
-                    <Mail className="w-4 h-4" style={{ color: accent }} />
-                  </div>
-                  <span className="text-sm font-medium group-hover:underline" style={{ color: text2, fontFamily: bodyFont }}>{project.businessEmail || project.email}</span>
-                </a>
-              )}
-              {(project.businessPhone || project.phone) && (
-                <a href={`https://wa.me/${(project.businessPhone || project.phone).replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 flex items-center justify-center" style={{ backgroundColor: "#25D36615", borderRadius: radiusSm }}>
-                    <MessageCircle className="w-4 h-4" style={{ color: "#25D366" }} />
-                  </div>
-                  <span className="text-sm font-medium group-hover:underline" style={{ color: text2, fontFamily: bodyFont }}>{project.businessPhone || project.phone}</span>
-                </a>
-              )}
-              {project.address && (
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center" style={{ backgroundColor: `${accent}15`, borderRadius: radiusSm }}>
-                    <MapPin className="w-4 h-4" style={{ color: accent }} />
-                  </div>
-                  <span className="text-sm font-medium" style={{ color: text2, fontFamily: bodyFont }}>{project.address}</span>
-                </div>
-              )}
-              {project.businessHours && (
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center" style={{ backgroundColor: `${accent}15`, borderRadius: radiusSm }}>
-                    <Clock className="w-4 h-4" style={{ color: accent }} />
-                  </div>
-                  <span className="text-sm font-medium" style={{ color: text2, fontFamily: bodyFont }}>{project.businessHours}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-3 pt-4">
-                {project.instagram && (
-                  <a href={`https://instagram.com/${project.instagram.replace("@", "")}`} target="_blank" rel="noreferrer"
-                    className="w-10 h-10 flex items-center justify-center transition-all hover:scale-110"
-                    style={{ backgroundColor: `${accent}15`, borderRadius: radiusSm }}>
-                    <Instagram className="w-4 h-4" style={{ color: accent }} />
-                  </a>
-                )}
-                {project.facebook && (
-                  <a href={project.facebook.startsWith("http") ? project.facebook : `https://${project.facebook}`} target="_blank" rel="noreferrer"
-                    className="w-10 h-10 flex items-center justify-center transition-all hover:scale-110"
-                    style={{ backgroundColor: `${accent}15`, borderRadius: radiusSm }}>
-                    <Facebook className="w-4 h-4" style={{ color: accent }} />
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-          <motion.div {...getAnim(2)} className="p-8 md:p-10 border flex flex-col items-center justify-center text-center gap-6"
-            style={{ borderColor: border, backgroundColor: card, borderRadius: radius }}>
-            <h3 className="font-bold text-lg" style={{ fontFamily: headingFont }}>¿Hablamos?</h3>
-            <p className="text-sm" style={{ color: text2, fontFamily: bodyFont }}>Contáctanos directamente por email o WhatsApp</p>
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
-              {(project.businessEmail || project.email) && (
-                <a href={`mailto:${project.businessEmail || project.email}`}
-                  className="flex-1 flex items-center justify-center gap-2 py-4 text-sm font-bold transition-all hover:scale-[1.02]"
-                  style={{ backgroundColor: `${accent}15`, color: accent, borderRadius: radius }}>
-                  <Mail className="w-4 h-4" /> Email
-                </a>
-              )}
-              {(project.businessPhone || project.phone) && (
-                <a href={`https://wa.me/${(project.businessPhone || project.phone).replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 py-4 text-white text-sm font-bold transition-all hover:scale-[1.02]"
-                  style={{ backgroundColor: "#25D366", borderRadius: radius }}>
-                  <MessageCircle className="w-4 h-4" /> WhatsApp
-                </a>
-              )}
-            </div>
-          </motion.div>
+    <section id="contact" className="py-20" style={{ backgroundColor: colors.accentDark }}>
+      <div className="max-w-4xl mx-auto px-6 md:px-12 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4"
+          style={{ color: colors.accentText, fontFamily: "'Plus Jakarta Sans'" }}>
+          {content.contactTitle}
+        </h2>
+        <p className="text-base mb-10" style={{ color: `${colors.accentText}cc` }}>{content.contactSubtitle}</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          {webEmail && (
+            <a href={`mailto:${webEmail}`}
+              className="flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold transition-all hover:scale-105"
+              style={{ background: colors.accentText, color: colors.accentDark }}>
+              <Mail className="w-4 h-4" /> Email
+            </a>
+          )}
+          {webPhone && (
+            <a href={`https://wa.me/${webPhone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
+              className="flex items-center gap-2 px-7 py-3.5 rounded-full text-white text-sm font-bold transition-all hover:scale-105"
+              style={{ background: "#25D366" }}>
+              <MessageCircle className="w-4 h-4" /> WhatsApp
+            </a>
+          )}
         </div>
-        {project.address && (
-          <div className="mt-16 overflow-hidden" style={{ border: `1px solid ${border}`, borderRadius: radius }}>
-            <iframe title="Ubicación" width="100%" height="350" style={{ border: 0 }}
-              src={`https://www.google.com/maps?q=${encodeURIComponent(project.address)}&output=embed`} allowFullScreen />
-          </div>
-        )}
+        {/* Contact details */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm" style={{ color: `${colors.accentText}99` }}>
+          {project.address && <span className="flex items-center gap-2"><MapPin className="w-4 h-4" /> {project.address}</span>}
+          {project.businessHours && <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> {project.businessHours}</span>}
+        </div>
+        {/* Social */}
+        <div className="mt-6 flex items-center justify-center gap-3">
+          {project.instagram && (
+            <a href={`https://instagram.com/${project.instagram.replace("@", "")}`} target="_blank" rel="noreferrer"
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+              style={{ backgroundColor: `${colors.accentText}20` }}>
+              <Instagram className="w-4 h-4" style={{ color: colors.accentText }} />
+            </a>
+          )}
+          {project.facebook && (
+            <a href={project.facebook.startsWith("http") ? project.facebook : `https://${project.facebook}`} target="_blank" rel="noreferrer"
+              className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+              style={{ backgroundColor: `${colors.accentText}20` }}>
+              <Facebook className="w-4 h-4" style={{ color: colors.accentText }} />
+            </a>
+          )}
+        </div>
       </div>
     </section>
   );
 
-  // ====== NAV ======
-  const renderNav = () => {
-    const navStyle = design.navStyle || "transparent";
-    if (navStyle === "hidden") return null;
-
-    const navBg = navStyle === "solid" ? card : "transparent";
-    const navBorder = navStyle === "solid" ? `1px solid ${border}` : "none";
-
-    if (navStyle === "centered") {
-      return (
-        <nav className="py-6 flex flex-col items-center gap-4" style={{ backgroundColor: navBg, borderBottom: navBorder }}>
-          <div className="flex items-center gap-3">
-            {project.logo && <img src={project.logo} alt="Logo" className="w-8 h-8 object-contain" style={{ borderRadius: radiusSm }} />}
-            <span contentEditable suppressContentEditableWarning className="font-bold text-lg tracking-tight outline-none" style={{ fontFamily: headingFont }}>{project.businessName}</span>
-          </div>
-          <div className="flex items-center gap-8 text-xs font-medium" style={{ color: text2 }}>
-            <a href="#about" className="hover:opacity-70 transition-opacity">Nosotros</a>
-            <a href="#services" className="hover:opacity-70 transition-opacity">Servicios</a>
-            <a href="#contact" className="hover:opacity-70 transition-opacity">Contacto</a>
-          </div>
-        </nav>
-      );
-    }
-
-    if (navStyle === "minimal") {
-      return (
-        <nav className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {project.logo && <img src={project.logo} alt="Logo" className="w-8 h-8 object-contain" style={{ borderRadius: radiusSm }} />}
-            <span contentEditable suppressContentEditableWarning className="font-bold text-base tracking-tight outline-none" style={{ fontFamily: headingFont }}>{project.businessName}</span>
-          </div>
-          <a href={`mailto:${project.businessEmail || project.email}`}
-            className="text-xs font-semibold px-5 py-2.5 transition-all hover:scale-105"
-            style={{ background: isGradient ? accentBg : accent, color: accentText, borderRadius: radius }}>
-            Contactar
-          </a>
-        </nav>
-      );
-    }
-
-    // transparent or solid
-    return (
-      <nav className="max-w-7xl mx-auto px-6 md:px-12 py-6 flex items-center justify-between" style={{ backgroundColor: navBg, borderBottom: navBorder }}>
-        <div className="flex items-center gap-3">
-          {project.logo && <img src={project.logo} alt="Logo" className="w-8 h-8 object-contain" style={{ borderRadius: radiusSm }} />}
-          <span contentEditable suppressContentEditableWarning
-            onBlur={(e) => setProject((p) => ({ ...p, businessName: e.currentTarget.textContent || p.businessName }))}
-            className="font-bold text-base tracking-tight outline-none" style={{ fontFamily: headingFont }}>{project.businessName}</span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-xs font-medium" style={{ color: text2 }}>
-          <a href="#about" className="hover:opacity-70 transition-opacity">Nosotros</a>
-          <a href="#services" className="hover:opacity-70 transition-opacity">Servicios</a>
-          <a href="#contact" className="hover:opacity-70 transition-opacity">Contacto</a>
-        </div>
-        <a href={`mailto:${project.businessEmail || project.email}`}
-          className="hidden md:flex items-center gap-1.5 text-xs font-semibold px-5 py-2.5 transition-all hover:scale-105"
-          style={{ background: isGradient ? accentBg : accent, color: accentText, borderRadius: radius }}>
-          Contactar <ArrowUpRight className="w-3 h-3" />
-        </a>
-      </nav>
-    );
-  };
-
   // ====== FOOTER ======
-  const renderFooter = () => {
-    const footerStyle = design.footerStyle || "minimal";
-
-    if (footerStyle === "banner") {
-      return (
-        <footer className="py-20 text-center" style={{ background: isGradient ? accentBg : accent, color: accentText }}>
-          <p className="text-3xl md:text-5xl font-bold mb-4 max-w-3xl mx-auto px-6" style={{ fontFamily: headingFont }}>{content.footerTagline}</p>
-          <a href={`mailto:${project.businessEmail || project.email}`}
-            className="inline-flex items-center gap-2 mt-6 px-8 py-4 text-sm font-bold transition-all hover:scale-105"
-            style={{ background: bg, color: accent, borderRadius: radius }}>
-            Contactar <ArrowUpRight className="w-4 h-4" />
-          </a>
-          <p className="mt-12 text-xs opacity-60">© {new Date().getFullYear()} {project.businessName}</p>
-        </footer>
-      );
-    }
-
-    if (footerStyle === "columns") {
-      return (
-        <footer className="max-w-7xl mx-auto px-6 md:px-12 py-16 grid grid-cols-1 md:grid-cols-3 gap-12" style={{ borderTop: `1px solid ${border}` }}>
+  const renderFooter = () => (
+    <footer className="py-12" style={{ backgroundColor: colors.bg, borderTop: `1px solid ${colors.border}` }}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-3">
               {project.logo && <img src={project.logo} alt="Logo" className="w-6 h-6 object-contain rounded" />}
-              <span className="font-bold" style={{ fontFamily: headingFont }}>{project.businessName}</span>
+              <span className="font-bold" style={{ fontFamily: "'Plus Jakarta Sans'" }}>{project.businessName}</span>
             </div>
-            <p className="text-sm" style={{ color: text2 }}>{content.footerTagline}</p>
+            <p className="text-sm" style={{ color: colors.text2 }}>{content.footerTagline}</p>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: accent }}>Navegación</p>
-            <div className="space-y-2 text-sm" style={{ color: text2 }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.accent }}>Navegación</p>
+            <div className="space-y-2 text-sm" style={{ color: colors.text2 }}>
               <a href="#about" className="block hover:opacity-70">Nosotros</a>
               <a href="#services" className="block hover:opacity-70">Servicios</a>
               <a href="#contact" className="block hover:opacity-70">Contacto</a>
             </div>
           </div>
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider mb-4" style={{ color: accent }}>Contacto</p>
-            <div className="space-y-2 text-sm" style={{ color: text2 }}>
-              {(project.businessEmail || project.email) && <a href={`mailto:${project.businessEmail || project.email}`} className="block hover:underline">{project.businessEmail || project.email}</a>}
-              {(project.businessPhone || project.phone) && <span className="block">{project.businessPhone || project.phone}</span>}
+            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: colors.accent }}>Contacto</p>
+            <div className="space-y-2 text-sm" style={{ color: colors.text2 }}>
+              {webEmail && <a href={`mailto:${webEmail}`} className="block hover:underline">{webEmail}</a>}
+              {webPhone && <span className="block">{webPhone}</span>}
+              {project.address && <span className="block">{project.address}</span>}
             </div>
           </div>
-        </footer>
-      );
-    }
-
-    if (footerStyle === "centered") {
-      return (
-        <footer className="py-16 text-center" style={{ borderTop: `1px solid ${border}` }}>
-          <div className="flex items-center justify-center gap-3 mb-4">
-            {project.logo && <img src={project.logo} alt="Logo" className="w-6 h-6 object-contain rounded" />}
-            <span className="font-bold" style={{ fontFamily: headingFont }}>{project.businessName}</span>
-          </div>
-          <p contentEditable suppressContentEditableWarning className="text-sm max-w-md mx-auto outline-none" style={{ color: text2 }}>{content.footerTagline}</p>
-          <p className="mt-6 text-xs" style={{ color: text2 }}>© {new Date().getFullYear()} {project.businessName}</p>
-        </footer>
-      );
-    }
-
-    // minimal
-    return (
-      <footer className="max-w-7xl mx-auto px-6 md:px-12 py-12 flex flex-col md:flex-row items-center justify-between gap-6" style={{ borderTop: `1px solid ${border}` }}>
-        <div className="flex items-center gap-3">
-          {project.logo && <img src={project.logo} alt="Logo" className="w-6 h-6 object-contain rounded" />}
-          <span className="text-sm font-bold" style={{ fontFamily: headingFont }}>{project.businessName}</span>
         </div>
-        <p contentEditable suppressContentEditableWarning className="text-xs outline-none text-center" style={{ color: text2 }}>{content.footerTagline}</p>
-        <p className="text-xs" style={{ color: text2 }}>© {new Date().getFullYear()} {project.businessName}</p>
-      </footer>
-    );
-  };
-
-  // Section map
-  const sectionMap: Record<string, () => JSX.Element | null> = {
-    hero: renderHero,
-    features: renderFeatures,
-    about: renderAbout,
-    photos: renderPhotos,
-    services: renderServices,
-    contact: renderContact,
-  };
-
-  const orderedSections = design.sectionOrder.filter(s => sectionMap[s]);
+        <div className="mt-10 pt-6 text-center text-xs" style={{ color: colors.text2, borderTop: `1px solid ${colors.border}` }}>
+          © {new Date().getFullYear()} {project.businessName}. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+  );
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: bg, color: text1, fontFamily: bodyFont }}>
+    <div className="min-h-screen" style={{ backgroundColor: colors.bg, color: colors.text1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       {/* Toolbar */}
-      <div className="sticky top-0 z-50 backdrop-blur-2xl border-b" style={{ backgroundColor: `${bg}e6`, borderColor: border }}>
+      <div className="sticky top-0 z-50 backdrop-blur-2xl border-b" style={{ backgroundColor: `${colors.bg}e6`, borderColor: colors.border }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
           <Button variant="ghost" size="sm" onClick={onBack} className="text-xs gap-1.5">
             <ArrowLeft className="w-3.5 h-3.5" /> Volver
           </Button>
           <div className="flex items-center gap-3">
-            <a href="mailto:hello@pgrdigital.tech" className="text-xs hover:underline" style={{ color: text2 }}>
+            <a href="mailto:hello@pgrdigital.tech" className="text-xs hover:underline" style={{ color: colors.text2 }}>
               hello@pgrdigital.tech
             </a>
             <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm" className="text-xs font-semibold rounded-full px-5"
-              style={{ backgroundColor: accent, color: accentText }}>
+              style={{ backgroundColor: colors.accent, color: colors.accentText }}>
               {isCheckingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <CreditCard className="w-3.5 h-3.5 mr-1.5" />}
               Publicar · 500€
             </Button>
@@ -737,48 +555,46 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       <AnimatePresence>
         {isGenerating && (
           <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-5" style={{ backgroundColor: bg }}>
+            className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-5" style={{ backgroundColor: colors.bg }}>
             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }}>
-              <Sparkles className="w-10 h-10" style={{ color: accent }} />
+              <Sparkles className="w-10 h-10" style={{ color: colors.accent }} />
             </motion.div>
             <div className="text-center">
-              <p className="text-sm font-semibold mb-1" style={{ fontFamily: headingFont }}>Diseñando tu web con IA</p>
-              <p className="text-xs" style={{ color: text2 }}>Creando un diseño único para tu negocio...</p>
+              <p className="text-sm font-semibold mb-1">Diseñando tu web con IA</p>
+              <p className="text-xs" style={{ color: colors.text2 }}>Creando un diseño único para tu negocio...</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Nav */}
+      {/* Fixed section order */}
       {renderNav()}
-
-      {/* Dynamic sections */}
-      {orderedSections.map((section) => (
-        <div key={section}>{sectionMap[section]()}</div>
-      ))}
-
-      {/* Footer */}
+      {renderHero()}
+      {renderCategories()}
+      {renderAbout()}
+      {renderServices()}
+      {renderCtaBanner()}
+      {renderFeatures()}
+      {renderTestimonials()}
+      {renderFaq()}
+      {renderContact()}
       {renderFooter()}
 
       {/* WhatsApp floating */}
-      {(project.businessPhone || project.phone) && (
-        <a href={`https://wa.me/${(project.businessPhone || project.phone).replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
+      {webPhone && (
+        <a href={`https://wa.me/${webPhone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer"
           className="fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform z-50"
           style={{ backgroundColor: "#25D366" }}>
           <MessageCircle className="w-6 h-6 text-white" />
         </a>
       )}
 
-      {/* Edit hint - more visible */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 2, duration: 0.5 }}
-        className="fixed bottom-6 left-6 z-50"
-      >
-        <div className="flex items-center gap-3 px-5 py-3 text-sm font-semibold shadow-2xl border-2"
-          style={{ backgroundColor: accent, color: accentText, borderColor: accent, borderRadius: radius }}>
-          ✏️ Haz clic en cualquier texto para editarlo antes de publicar
+      {/* Edit hint */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2, duration: 0.5 }}
+        className="fixed bottom-6 left-6 z-50">
+        <div className="flex items-center gap-3 px-5 py-3 text-sm font-semibold shadow-2xl border-2 rounded-full"
+          style={{ backgroundColor: colors.accent, color: colors.accentText, borderColor: colors.accent }}>
+          ✏️ Haz clic en cualquier texto para editarlo
         </div>
       </motion.div>
     </div>
