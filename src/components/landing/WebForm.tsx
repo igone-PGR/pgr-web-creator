@@ -108,7 +108,8 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
 
   const addCorporateColor = () => {
     if (form.corporateColors.length < 5) {
-      setForm((f) => ({ ...f, corporateColors: [...f.corporateColors, "#7c3aed"] }));
+      const fallback = form.corporateColors[0] || CORPORATE_PALETTES[0].colors[0];
+      setForm((f) => ({ ...f, corporateColors: [...f.corporateColors, fallback] }));
     }
   };
 
@@ -120,11 +121,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
   };
 
   const removeCorporateColor = (idx: number) => {
+    if (form.corporateColors.length <= 1) return;
     setForm((f) => ({
       ...f,
       corporateColors: f.corporateColors.filter((_, i) => i !== idx),
     }));
   };
+
+  const selectCorporatePalette = (paletteColors: readonly string[]) => {
+    setForm((f) => ({ ...f, corporateColors: [...paletteColors] }));
+  };
+
+  const selectedPalette = CORPORATE_PALETTES.find((palette) => areSamePalette(form.corporateColors, palette.colors));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
