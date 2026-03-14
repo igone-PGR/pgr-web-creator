@@ -19,6 +19,7 @@ export interface ProjectData {
   photos?: string[];
   preferredDomain?: string;
   language?: string;
+  corporateColors?: string[];
 }
 
 export const COLOR_SCHEMES = [
