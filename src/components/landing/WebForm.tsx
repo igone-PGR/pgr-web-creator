@@ -353,19 +353,55 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                     </div>
 
                     {/* Corporate Colors */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <Label>Colores corporativos</Label>
-                          <p className="text-xs text-muted-foreground mt-0.5">Añade los colores de tu marca para personalizar la web</p>
-                        </div>
-                        {form.corporateColors.length < 5 && (
-                          <button type="button" onClick={addCorporateColor} className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors">
-                            <Plus className="w-3.5 h-3.5" /> Añadir
-                          </button>
-                        )}
+                    <div className="space-y-4">
+                      <div>
+                        <Label>Paleta de colores</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">Elige una paleta y, si quieres, ajusta los tonos manualmente.</p>
                       </div>
-                      {form.corporateColors.length > 0 && (
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {CORPORATE_PALETTES.map((palette) => {
+                          const isSelected = areSamePalette(form.corporateColors, palette.colors);
+                          return (
+                            <button
+                              key={palette.name}
+                              type="button"
+                              onClick={() => selectCorporatePalette(palette.colors)}
+                              className={`rounded-2xl border p-3 text-left transition-all ${
+                                isSelected
+                                  ? "border-accent bg-accent/10 shadow-accent"
+                                  : "border-border bg-card hover:border-accent/40"
+                              }`}
+                            >
+                              <div className="h-9 overflow-hidden rounded-xl border border-border flex">
+                                {palette.colors.map((color) => (
+                                  <span key={color} className="flex-1" style={{ backgroundColor: color }} />
+                                ))}
+                              </div>
+                              <p className="mt-3 text-sm font-semibold">{palette.name}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-muted-foreground">
+                            {selectedPalette
+                              ? `Paleta seleccionada: ${selectedPalette.name}`
+                              : "Paleta personalizada"}
+                          </p>
+                          {form.corporateColors.length < 5 && (
+                            <button
+                              type="button"
+                              onClick={addCorporateColor}
+                              className="flex items-center gap-1 text-xs font-medium text-accent hover:text-accent/80 transition-colors"
+                            >
+                              <Plus className="w-3.5 h-3.5" /> Añadir tono
+                            </button>
+                          )}
+                        </div>
+
                         <div className="flex flex-wrap gap-3">
                           {form.corporateColors.map((color, idx) => (
                             <div key={idx} className="flex items-center gap-2 bg-secondary rounded-lg px-3 py-2">
@@ -377,16 +413,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                                 style={{ padding: 0 }}
                               />
                               <span className="text-xs font-mono text-muted-foreground uppercase">{color}</span>
-                              <button type="button" onClick={() => removeCorporateColor(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                              <button
+                                type="button"
+                                onClick={() => removeCorporateColor(idx)}
+                                className="text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40"
+                                disabled={form.corporateColors.length <= 1}
+                              >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           ))}
                         </div>
-                      )}
-                      {form.corporateColors.length === 0 && (
-                        <p className="text-xs text-muted-foreground">Si no añades colores, la IA elegirá una paleta ideal para tu sector</p>
-                      )}
+                      </div>
                     </div>
                   </div>
                 )}
