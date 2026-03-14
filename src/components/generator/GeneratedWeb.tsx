@@ -24,6 +24,38 @@ const ICON_MAP: Record<string, any> = {
 };
 
 const GOOGLE_FONTS = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap";
+const BASE_DARK_COLOR = "#131313";
+
+const HEX_COLOR_REGEX = /^#([0-9a-f]{6})$/i;
+
+const normalizeHex = (value?: string | null) => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return HEX_COLOR_REGEX.test(trimmed) ? trimmed.toUpperCase() : null;
+};
+
+const getContrastText = (hex: string) => {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.62 ? "#131313" : "#FFFFFF";
+};
+
+const normalizePalette = (palette: ColorPalette | undefined, corporateColors?: string[]): ColorPalette => {
+  const preferredAccent = normalizeHex(corporateColors?.[0]);
+  const accent = preferredAccent || normalizeHex(palette?.accent) || DEFAULT_COLORS.accent;
+  return {
+    ...DEFAULT_COLORS,
+    ...palette,
+    accent,
+    accentText: preferredAccent ? getContrastText(accent) : palette?.accentText || DEFAULT_COLORS.accentText,
+    accentDark: BASE_DARK_COLOR,
+    text1: normalizeHex(palette?.text1) || DEFAULT_COLORS.text1,
+    text2: normalizeHex(palette?.text2) || DEFAULT_COLORS.text2,
+  };
+};
 
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [project] = useState<ProjectData>(data);
@@ -34,7 +66,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { toast } = useToast();
 
-  const colors: ColorPalette = content.colors || DEFAULT_COLORS;
+  const colors: ColorPalette = normalizePalette(content.colors, project.corporateColors);
   const photos = project.photos || [];
   const hasPhotos = photos.length > 0;
 
