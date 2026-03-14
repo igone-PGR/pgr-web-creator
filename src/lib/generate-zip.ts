@@ -1,5 +1,20 @@
 import JSZip from "jszip";
 
+const BASE_DARK_COLOR = "#131313";
+const HEX_COLOR_REGEX = /^#([0-9a-f]{6})$/i;
+
+const DEFAULT_COLORS = {
+  bg: "#FAFAF9",
+  bgAlt: "#F3F2EF",
+  card: "#FFFFFF",
+  text1: "#131313",
+  text2: "#5F5F5F",
+  border: "#E8E7E3",
+  accent: "#F48763",
+  accentText: "#FFFFFF",
+  accentDark: BASE_DARK_COLOR,
+};
+
 function escapeHtml(text: string | null | undefined): string {
   if (!text) return "";
   const map: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -13,6 +28,21 @@ function sanitizeHref(url: string): string {
     if (!["http:", "https:", "mailto:"].includes(parsed.protocol)) return "#";
     return escapeHtml(parsed.href);
   } catch { return "#"; }
+}
+
+function normalizeHex(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return HEX_COLOR_REGEX.test(trimmed) ? trimmed.toUpperCase() : null;
+}
+
+function getContrastText(hex: string): string {
+  const clean = hex.replace("#", "");
+  const r = parseInt(clean.slice(0, 2), 16);
+  const g = parseInt(clean.slice(2, 4), 16);
+  const b = parseInt(clean.slice(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.62 ? "#131313" : "#FFFFFF";
 }
 
 interface ProjectForZip {
@@ -37,7 +67,14 @@ interface ProjectForZip {
 export async function generateProjectZip(project: ProjectForZip): Promise<Blob> {
   const zip = new JSZip();
   const content = project.generated_content || {};
-  const colors = content.colors || { bg: "#fafaf9", bgAlt: "#f3f2ef", card: "#ffffff", text1: "#1a1a17", text2: "#6b6b63", border: "#e8e7e3", accent: "#1B5E3B", accentText: "#ffffff", accentDark: "#143D2B" };
+  const accent = normalizeHex(content.colors?.accent) || DEFAULT_COLORS.accent;
+  const colors = {
+    ...DEFAULT_COLORS,
+    ...content.colors,
+    accent,
+    accentText: normalizeHex(content.colors?.accentText) || getContrastText(accent),
+    accentDark: BASE_DARK_COLOR,
+  };
 
   const webEmail = project.business_email || project.email;
   const webPhone = project.business_phone || project.phone;
