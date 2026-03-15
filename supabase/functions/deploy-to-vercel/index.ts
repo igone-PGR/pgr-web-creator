@@ -218,9 +218,21 @@ serve(async (req) => {
     const { project_id } = await req.json();
     if (!project_id) throw new Error("project_id is required");
 
-    const VERCEL_TOKEN = Deno.env.get("VERCEL_API_TOKEN");
-    const VERCEL_TEAM_ID = Deno.env.get("VERCEL_TEAM_ID") || "";
+    const VERCEL_TOKEN = (Deno.env.get("VERCEL_API_TOKEN") || "").trim();
+    const VERCEL_TEAM_ID = (Deno.env.get("VERCEL_TEAM_ID") || "").trim();
     if (!VERCEL_TOKEN) throw new Error("VERCEL_API_TOKEN not configured");
+
+    // Validate token by checking user endpoint first
+    console.log(`Token length: ${VERCEL_TOKEN.length}, starts with: ${VERCEL_TOKEN.substring(0, 8)}...`);
+    const tokenCheckRes = await fetch("https://api.vercel.com/v2/user", {
+      headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
+    });
+    const tokenCheckData = await tokenCheckRes.json();
+    if (!tokenCheckRes.ok) {
+      console.error("Token validation failed:", JSON.stringify(tokenCheckData));
+      throw new Error(`VERCEL_API_TOKEN inválido (status ${tokenCheckRes.status}). Genera un nuevo token en vercel.com/account/tokens con scope "Full Account".`);
+    }
+    console.log(`Token valid - Vercel user: ${tokenCheckData.user?.username || tokenCheckData.user?.email}`);
 
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
