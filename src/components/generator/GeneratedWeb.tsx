@@ -57,6 +57,12 @@ const normalizePalette = (palette: ColorPalette | undefined, corporateColors?: s
   };
 };
 
+const EXTRAS_OPTIONS = [
+  { id: "price_1TBbCdL3Sa5XsYOcUPt1GXYK", icon: ShoppingCart, name: "E-commerce", price: 400, description: "Tienda online con catálogo y pasarela de pago" },
+  { id: "price_1TBbDnL3Sa5XsYOcyHoLWTOj", icon: CalendarCheck, name: "Agenda de citas / Reservas", price: 250, description: "Sistema de reservas online integrado" },
+  { id: "price_1TBbE8L3Sa5XsYOcNTDC02en", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
+];
+
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [project] = useState<ProjectData>(data);
   const [content, setContent] = useState<WebContent>(DEFAULT_CONTENT);
@@ -64,6 +70,8 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [showExtrasPanel, setShowExtrasPanel] = useState(false);
   const { toast } = useToast();
 
   const colors: ColorPalette = normalizePalette(content.colors, project.corporateColors);
