@@ -122,12 +122,21 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     }
   };
 
+  const toggleExtra = (id: string) => {
+    setSelectedExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
+  };
+
+  const extrasTotal = selectedExtras.reduce((sum, id) => {
+    const ext = EXTRAS_OPTIONS.find(e => e.id === id);
+    return sum + (ext?.price || 0);
+  }, 0);
+
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
       const { photos: _photos, logo: _logo, ...projectWithoutBinaries } = project;
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
-        body: { project: { ...projectWithoutBinaries, logo: null }, generatedContent: content },
+        body: { project: { ...projectWithoutBinaries, logo: null }, generatedContent: content, extras: selectedExtras },
       });
       if (error) throw error;
       if (result?.url) {
