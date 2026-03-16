@@ -28,6 +28,7 @@ const Index = () => {
         <Hero />
         <Examples />
         <HowItWorks />
+        <Pricing />
         <WebForm onSubmit={setGeneratedProject} />
       </main>
       <Footer />
