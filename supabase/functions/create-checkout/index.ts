@@ -36,9 +36,16 @@ const ProjectSchema = z.object({
   language: z.string().max(10).optional().default("es"),
 });
 
+const VALID_EXTRAS = [
+  "price_1TBbCdL3Sa5XsYOcUPt1GXYK", // E-commerce 400€
+  "price_1TBbDnL3Sa5XsYOcyHoLWTOj", // Agenda citas 250€
+  "price_1TBbE8L3Sa5XsYOcNTDC02en", // Logo + marca 150€
+];
+
 const CheckoutRequestSchema = z.object({
   project: ProjectSchema,
   generatedContent: z.record(z.unknown()).optional().nullable(),
+  extras: z.array(z.string()).optional().default([]),
 });
 
 serve(async (req) => {
@@ -48,7 +55,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { project, generatedContent } = CheckoutRequestSchema.parse(body);
+    const { project, generatedContent, extras } = CheckoutRequestSchema.parse(body);
 
     // Save project to DB first
     const supabaseAdmin = createClient(
@@ -94,11 +101,20 @@ serve(async (req) => {
       apiVersion: "2025-08-27.basil",
     });
 
+    // Build line items: base product + validated extras
+    const lineItems: { price: string; quantity: number }[] = [
+      { price: "price_1T4ezHL3Sa5XsYOcVNfsSnTm", quantity: 1 },
+    ];
+
+    for (const extraPriceId of extras) {
+      if (VALID_EXTRAS.includes(extraPriceId)) {
+        lineItems.push({ price: extraPriceId, quantity: 1 });
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer_email: project.email,
-      line_items: [
-        { price: "price_1T4ezHL3Sa5XsYOcVNfsSnTm", quantity: 1 },
-      ],
+      line_items: lineItems,
       mode: "payment",
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}&project_id=${savedProject.id}`,
       cancel_url: `${req.headers.get("origin")}/?canceled=true`,
