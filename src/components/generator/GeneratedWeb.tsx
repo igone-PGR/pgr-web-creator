@@ -4,7 +4,7 @@ import {
   ArrowLeft, CreditCard, Mail, Phone, MapPin, MessageCircle,
   ArrowUpRight, Loader2, Clock, Sparkles, Star, Heart, Shield, Award,
   ChevronLeft, ChevronRight, ChevronDown, Zap, Check, Users, Target,
-  Instagram, Facebook,
+  Instagram, Facebook, ShoppingCart, CalendarCheck, Palette, PenTool, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProjectData } from "@/types/project";
