@@ -4,7 +4,7 @@ import {
   ArrowLeft, CreditCard, Mail, Phone, MapPin, MessageCircle,
   ArrowUpRight, Loader2, Clock, Sparkles, Star, Heart, Shield, Award,
   ChevronLeft, ChevronRight, ChevronDown, Zap, Check, Users, Target,
-  Instagram, Facebook,
+  Instagram, Facebook, ShoppingCart, CalendarCheck, Palette, PenTool, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProjectData } from "@/types/project";
@@ -57,6 +57,12 @@ const normalizePalette = (palette: ColorPalette | undefined, corporateColors?: s
   };
 };
 
+const EXTRAS_OPTIONS = [
+  { id: "price_1TBbCdL3Sa5XsYOcUPt1GXYK", icon: ShoppingCart, name: "E-commerce", price: 400, description: "Tienda online con catálogo y pasarela de pago" },
+  { id: "price_1TBbDnL3Sa5XsYOcyHoLWTOj", icon: CalendarCheck, name: "Agenda de citas / Reservas", price: 250, description: "Sistema de reservas online integrado" },
+  { id: "price_1TBbE8L3Sa5XsYOcNTDC02en", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
+];
+
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [project] = useState<ProjectData>(data);
   const [content, setContent] = useState<WebContent>(DEFAULT_CONTENT);
@@ -64,6 +70,8 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [showExtrasPanel, setShowExtrasPanel] = useState(false);
   const { toast } = useToast();
 
   const colors: ColorPalette = normalizePalette(content.colors, project.corporateColors);
@@ -114,12 +122,21 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     }
   };
 
+  const toggleExtra = (id: string) => {
+    setSelectedExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
+  };
+
+  const extrasTotal = selectedExtras.reduce((sum, id) => {
+    const ext = EXTRAS_OPTIONS.find(e => e.id === id);
+    return sum + (ext?.price || 0);
+  }, 0);
+
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
       const { photos: _photos, logo: _logo, ...projectWithoutBinaries } = project;
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
-        body: { project: { ...projectWithoutBinaries, logo: null }, generatedContent: content },
+        body: { project: { ...projectWithoutBinaries, logo: null }, generatedContent: content, extras: selectedExtras },
       });
       if (error) throw error;
       if (result?.url) {
@@ -572,17 +589,99 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
             <ArrowLeft className="w-3.5 h-3.5" /> Volver
           </Button>
           <div className="flex items-center gap-3">
-            <a href="mailto:hello@pgrdigital.tech" className="text-xs hover:underline" style={{ color: colors.text2 }}>
-              hello@pgrdigital.tech
-            </a>
+            <button onClick={() => setShowExtrasPanel(true)}
+              className="text-xs font-medium px-3 py-1.5 rounded-full border transition-all hover:shadow-md flex items-center gap-1.5"
+              style={{ borderColor: colors.accent, color: colors.accent }}>
+              🚀 Añadir extras {selectedExtras.length > 0 && `(${selectedExtras.length})`}
+            </button>
             <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm" className="text-xs font-semibold rounded-full px-5"
               style={{ backgroundColor: colors.accent, color: colors.accentText }}>
               {isCheckingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <CreditCard className="w-3.5 h-3.5 mr-1.5" />}
-              Publicar · 500€
+              Publicar · {500 + extrasTotal}€
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Extras Panel */}
+      <AnimatePresence>
+        {showExtrasPanel && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(0,0,0,0.6)" }}
+            onClick={() => setShowExtrasPanel(false)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-lg rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[85vh]"
+              style={{ backgroundColor: colors.bg, border: `1px solid ${colors.border}` }}
+              onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-lg font-bold" style={{ color: colors.text1 }}>🚀 Extras premium</h3>
+                <button onClick={() => setShowExtrasPanel(false)} className="p-1 rounded-lg hover:opacity-70">
+                  <X className="w-5 h-5" style={{ color: colors.text2 }} />
+                </button>
+              </div>
+              <p className="text-sm mb-5" style={{ color: colors.text2 }}>Potencia tu web con funcionalidades adicionales</p>
+              <div className="space-y-3">
+                {EXTRAS_OPTIONS.map(ext => {
+                  const selected = selectedExtras.includes(ext.id);
+                  return (
+                    <button key={ext.id} onClick={() => toggleExtra(ext.id)}
+                      className="w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all"
+                      style={{
+                        borderColor: selected ? colors.accent : colors.border,
+                        backgroundColor: selected ? `${colors.accent}10` : colors.card,
+                      }}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: `${colors.accent}15` }}>
+                        <ext.icon className="w-5 h-5" style={{ color: colors.accent }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm" style={{ color: colors.text1 }}>{ext.name}</span>
+                          <span className="font-extrabold text-sm" style={{ color: colors.accent }}>{ext.price}€</span>
+                        </div>
+                        <p className="text-xs mt-1" style={{ color: colors.text2 }}>{ext.description}</p>
+                      </div>
+                      <div className="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{ borderColor: selected ? colors.accent : colors.border, backgroundColor: selected ? colors.accent : "transparent" }}>
+                        {selected && <Check className="w-3 h-3" style={{ color: colors.accentText }} />}
+                      </div>
+                    </button>
+                  );
+                })}
+
+                {/* Diseño extra - contact only */}
+                <div className="flex items-start gap-3 p-4 rounded-xl border text-left" style={{ borderColor: colors.border, backgroundColor: colors.card }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: `${colors.accent}15` }}>
+                    <Palette className="w-5 h-5" style={{ color: colors.accent }} />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-sm" style={{ color: colors.text1 }}>Diseño extra (2 rondas)</span>
+                      <span className="font-bold text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${colors.accent}15`, color: colors.accent }}>A consultar</span>
+                    </div>
+                    <p className="text-xs mt-1" style={{ color: colors.text2 }}>2 rondas de revisiones de diseño personalizado</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4" style={{ borderTop: `1px solid ${colors.border}` }}>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold" style={{ color: colors.text1 }}>Total</span>
+                  <span className="text-xl font-extrabold" style={{ color: colors.text1 }}>{500 + extrasTotal}€</span>
+                </div>
+                <button onClick={() => { setShowExtrasPanel(false); handleCheckout(); }}
+                  disabled={isCheckingOut}
+                  className="w-full py-3 rounded-full font-bold text-sm transition-all hover:scale-[1.02]"
+                  style={{ backgroundColor: colors.accent, color: colors.accentText }}>
+                  {isCheckingOut ? "Procesando..." : `Publicar mi web · ${500 + extrasTotal}€`}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Loading */}
       <AnimatePresence>
