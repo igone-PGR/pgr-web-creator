@@ -3,6 +3,7 @@ import Header from "@/components/landing/Header";
 import Hero from "@/components/landing/Hero";
 import Examples from "@/components/landing/Examples";
 import HowItWorks from "@/components/landing/HowItWorks";
+import Pricing from "@/components/landing/Pricing";
 import WebForm from "@/components/landing/WebForm";
 import Footer from "@/components/landing/Footer";
 import GeneratedWeb from "@/components/generator/GeneratedWeb";
