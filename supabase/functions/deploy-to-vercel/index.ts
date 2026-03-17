@@ -34,21 +34,11 @@ function slugify(text: string): string {
     .substring(0, 50);
 }
 
-const COLOR_MAP: Record<string, { primary: string; secondary: string }> = {
-  Coral: { primary: "#FF6B4A", secondary: "#FFF0ED" },
-  Azul: { primary: "#3B82F6", secondary: "#EFF6FF" },
-  Verde: { primary: "#10B981", secondary: "#ECFDF5" },
-  Violeta: { primary: "#8B5CF6", secondary: "#F5F3FF" },
-  Rosa: { primary: "#EC4899", secondary: "#FDF2F8" },
-  "Ámbar": { primary: "#F59E0B", secondary: "#FFFBEB" },
-};
-
 function generateSiteFiles(project: any) {
   const content = project.generated_content || {};
   const design = content.design || {};
   const colors = content.colors || design.colors || {};
   const dark = design.darkMode ?? project.dark_mode;
-  const scheme = COLOR_MAP[project.color_scheme] || COLOR_MAP.Coral;
 
   const bg = colors.bg || (dark ? "#0A0A0F" : "#FAFAF9");
   const bgAlt = colors.bgAlt || (dark ? "#111118" : "#F3F2EF");
@@ -56,21 +46,53 @@ function generateSiteFiles(project: any) {
   const text1 = colors.text1 || (dark ? "#F5F5F0" : "#131313");
   const text2 = colors.text2 || (dark ? "#8A8A95" : "#5F5F5F");
   const border = colors.border || (dark ? "#222230" : "#E8E7E3");
-  const accent = colors.accent || scheme.primary;
+  const accent = colors.accent || "#FF6B4A";
   const accentText = colors.accentText || "#FFFFFF";
 
-  const fontPair = design.fontPair || { heading: "Inter", body: "Inter" };
+  const fontPair = design.fontPair || { heading: "Plus Jakarta Sans", body: "Plus Jakarta Sans" };
   const borderRadius = design.borderRadius === "sharp" ? "0" : design.borderRadius === "pill" ? "9999px" : "1.5rem";
 
   const services = content.services || [];
   const features = content.features || [];
+  const testimonials = content.testimonials || [];
+  const faq = content.faq || [];
+  const photos: string[] = project.photos || [];
+  const logo: string | null = project.logo || null;
 
-  const servicesHtml = services.map((s: any, i: number) => `
+  const webEmail = project.business_email || project.email;
+  const webPhone = project.business_phone || project.phone;
+  const lang = project.language || "es";
+
+  // --- Photo grid for hero ---
+  const heroPhotosHtml = photos.length > 0 ? `
+    <div class="hero-photos">
+      <img src="${escapeHtml(photos[0])}" alt="${escapeHtml(project.business_name)}" class="hero-photo-main" />
+      ${photos.length > 1 ? `<div class="hero-photos-row">
+        ${photos.slice(1, 3).map(p => `<img src="${escapeHtml(p)}" alt="" class="hero-photo-sm" />`).join("")}
+      </div>` : ""}
+    </div>
+  ` : `<div class="hero-placeholder"><span>✦</span></div>`;
+
+  // --- About photo ---
+  const aboutPhoto = photos.length > 0 ? `
+    <img src="${escapeHtml(photos[Math.min(1, photos.length - 1)])}" alt="${escapeHtml(project.business_name)}" class="about-photo" />
+  ` : `<div class="about-placeholder"></div>`;
+
+  // --- Services ---
+  const servicesHtml = services.map((s: any, i: number) => {
+    const photoUrl = photos.length > 0 ? photos[i % photos.length] : null;
+    const imgHtml = photoUrl
+      ? `<div class="service-img"><img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(s.name)}" /></div>`
+      : `<div class="service-img service-placeholder"><span>✦</span></div>`;
+    return `
     <div class="service-card">
-      <span class="service-num">${String(i + 1).padStart(2, "0")}</span>
-      <h3>${escapeHtml(s.name)}</h3>
-      <p>${escapeHtml(s.description)}</p>
-    </div>`).join("");
+      ${imgHtml}
+      <div class="service-body">
+        <h3>${escapeHtml(s.name)}</h3>
+        <p>${escapeHtml(s.description)}</p>
+      </div>
+    </div>`;
+  }).join("");
 
   const featuresHtml = features.map((f: any, i: number) => `
     <div class="feature-card ${i === 0 ? "feature-wide" : ""}">
@@ -78,9 +100,27 @@ function generateSiteFiles(project: any) {
       <p>${escapeHtml(f.description)}</p>
     </div>`).join("");
 
-  const webEmail = project.business_email || project.email;
-  const webPhone = project.business_phone || project.phone;
-  const lang = project.language || "es";
+  const testimonialsHtml = testimonials.map((t: any) => `
+    <div class="testimonial-card">
+      <div class="testimonial-stars">${"★".repeat(t.rating || 5)}</div>
+      <p class="testimonial-text">"${escapeHtml(t.text)}"</p>
+      <p class="testimonial-name">— ${escapeHtml(t.name)}</p>
+    </div>`).join("");
+
+  const faqHtml = faq.map((f: any) => `
+    <details class="faq-item">
+      <summary>${escapeHtml(f.question)}</summary>
+      <p>${escapeHtml(f.answer)}</p>
+    </details>`).join("");
+
+  // --- Photo gallery section ---
+  const galleryHtml = photos.length > 3 ? `
+  <section class="gallery">
+    <p class="section-tag">Galería</p>
+    <div class="gallery-grid">
+      ${photos.slice(0, 8).map(p => `<img src="${escapeHtml(p)}" alt="" class="gallery-img" />`).join("")}
+    </div>
+  </section>` : "";
 
   const contactItems = [
     webEmail ? `<a href="mailto:${escapeHtml(webEmail)}" class="contact-item">📧 ${escapeHtml(webEmail)}</a>` : "",
@@ -94,6 +134,8 @@ function generateSiteFiles(project: any) {
     project.facebook ? `<a href="${sanitizeHref(project.facebook)}" target="_blank">Facebook</a>` : "",
   ].filter(Boolean).join(" · ");
 
+  const logoHtml = logo ? `<img src="${escapeHtml(logo)}" alt="${escapeHtml(project.business_name)}" class="nav-logo" />` : "";
+
   const html = `<!DOCTYPE html>
 <html lang="${escapeHtml(lang)}">
 <head>
@@ -106,34 +148,61 @@ function generateSiteFiles(project: any) {
 </head>
 <body>
   <nav>
-    <span class="logo">${escapeHtml(project.business_name)}</span>
-    <div class="nav-links">
-      <a href="#about">${lang === "en" ? "About" : lang === "fr" ? "À propos" : "Nosotros"}</a>
-      <a href="#services">${lang === "en" ? "Services" : lang === "fr" ? "Services" : "Servicios"}</a>
-      <a href="#contact">${lang === "en" ? "Contact" : lang === "fr" ? "Contact" : "Contacto"}</a>
+    <div class="nav-brand">
+      ${logoHtml}
+      <span class="logo">${escapeHtml(project.business_name)}</span>
     </div>
-    <a href="mailto:${escapeHtml(webEmail)}" class="nav-cta">${lang === "en" ? "Contact" : lang === "fr" ? "Contacter" : "Contactar"} →</a>
+    <div class="nav-links">
+      <a href="#about">${lang === "en" ? "About" : "Nosotros"}</a>
+      <a href="#services">${lang === "en" ? "Services" : "Servicios"}</a>
+      <a href="#contact">${lang === "en" ? "Contact" : "Contacto"}</a>
+    </div>
+    <a href="mailto:${escapeHtml(webEmail)}" class="nav-cta">${lang === "en" ? "Contact" : "Contactar"} →</a>
   </nav>
 
   <section class="hero">
-    <p class="hero-tag">${escapeHtml(project.slogan || project.sector)}</p>
-    <h1>${escapeHtml(content.heroHeadline || project.business_name)}</h1>
-    <p class="hero-sub">${escapeHtml(content.heroSubtitle || project.description)}</p>
-    <a href="#contact" class="hero-btn">${escapeHtml(content.heroCta || "Contactar")} →</a>
+    <div class="hero-content">
+      <div class="hero-text">
+        <p class="hero-tag">${escapeHtml(project.slogan || project.sector)}</p>
+        <h1>${escapeHtml(content.heroHeadline || project.business_name)}</h1>
+        <p class="hero-sub">${escapeHtml(content.heroSubtitle || project.description)}</p>
+        <a href="#contact" class="hero-btn">${escapeHtml(content.heroCta || "Contactar")} →</a>
+      </div>
+      ${heroPhotosHtml}
+    </div>
   </section>
 
   ${featuresHtml ? `<section class="features">${featuresHtml}</section>` : ""}
 
   <section id="about" class="about">
-    <p class="section-tag">${escapeHtml(content.aboutTitle || "Sobre nosotros")}</p>
-    <p class="about-text">${escapeHtml(content.aboutText || project.description)}</p>
+    <div class="about-grid">
+      ${aboutPhoto}
+      <div class="about-text-col">
+        <p class="section-tag">${escapeHtml(content.aboutTitle || "Sobre nosotros")}</p>
+        <p class="about-text">${escapeHtml(content.aboutText || project.description)}</p>
+      </div>
+    </div>
   </section>
 
   <section id="services" class="services">
     <p class="section-tag">${escapeHtml(content.servicesTitle || "Servicios")}</p>
-    <h2>${lang === "en" ? "What we offer" : lang === "fr" ? "Ce que nous offrons" : "Lo que ofrecemos"}</h2>
+    <h2>${escapeHtml(content.servicesSubtitle || "Lo que ofrecemos")}</h2>
     <div class="services-grid">${servicesHtml}</div>
   </section>
+
+  ${galleryHtml}
+
+  ${testimonialsHtml ? `
+  <section class="testimonials">
+    <p class="section-tag">Opiniones</p>
+    <div class="testimonials-grid">${testimonialsHtml}</div>
+  </section>` : ""}
+
+  ${faqHtml ? `
+  <section id="faq" class="faq-section">
+    <p class="section-tag">Preguntas frecuentes</p>
+    <div class="faq-list">${faqHtml}</div>
+  </section>` : ""}
 
   <section id="contact" class="contact">
     <div class="contact-inner">
@@ -147,7 +216,7 @@ function generateSiteFiles(project: any) {
   </section>
 
   <footer>
-    <p>© ${new Date().getFullYear()} ${escapeHtml(project.business_name)}. ${lang === "en" ? "All rights reserved." : lang === "fr" ? "Tous droits réservés." : "Todos los derechos reservados."}</p>
+    <p>© ${new Date().getFullYear()} ${escapeHtml(project.business_name)}. ${lang === "en" ? "All rights reserved." : "Todos los derechos reservados."}</p>
     ${content.footerTagline ? `<p class="footer-tagline">${escapeHtml(content.footerTagline)}</p>` : ""}
   </footer>
 </body>
@@ -157,18 +226,27 @@ function generateSiteFiles(project: any) {
 body { font-family:'${fontPair.body}',sans-serif; background:${bg}; color:${text1}; }
 h1,h2,h3 { font-family:'${fontPair.heading}',sans-serif; }
 a { color:inherit; text-decoration:none; }
+img { max-width:100%; height:auto; }
 
 nav { max-width:1200px; margin:0 auto; padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+.nav-brand { display:flex; align-items:center; gap:0.75rem; }
+.nav-logo { width:32px; height:32px; object-fit:contain; border-radius:8px; }
 .logo { font-weight:700; font-size:1rem; font-family:'${fontPair.heading}',sans-serif; }
 .nav-links { display:flex; gap:2rem; font-size:0.75rem; font-weight:500; color:${text2}; }
 .nav-links a:hover { opacity:0.7; }
 .nav-cta { font-size:0.75rem; font-weight:600; padding:0.625rem 1.25rem; border-radius:${borderRadius}; background:${accent}; color:${accentText}; }
 
-.hero { max-width:1200px; margin:0 auto; padding:6rem 2rem 4rem; }
+.hero { background:#131313; }
+.hero-content { max-width:1200px; margin:0 auto; padding:6rem 2rem 4rem; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
 .hero-tag { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.25em; color:${accent}; margin-bottom:1.5rem; }
-.hero h1 { font-size:clamp(2.5rem,8vw,5rem); font-weight:900; line-height:0.95; letter-spacing:-0.03em; max-width:800px; }
-.hero-sub { margin-top:1.5rem; font-size:1.1rem; color:${text2}; max-width:500px; line-height:1.6; }
+.hero h1 { font-size:clamp(2.5rem,6vw,4.5rem); font-weight:900; line-height:0.95; letter-spacing:-0.03em; color:#fff; }
+.hero-sub { margin-top:1.5rem; font-size:1.1rem; color:#ffffffcc; max-width:500px; line-height:1.6; }
 .hero-btn { display:inline-block; margin-top:2.5rem; padding:1rem 2rem; border-radius:${borderRadius}; background:${accent}; color:${accentText}; font-weight:700; font-size:0.875rem; }
+.hero-photos { display:grid; gap:0.75rem; }
+.hero-photo-main { width:100%; height:280px; object-fit:cover; border-radius:${borderRadius}; }
+.hero-photos-row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+.hero-photo-sm { width:100%; height:160px; object-fit:cover; border-radius:${borderRadius}; }
+.hero-placeholder { width:100%; height:320px; border-radius:${borderRadius}; background:${accent}44; display:flex; align-items:center; justify-content:center; font-size:3rem; color:${accentText}44; }
 
 .features { max-width:1200px; margin:0 auto; padding:4rem 2rem; display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
 .feature-card { padding:2.5rem; border-radius:${borderRadius}; border:1px solid ${border}; background:${card}; }
@@ -177,17 +255,41 @@ nav { max-width:1200px; margin:0 auto; padding:1.5rem 2rem; display:flex; align-
 .feature-card p { font-size:0.875rem; color:${text2}; line-height:1.6; }
 
 .about { padding:6rem 0; background:${bgAlt}; }
-.about > * { max-width:1200px; margin:0 auto; padding:0 2rem; }
+.about-grid { max-width:1200px; margin:0 auto; padding:0 2rem; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+.about-photo { width:100%; height:420px; object-fit:cover; border-radius:${borderRadius}; }
+.about-placeholder { width:100%; height:420px; border-radius:${borderRadius}; background:${accent}10; }
 .section-tag { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.25em; color:${accent}; margin-bottom:2rem; }
-.about-text { font-size:clamp(1.5rem,4vw,3rem); font-weight:700; line-height:1.1; max-width:900px; }
+.about-text { font-size:clamp(1.5rem,4vw,2.5rem); font-weight:700; line-height:1.15; }
 
 .services { max-width:1200px; margin:0 auto; padding:6rem 2rem; }
 .services h2 { font-size:2rem; font-weight:700; margin-bottom:3rem; }
-.services-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.25rem; }
-.service-card { padding:2rem; border-radius:${borderRadius}; border:1px solid ${border}; background:${card}; }
-.service-num { font-size:2rem; font-weight:900; color:${accent}30; }
-.service-card h3 { font-size:1.1rem; font-weight:700; margin:0.75rem 0 0.5rem; }
+.services-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem; }
+.service-card { border-radius:${borderRadius}; border:1px solid ${border}; background:${card}; overflow:hidden; }
+.service-img { height:200px; overflow:hidden; }
+.service-img img { width:100%; height:100%; object-fit:cover; transition:transform 0.5s; }
+.service-card:hover .service-img img { transform:scale(1.05); }
+.service-placeholder { display:flex; align-items:center; justify-content:center; background:${accent}10; font-size:2rem; color:${accent}33; }
+.service-body { padding:1.5rem; }
+.service-card h3 { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; }
 .service-card p { font-size:0.875rem; color:${text2}; line-height:1.6; }
+
+.gallery { max-width:1200px; margin:0 auto; padding:4rem 2rem; }
+.gallery-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+.gallery-img { width:100%; height:200px; object-fit:cover; border-radius:${borderRadius}; }
+
+.testimonials { max-width:1200px; margin:0 auto; padding:6rem 2rem; }
+.testimonials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+.testimonial-card { padding:2rem; border-radius:${borderRadius}; background:${card}; border:1px solid ${border}; }
+.testimonial-stars { color:${accent}; margin-bottom:0.75rem; }
+.testimonial-text { font-size:0.95rem; color:${text1}; line-height:1.6; margin-bottom:1rem; font-style:italic; }
+.testimonial-name { font-size:0.8rem; color:${text2}; font-weight:600; }
+
+.faq-section { max-width:800px; margin:0 auto; padding:6rem 2rem; }
+.faq-list { margin-top:1rem; }
+.faq-item { border-bottom:1px solid ${border}; }
+.faq-item summary { padding:1.25rem 0; font-weight:600; cursor:pointer; font-size:1rem; list-style:none; }
+.faq-item summary::-webkit-details-marker { display:none; }
+.faq-item p { padding:0 0 1.25rem; font-size:0.9rem; color:${text2}; line-height:1.6; }
 
 .contact { padding:6rem 0; background:${bgAlt}; }
 .contact-inner { max-width:1200px; margin:0 auto; padding:0 2rem; }
@@ -200,9 +302,14 @@ footer { max-width:1200px; margin:0 auto; padding:3rem 2rem; text-align:center; 
 .footer-tagline { margin-top:0.5rem; font-style:italic; }
 
 @media (max-width:768px) {
+  .hero-content { grid-template-columns:1fr; }
+  .hero-photos { display:none; }
   .features { grid-template-columns:1fr; }
   .feature-wide { grid-column:span 1; }
+  .about-grid { grid-template-columns:1fr; }
   .services-grid { grid-template-columns:1fr; }
+  .gallery-grid { grid-template-columns:repeat(2,1fr); }
+  .testimonials-grid { grid-template-columns:1fr; }
   .nav-links, .nav-cta { display:none; }
 }`;
 
@@ -222,24 +329,11 @@ serve(async (req) => {
     const VERCEL_TEAM_ID = (Deno.env.get("VERCEL_TEAM_ID") || "").trim();
     if (!VERCEL_TOKEN) throw new Error("VERCEL_API_TOKEN not configured");
 
-    // Validate token by checking user endpoint first
-    console.log(`Token length: ${VERCEL_TOKEN.length}, starts with: ${VERCEL_TOKEN.substring(0, 8)}...`);
-    const tokenCheckRes = await fetch("https://api.vercel.com/v2/user", {
-      headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
-    });
-    const tokenCheckData = await tokenCheckRes.json();
-    if (!tokenCheckRes.ok) {
-      console.error("Token validation failed:", JSON.stringify(tokenCheckData));
-      throw new Error(`VERCEL_API_TOKEN inválido (status ${tokenCheckRes.status}). Genera un nuevo token en vercel.com/account/tokens con scope "Full Account".`);
-    }
-    console.log(`Token valid - Vercel user: ${tokenCheckData.user?.username || tokenCheckData.user?.email}`);
-
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Fetch project data
     const { data: project, error: dbError } = await supabaseAdmin
       .from("projects")
       .select("*")
@@ -248,16 +342,11 @@ serve(async (req) => {
 
     if (dbError || !project) throw new Error("Project not found");
 
-    // Generate site files
     const { html, css } = generateSiteFiles(project);
 
-    // Create slug for subdomain
     const slug = slugify(project.business_name);
     const projectName = `pgr-${slug}`;
-    const domain = `${slug}.pgrdigital.tech`;
 
-    // Deploy to Vercel using the Deployments API
-    // This creates the project if it doesn't exist
     const deployPayload = {
       name: projectName,
       files: [
@@ -272,9 +361,7 @@ serve(async (req) => {
           encoding: "base64",
         },
       ],
-      projectSettings: {
-        framework: null,
-      },
+      projectSettings: { framework: null },
       target: "production",
     };
 
@@ -295,12 +382,7 @@ serve(async (req) => {
 
     if (!deployRes.ok) {
       console.error("Vercel deploy error:", JSON.stringify(deployData));
-      const code = deployData?.error?.code;
-      const message = deployData?.error?.message || deployRes.statusText;
-      if (deployRes.status === 403 || code === "forbidden") {
-        throw new Error("Vercel rechazó el despliegue por permisos insuficientes para crear proyectos (API token sin acceso write). Actualiza VERCEL_API_TOKEN con permisos de creación de proyectos en el equipo correcto.");
-      }
-      throw new Error(`Vercel deploy failed: ${message}`);
+      throw new Error(`Vercel deploy failed: ${deployData?.error?.message || deployRes.statusText}`);
     }
 
     const vercelProjectId = deployData.projectId;
@@ -308,32 +390,9 @@ serve(async (req) => {
 
     console.log(`Deployed to ${deploymentUrl}, projectId: ${vercelProjectId}`);
 
-    // Add custom domain to the Vercel project
-    try {
-      const domainRes = await fetch(
-        `https://api.vercel.com/v10/projects/${vercelProjectId}/domains${teamQuery}`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${VERCEL_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name: domain }),
-        }
-      );
+    // Use the default Vercel URL (projectName.vercel.app)
+    const finalUrl = `https://${projectName}.vercel.app`;
 
-      const domainData = await domainRes.json();
-      if (!domainRes.ok && domainData.error?.code !== "domain_already_in_use") {
-        console.error("Domain assignment error:", JSON.stringify(domainData));
-      } else {
-        console.log(`Domain ${domain} assigned successfully`);
-      }
-    } catch (domainErr) {
-      console.error("Failed to assign domain:", domainErr);
-    }
-
-    // Update project in DB with Vercel info
-    const finalUrl = `https://${domain}`;
     await supabaseAdmin
       .from("projects")
       .update({
@@ -348,7 +407,6 @@ serve(async (req) => {
         success: true,
         url: finalUrl,
         vercel_url: `https://${deploymentUrl}`,
-        domain,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

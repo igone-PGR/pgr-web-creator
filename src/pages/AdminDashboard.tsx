@@ -16,9 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
-  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package, Download,
+  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package, ExternalLink, Image,
 } from "lucide-react";
-import { generateProjectZip } from "@/lib/generate-zip";
 
 interface Project {
   id: string;
@@ -42,6 +41,12 @@ interface Project {
   contact_name: string | null;
   business_email: string | null;
   business_phone: string | null;
+  photos: string[] | null;
+  logo: string | null;
+  vercel_url: string | null;
+  language: string;
+  preferred_domain: string | null;
+  corporate_colors?: string[];
 }
 
 const AdminDashboard = () => {
@@ -54,7 +59,6 @@ const AdminDashboard = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [saving, setSaving] = useState(false);
-  const [downloading, setDownloading] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
@@ -87,31 +91,6 @@ const AdminDashboard = () => {
     if (!error) {
       toast({ title: "Proyecto marcado como entregado" });
       fetchProjects();
-    }
-  };
-
-  const handleDownloadZip = async (project: Project) => {
-    if (!project.generated_content) {
-      toast({ title: "Este proyecto no tiene contenido generado", variant: "destructive" });
-      return;
-    }
-    setDownloading(project.id);
-    try {
-      const blob = await generateProjectZip(project);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${project.business_name.replace(/[^a-zA-Z0-9]/g, "_")}_web.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast({ title: "ZIP descargado correctamente" });
-    } catch (err) {
-      console.error("ZIP error:", err);
-      toast({ title: "Error al generar el ZIP", variant: "destructive" });
-    } finally {
-      setDownloading(null);
     }
   };
 
@@ -213,6 +192,7 @@ const AdminDashboard = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Sector</TableHead>
                   <TableHead>Estado</TableHead>
+                  <TableHead>Web</TableHead>
                   <TableHead>Fecha</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
@@ -226,17 +206,18 @@ const AdminDashboard = () => {
                     <TableCell className="capitalize">{p.sector}</TableCell>
                     <TableCell>
                       <Badge variant={p.status === "delivered" ? "default" : "secondary"}>
-                        {p.status === "delivered" ? "Entregado" : "Pendiente"}
+                        {p.status === "delivered" ? "Entregado" : p.status === "deployed" ? "Desplegado" : "Pendiente"}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {p.vercel_url ? (
+                        <a href={p.vercel_url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline text-xs flex items-center gap-1">
+                          <ExternalLink className="w-3 h-3" /> Ver web
+                        </a>
+                      ) : "—"}
                     </TableCell>
                     <TableCell>{new Date(p.created_at).toLocaleDateString("es-ES")}</TableCell>
                     <TableCell className="text-right space-x-1">
-                      {/* Download ZIP */}
-                      <Button variant="ghost" size="icon" onClick={() => handleDownloadZip(p)}
-                        disabled={downloading === p.id} title="Descargar ZIP">
-                        {downloading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                      </Button>
-
                       {/* View */}
                       <Dialog>
                         <DialogTrigger asChild>
@@ -244,30 +225,118 @@ const AdminDashboard = () => {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+                        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>{selectedProject?.business_name}</DialogTitle>
                           </DialogHeader>
                           {selectedProject && (
-                            <div className="space-y-3 text-sm">
-                              <p><strong>Contacto:</strong> {selectedProject.contact_name || "—"}</p>
-                              <p><strong>Email:</strong> {selectedProject.email}</p>
-                              <p><strong>Teléfono:</strong> {selectedProject.phone || "—"}</p>
-                              <p><strong>Dirección:</strong> {selectedProject.address || "—"}</p>
-                              <p><strong>Sector:</strong> {selectedProject.sector}</p>
-                              <p><strong>Slogan:</strong> {selectedProject.slogan || "—"}</p>
-                              <p><strong>Horario:</strong> {selectedProject.business_hours || "—"}</p>
-                              <p><strong>Instagram:</strong> {selectedProject.instagram || "—"}</p>
-                              <p><strong>Facebook:</strong> {selectedProject.facebook || "—"}</p>
+                            <div className="space-y-4 text-sm">
+                              {/* Basic info */}
+                              <div className="grid grid-cols-2 gap-3">
+                                <p><strong>Contacto:</strong> {selectedProject.contact_name || "—"}</p>
+                                <p><strong>Email:</strong> {selectedProject.email}</p>
+                                <p><strong>Teléfono:</strong> {selectedProject.phone || "—"}</p>
+                                <p><strong>Email negocio:</strong> {selectedProject.business_email || "—"}</p>
+                                <p><strong>Tel. negocio:</strong> {selectedProject.business_phone || "—"}</p>
+                                <p><strong>Dirección:</strong> {selectedProject.address || "—"}</p>
+                                <p><strong>Sector:</strong> {selectedProject.sector}</p>
+                                <p><strong>Slogan:</strong> {selectedProject.slogan || "—"}</p>
+                                <p><strong>Horario:</strong> {selectedProject.business_hours || "—"}</p>
+                                <p><strong>Instagram:</strong> {selectedProject.instagram || "—"}</p>
+                                <p><strong>Facebook:</strong> {selectedProject.facebook || "—"}</p>
+                                <p><strong>Idioma:</strong> {selectedProject.language || "es"}</p>
+                                <p><strong>Dominio preferido:</strong> {selectedProject.preferred_domain || "—"}</p>
+                                <p><strong>Modo oscuro:</strong> {selectedProject.dark_mode ? "Sí" : "No"}</p>
+                              </div>
+
                               <p><strong>Descripción:</strong> {selectedProject.description}</p>
-                              <p><strong>Color:</strong> {selectedProject.color_scheme}</p>
-                              <p><strong>Modo oscuro:</strong> {selectedProject.dark_mode ? "Sí" : "No"}</p>
+
+                              {/* Vercel URL */}
+                              {selectedProject.vercel_url && (
+                                <div className="p-3 rounded-lg bg-muted">
+                                  <strong>🌐 URL publicada:</strong>{" "}
+                                  <a href={selectedProject.vercel_url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
+                                    {selectedProject.vercel_url}
+                                  </a>
+                                </div>
+                              )}
+
+                              {/* Logo */}
+                              {selectedProject.logo && (
+                                <div>
+                                  <strong>Logo:</strong>
+                                  <div className="mt-2">
+                                    <img src={selectedProject.logo} alt="Logo" className="w-20 h-20 object-contain rounded-lg border" />
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Photos */}
+                              {selectedProject.photos && selectedProject.photos.length > 0 && (
+                                <div>
+                                  <strong className="flex items-center gap-1"><Image className="w-4 h-4" /> Fotos del cliente ({selectedProject.photos.length}):</strong>
+                                  <div className="grid grid-cols-3 gap-2 mt-2">
+                                    {selectedProject.photos.map((photo, i) => (
+                                      <a key={i} href={photo} target="_blank" rel="noopener noreferrer">
+                                        <img src={photo} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-lg border hover:opacity-80 transition-opacity" />
+                                      </a>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Services */}
                               {selectedProject.services_list && (
                                 <div>
                                   <strong>Servicios:</strong>
-                                  <pre className="bg-muted p-2 rounded text-xs mt-1 overflow-auto">
-                                    {JSON.stringify(selectedProject.services_list, null, 2)}
-                                  </pre>
+                                  {Array.isArray(selectedProject.services_list) && selectedProject.services_list.length > 0 ? (
+                                    <ul className="mt-1 space-y-1 list-disc list-inside">
+                                      {selectedProject.services_list.map((s: any, i: number) => (
+                                        <li key={i}><strong>{s.name}</strong>: {s.description}</li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-muted-foreground mt-1">Sin servicios</p>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Generated content summary */}
+                              {selectedProject.generated_content && (
+                                <div>
+                                  <strong>Contenido generado:</strong>
+                                  <div className="mt-2 space-y-2 bg-muted p-3 rounded-lg text-xs">
+                                    {selectedProject.generated_content.heroHeadline && (
+                                      <p><strong>Hero:</strong> {selectedProject.generated_content.heroHeadline}</p>
+                                    )}
+                                    {selectedProject.generated_content.heroSubtitle && (
+                                      <p><strong>Subtítulo:</strong> {selectedProject.generated_content.heroSubtitle}</p>
+                                    )}
+                                    {selectedProject.generated_content.aboutText && (
+                                      <p><strong>About:</strong> {selectedProject.generated_content.aboutText}</p>
+                                    )}
+                                    {selectedProject.generated_content.services && (
+                                      <div>
+                                        <strong>Servicios generados:</strong>
+                                        <ul className="list-disc list-inside mt-1">
+                                          {selectedProject.generated_content.services.map((s: any, i: number) => (
+                                            <li key={i}>{s.name}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    {selectedProject.generated_content.colors && (
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <strong>Paleta:</strong>
+                                        {Object.entries(selectedProject.generated_content.colors).map(([key, val]) => (
+                                          <span key={key} className="inline-flex items-center gap-1">
+                                            <span className="w-4 h-4 rounded border inline-block" style={{ backgroundColor: val as string }} />
+                                            <span>{key}</span>
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                             </div>
@@ -317,7 +386,7 @@ const AdminDashboard = () => {
                 ))}
                 {filtered.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                       No se encontraron proyectos
                     </TableCell>
                   </TableRow>
