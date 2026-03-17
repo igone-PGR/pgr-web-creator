@@ -87,6 +87,7 @@ serve(async (req) => {
         generated_content: generatedContent,
         preferred_domain: project.preferredDomain || null,
         language: project.language || "es",
+        photos: project.photos || [],
         paid: false,
       })
       .select("id")
