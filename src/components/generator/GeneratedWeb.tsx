@@ -131,12 +131,62 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     return sum + (ext?.price || 0);
   }, 0);
 
+  const uploadPhotosToStorage = async (): Promise<string[]> => {
+    const urls: string[] = [];
+    const projectId = crypto.randomUUID();
+    for (let i = 0; i < photos.length; i++) {
+      const base64 = photos[i];
+      if (!base64.startsWith("data:")) continue;
+      const match = base64.match(/^data:image\/(\w+);base64,/);
+      const ext = match?.[1] || "jpg";
+      const raw = base64.replace(/^data:image\/\w+;base64,/, "");
+      const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+      const path = `${projectId}/photo-${i}.${ext}`;
+      const { error } = await supabase.storage
+        .from("project-photos")
+        .upload(path, bytes, { contentType: `image/${ext}`, upsert: true });
+      if (error) {
+        console.error("Photo upload error:", error);
+        continue;
+      }
+      const { data: urlData } = supabase.storage.from("project-photos").getPublicUrl(path);
+      urls.push(urlData.publicUrl);
+    }
+    return urls;
+  };
+
+  const uploadLogoToStorage = async (): Promise<string | null> => {
+    if (!project.logo || !project.logo.startsWith("data:")) return null;
+    const match = project.logo.match(/^data:image\/(\w+);base64,/);
+    const ext = match?.[1] || "png";
+    const raw = project.logo.replace(/^data:image\/\w+;base64,/, "");
+    const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+    const path = `logos/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage
+      .from("project-photos")
+      .upload(path, bytes, { contentType: `image/${ext}`, upsert: true });
+    if (error) { console.error("Logo upload error:", error); return null; }
+    const { data: urlData } = supabase.storage.from("project-photos").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
   const handleCheckout = async () => {
     setIsCheckingOut(true);
     try {
+      toast({ title: "Subiendo imágenes...", description: "Esto puede tardar unos segundos." });
+
+      const [photoUrls, logoUrl] = await Promise.all([
+        uploadPhotosToStorage(),
+        uploadLogoToStorage(),
+      ]);
+
       const { photos: _photos, logo: _logo, ...projectWithoutBinaries } = project;
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
-        body: { project: { ...projectWithoutBinaries, logo: null }, generatedContent: content, extras: selectedExtras },
+        body: {
+          project: { ...projectWithoutBinaries, logo: logoUrl, photos: photoUrls },
+          generatedContent: content,
+          extras: selectedExtras,
+        },
       });
       if (error) throw error;
       if (result?.url) {
