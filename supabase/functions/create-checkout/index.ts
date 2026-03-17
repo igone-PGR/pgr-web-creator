@@ -19,7 +19,7 @@ const ProjectSchema = z.object({
   description: z.string().min(1).max(2000),
   sector: z.string().min(1).max(100),
   slogan: z.string().max(300).optional().nullable(),
-  logo: z.string().max(500).optional().nullable(),
+  logo: z.string().max(2000).optional().nullable(),
   address: z.string().max(500).optional().nullable(),
   instagram: z.string().max(100).optional().nullable(),
   facebook: z.string().max(200).optional().nullable(),
@@ -34,6 +34,7 @@ const ProjectSchema = z.object({
   darkMode: z.boolean().optional().default(false),
   preferredDomain: z.string().max(253).optional().nullable(),
   language: z.string().max(10).optional().default("es"),
+  photos: z.array(z.string().url()).max(50).optional().default([]),
 });
 
 const VALID_EXTRAS = [
