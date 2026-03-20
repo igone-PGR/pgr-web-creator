@@ -2,9 +2,20 @@ import type { TemplateInput } from "./shared";
 export { buildInputFromProjectData } from "./shared";
 export type { TemplateInput } from "./shared";
 
-import { generateSpectralHtml } from "./spectral";
+import { generateHosteleriaHtml } from "./hosteleria";
+import { generateEsteticaHtml } from "./estetica";
+import { generateFitnessHtml } from "./fitness";
+import { generateDefaultHtml } from "./default";
 
-// All sectors use the Spectral template as the unified base
+const SECTOR_TEMPLATE_MAP: Record<string, (input: TemplateInput) => string> = {
+  "Hostelería": generateHosteleriaHtml,
+  "Restauración": generateHosteleriaHtml,
+  "Estética": generateEsteticaHtml,
+  "Salud": generateEsteticaHtml,
+  "Fitness": generateFitnessHtml,
+};
+
 export function generateSiteHtml(input: TemplateInput): string {
-  return generateSpectralHtml(input);
+  const generator = SECTOR_TEMPLATE_MAP[input.project.sector] || generateDefaultHtml;
+  return generator(input);
 }
