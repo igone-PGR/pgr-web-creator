@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KINETIC | IGNITE YOUR POTENTIAL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&amp;family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error-container": "#b92902",
+                        "outline": "#767575",
+                        "secondary-fixed": "#ffc4b1",
+                        "tertiary": "#ffeea5",
+                        "background": "#0e0e0e",
+                        "tertiary-fixed-dim": "#edd13a",
+                        "surface-tint": "#f3ffca",
+                        "surface-variant": "#262626",
+                        "on-surface": "#ffffff",
+                        "secondary": "#ff7441",
+                        "primary-dim": "#beee00",
+                        "primary-fixed-dim": "#beee00",
+                        "secondary-container": "#ab3600",
+                        "tertiary-dim": "#edd13a",
+                        "on-tertiary-fixed-variant": "#685900",
+                        "surface-container-low": "#131313",
+                        "on-secondary-container": "#fff6f3",
+                        "on-surface-variant": "#adaaaa",
+                        "tertiary-container": "#fce047",
+                        "on-secondary": "#410f00",
+                        "on-error-container": "#ffd2c8",
+                        "on-error": "#450900",
+                        "surface-container": "#1a1919",
+                        "primary-fixed": "#cafd00",
+                        "primary-container": "#cafd00",
+                        "on-primary-fixed-variant": "#526900",
+                        "on-tertiary-container": "#5d5000",
+                        "on-tertiary": "#665800",
+                        "secondary-fixed-dim": "#ffb197",
+                        "surface-container-highest": "#262626",
+                        "surface-bright": "#2c2c2c",
+                        "on-tertiary-fixed": "#483d00",
+                        "on-primary-fixed": "#3a4a00",
+                        "on-primary-container": "#4a5e00",
+                        "surface-dim": "#0e0e0e",
+                        "primary": "#f3ffca",
+                        "on-secondary-fixed-variant": "#932d00",
+                        "surface": "#0e0e0e",
+                        "tertiary-fixed": "#fce047",
+                        "on-primary": "#516700",
+                        "on-secondary-fixed": "#631b00",
+                        "error": "#ff7351",
+                        "secondary-dim": "#ff7441",
+                        "outline-variant": "#484847",
+                        "surface-container-lowest": "#000000",
+                        "inverse-primary": "#516700",
+                        "error-dim": "#d53d18",
+                        "surface-container-high": "#201f1f",
+                        "on-background": "#ffffff",
+                        "inverse-on-surface": "#565555",
+                        "inverse-surface": "#fcf9f8"
+                    },
+                    fontFamily: {
+                        "headline": ["Lexend"],
+                        "body": ["Manrope"],
+                        "label": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .kinetic-gradient {
+            background: linear-gradient(45deg, #f3ffca 0%, #cafd00 100%);
+        }
+        .text-glow {
+            text-shadow: 0 0 20px rgba(243, 255, 202, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-neutral-950/80 backdrop-blur-xl shadow-[0_0_20px_rgba(204,255,0,0.06)]">
+<div class="flex justify-between items-center px-8 py-6 max-w-full">
+<div class="text-2xl font-black italic tracking-tighter text-lime-400 font-headline">KINETIC</div>
+<div class="hidden md:flex items-center gap-12">
+<a class="font-headline tracking-tight uppercase font-bold text-lime-400 border-b-2 border-lime-400 pb-1 hover:scale-105 transition-all duration-300" href="#">Home</a>
+<a class="font-headline tracking-tight uppercase font-bold text-neutral-400 hover:text-white transition-colors hover:scale-105 transition-all duration-300" href="#">Workouts</a>
+<a class="font-headline tracking-tight uppercase font-bold text-neutral-400 hover:text-white transition-colors hover:scale-105 transition-all duration-300" href="#">Pricing</a>
+<a class="font-headline tracking-tight uppercase font-bold text-neutral-400 hover:text-white transition-colors hover:scale-105 transition-all duration-300" href="#">About</a>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-headline font-bold text-sm tracking-widest hover:scale-105 hover:shadow-[0_0_20px_rgba(204,255,0,0.3)] active:scale-95 transition-all duration-300">
+                GET STARTED
+            </button>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="High-intensity athlete in mid-motion" class="w-full h-full object-cover opacity-40" data-alt="Intense athlete doing high speed functional training in dark gym" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVkwyLTvfeo9WAj1SVY6QqlBkzNjtqvQFQfUQSWB8IbGAJu4WStIuDQ-qI-MK1VrxYlCyfOkMTqqkBZE7-IJX1KGlzyAjXYXFGuN5lCLgeQhwWDsAEEH_L0JwmZ1osZe-ULQpHyyQ-b_tSO8AUqxg-RxfWGEErMguNdGP55c2BG1GzYrVPQzo4TaZhIu1zaMpc5piNWj9uwmhQ0Cv2oMNtglDcnURqq3305ZCrLpEIZ9KNMLiJsenEGj-pmb0Pz2mWAmrEBQwynGvi"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-background via-transparent to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-7xl mx-auto px-8 w-full">
+<div class="max-w-4xl">
+<span class="inline-block text-secondary font-headline font-bold tracking-[0.4em] uppercase mb-6 text-sm">PUSH BEYOND LIMITS</span>
+<h1 class="text-6xl md:text-9xl font-headline font-black leading-tight tracking-tighter mb-8 uppercase text-glow">
+                        IGNITE YOUR <br/>
+<span class="text-primary italic">POTENTIAL</span>
+</h1>
+<p class="text-xl md:text-2xl text-on-surface-variant max-w-2xl mb-12 font-light leading-relaxed">
+                        The ultimate digital training experience. Precision-engineered workouts powered by data to evolve your performance.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-6">
+<button class="kinetic-gradient text-on-primary px-10 py-5 rounded-full font-headline font-extrabold text-lg tracking-wider hover:scale-105 hover:shadow-[0_0_30px_rgba(204,255,0,0.4)] transition-all duration-300">
+                            START TRAINING NOW
+                        </button>
+<button class="border-2 border-white/20 hover:border-white/40 text-white px-10 py-5 rounded-full font-headline font-bold text-lg tracking-wider transition-all duration-300">
+                            EXPLORE PLANS
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="py-32 px-8 bg-surface">
+<div class="max-w-7xl mx-auto">
+<div class="mb-20">
+<h2 class="text-4xl md:text-6xl font-headline font-extrabold tracking-tighter uppercase mb-4">ENGINEERED FOR <span class="text-primary">RESULTS</span></h2>
+<div class="w-24 h-2 bg-primary"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-surface-container-low p-12 rounded-xl group hover:bg-surface-container transition-colors duration-500 relative overflow-hidden">
+<div class="mb-8 text-primary group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-6xl" data-icon="fitness_center">fitness_center</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-4 uppercase">Personalized Workouts</h3>
+<p class="text-on-surface-variant leading-relaxed">Algorithms that adapt to your fatigue levels, strength gains, and schedule. No two paths are the same.</p>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="fitness_center">fitness_center</span>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface-container-low p-12 rounded-xl group hover:bg-surface-container transition-colors duration-500 relative overflow-hidden border-t-4 border-secondary/20">
+<div class="mb-8 text-secondary group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-6xl" data-icon="monitoring">monitoring</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-4 uppercase">Real-time Tracking</h3>
+<p class="text-on-surface-variant leading-relaxed">Live biometric integration. Visualize your heart rate, output, and metabolic stress as you train.</p>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="monitoring">monitoring</span>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface-container-low p-12 rounded-xl group hover:bg-surface-container transition-colors duration-500 relative overflow-hidden">
+<div class="mb-8 text-primary group-hover:scale-110 transition-transform duration-500">
+<span class="material-symbols-outlined text-6xl" data-icon="groups">groups</span>
+</div>
+<h3 class="text-2xl font-headline font-bold mb-4 uppercase">Expert Coaches</h3>
+<p class="text-on-surface-variant leading-relaxed">Direct access to elite strength coaches and nutritionists. Support that never clocks out.</p>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-9xl" data-icon="groups">groups</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Testimonials -->
+<section class="py-32 px-8 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+<div>
+<h2 class="text-4xl md:text-6xl font-headline font-extrabold tracking-tighter uppercase mb-8 leading-none">THE <br/>SUCCESS <br/><span class="text-secondary">STORIES</span></h2>
+<div class="space-y-12">
+<div class="border-l-4 border-primary pl-8 py-4">
+<p class="text-xl italic text-on-surface mb-6 font-light">"KINETIC completely changed my approach to training. The data doesn't lie, and the results speak for themselves."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-variant">
+<img alt="Male Athlete" class="w-full h-full object-cover" data-alt="Portrait of an athletic man in a gym" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWdk8m-hZ2timNn211nlC7xfPOIKb-4W3xWl-v_uRtPkRPORSm0bgi9tYCjERJvLtC0EPAg8cZYJo7808qCuDbmkH44JfwD1PVqa8_hj6NmZzPw3cnXRgahCGt33rnlosx5OszemqZjlnuVJz6n3biFpR_SYbIqP-dFsfX8vTqYVvzg-KoBhM8J78J8Oqm1nlbyLMow8qaMqHLjYa0wIVW-pB_n6PNuFyl6UEhR0rkQEsSH7Cuqn4l7xwAiwpMkzLAxF_TuihMvjI-"/>
+</div>
+<div>
+<div class="font-headline font-bold text-sm uppercase">Marcus Thorne</div>
+<div class="text-xs text-on-surface-variant tracking-widest uppercase">Pro Athlete</div>
+</div>
+</div>
+</div>
+<div class="border-l-4 border-secondary pl-8 py-4">
+<p class="text-xl italic text-on-surface mb-6 font-light">"The focus on precision is what sets this apart. It's not just working out; it's high-performance engineering for the body."</p>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-variant">
+<img alt="Female Athlete" class="w-full h-full object-cover" data-alt="Portrait of a fit woman training hard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsbgyIZX8s4vkaFONN4VSu4JEp-MJ7dhhEZLyJFvAPYi3PqoB-y0cZym7NPjLkfMAfL8uHe-YYg-MWh-2souS0c9WMXI6i7MytC2aDtjOWjKKFLjxRECL0b35HtR0cZi0kBuzaOCMZgsPKUQPARFBO7_b5yLLovuu9nnx10nv4r4b3j23ImdmkpJ-WSjC0r_M5_7JWMlsrXBtUTRRsChslqZkmLkR43shEcccabRxQ5HtVGIYC6MyjJfS21Brc_Ak2jPMOTMmicZhA"/>
+</div>
+<div>
+<div class="font-headline font-bold text-sm uppercase">Sarah Jenkins</div>
+<div class="text-xs text-on-surface-variant tracking-widest uppercase">Triathlete</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="relative group">
+<div class="absolute -inset-4 bg-primary/10 rounded-2xl blur-3xl group-hover:bg-primary/20 transition-all"></div>
+<img alt="Athlete Testimonial Action" class="relative rounded-2xl w-full h-[600px] object-cover grayscale hover:grayscale-0 transition-all duration-700" data-alt="Intense athlete doing deadlifts in a modern dark gym" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc7XRLym_dIb30Z5_uDhHuVgzV8gMdECJ816KC9kx-R9p2ACzk7FpiFdfW2_1P7wED05gTP-OOQ3-18-JpNiZKZCt444SieqOirdxaE2zHgeWcpFcyQzl-NMwB_5C3YXPGS_rRcgwYUIk9XnwppmLOP20YUHho99AKR-ctMnYwLURbhm0LNaENQSo5pNlkzq7E5d-KqLbXAOxjjjdwsonaYHpCZPWgvTyviu5LGcjTENcY45NtvOY68Hyyi-z52LwAKM6flnLQRo4E"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+<section class="py-32 px-8 bg-surface">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-20">
+<h2 class="text-5xl md:text-7xl font-headline font-black tracking-tighter uppercase mb-6">SELECT YOUR <span class="text-primary">PROTOCOL</span></h2>
+<p class="text-on-surface-variant text-lg">No commitments. Just raw performance.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Basic -->
+<div class="bg-surface-container-low p-10 rounded-xl flex flex-col hover:translate-y-[-8px] transition-transform duration-300">
+<div class="font-headline font-bold text-sm tracking-widest uppercase mb-4 text-on-surface-variant">BASIC</div>
+<div class="text-5xl font-headline font-black mb-8">$29<span class="text-lg font-medium text-on-surface-variant">/mo</span></div>
+<ul class="space-y-4 mb-12 flex-grow">
+<li class="flex items-center gap-3 text-on-surface-variant"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Unlimited App Access</li>
+<li class="flex items-center gap-3 text-on-surface-variant"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Base Training Plans</li>
+<li class="flex items-center gap-3 text-on-surface-variant"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Community Support</li>
+<li class="flex items-center gap-3 text-neutral-600 line-through"><span class="material-symbols-outlined text-neutral-600 text-xl" data-icon="cancel">cancel</span> 1-on-1 Coaching</li>
+</ul>
+<button class="w-full border-2 border-outline-variant hover:border-primary py-4 rounded-full font-headline font-bold uppercase transition-colors">SELECT BASIC</button>
+</div>
+<!-- Pro -->
+<div class="bg-surface-container-highest p-10 rounded-xl flex flex-col relative scale-105 z-10 border-2 border-primary/30 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-6 py-1 rounded-full font-headline font-extrabold text-xs tracking-widest">MOST POPULAR</div>
+<div class="font-headline font-bold text-sm tracking-widest uppercase mb-4 text-primary">PRO</div>
+<div class="text-5xl font-headline font-black mb-8">$59<span class="text-lg font-medium text-on-surface-variant">/mo</span></div>
+<ul class="space-y-4 mb-12 flex-grow">
+<li class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Everything in Basic</li>
+<li class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Dynamic Adaptive AI Plans</li>
+<li class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Advanced Analytics</li>
+<li class="flex items-center gap-3 text-on-surface"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Weekly Live Sessions</li>
+</ul>
+<button class="w-full kinetic-gradient text-on-primary py-4 rounded-full font-headline font-black uppercase shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">START PRO</button>
+</div>
+<!-- Elite -->
+<div class="bg-surface-container-low p-10 rounded-xl flex flex-col hover:translate-y-[-8px] transition-transform duration-300">
+<div class="font-headline font-bold text-sm tracking-widest uppercase mb-4 text-secondary">ELITE</div>
+<div class="text-5xl font-headline font-black mb-8">$99<span class="text-lg font-medium text-on-surface-variant">/mo</span></div>
+<ul class="space-y-4 mb-12 flex-grow">
+<li class="flex items-center gap-3 text-on-surface-variant"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Everything in Pro</li>
+<li class="flex items-center gap-3 text-on-surface-variant"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Dedicated Coach</li>
+<li class="flex items-center gap-3 text-on-surface-variant"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Nutrition Bio-hacking</li>
+<li class="flex items-center gap-3 text-on-surface-variant"><span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle">check_circle</span> Private Training Portal</li>
+</ul>
+<button class="w-full border-2 border-outline-variant hover:border-secondary py-4 rounded-full font-headline font-bold uppercase transition-colors">GET ELITE</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-40 px-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-primary/5"></div>
+<div class="max-w-4xl mx-auto text-center relative z-10">
+<h2 class="text-6xl md:text-8xl font-headline font-black tracking-tighter mb-12 uppercase italic leading-none">JOIN THE <br/><span class="text-primary text-glow">MOVEMENT</span></h2>
+<p class="text-xl md:text-2xl text-on-surface-variant mb-16 font-light">The first step to a better you starts with a single decision. Are you ready?</p>
+<div class="flex justify-center">
+<button class="group relative px-16 py-8 overflow-hidden rounded-full kinetic-gradient font-headline font-black text-2xl tracking-tighter text-on-primary hover:scale-105 transition-transform duration-500">
+<span class="relative z-10">BECOME UNSTOPPABLE</span>
+<div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+</div>
+</div>
+<!-- Decorative background elements -->
+<div class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-primary/20 blur-[120px] rounded-full"></div>
+<div class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2 w-96 h-96 bg-secondary/10 blur-[120px] rounded-full"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-neutral-950 w-full py-16 px-8 border-t border-white/10">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 max-w-7xl mx-auto">
+<div class="col-span-1 md:col-span-1">
+<div class="text-xl font-black text-white mb-4 font-headline uppercase tracking-tighter">KINETIC PULSE</div>
+<p class="text-neutral-500 font-body text-sm leading-relaxed mb-6">Redefining human performance through technology and sweat. Join the elite.</p>
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white hover:text-primary hover:border-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm" data-icon="public">public</span>
+</div>
+<div class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white hover:text-primary hover:border-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined text-sm" data-icon="camera">camera</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="font-headline text-sm tracking-wide uppercase text-white mb-6 font-bold">PLATFORM</h4>
+<ul class="space-y-4">
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Workouts</a></li>
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Nutrition</a></li>
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Devices</a></li>
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Community</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline text-sm tracking-wide uppercase text-white mb-6 font-bold">COMPANY</h4>
+<ul class="space-y-4">
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">About Us</a></li>
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Contact Us</a></li>
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Support</a></li>
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Careers</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline text-sm tracking-wide uppercase text-white mb-6 font-bold">LEGAL</h4>
+<ul class="space-y-4">
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Privacy Policy</a></li>
+<li><a class="font-headline text-sm tracking-wide uppercase text-neutral-500 hover:text-orange-500 transition-colors duration-200" href="#">Terms of Service</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="font-lexend text-sm tracking-wide uppercase text-neutral-500">© 2024 KINETIC PULSE. ALL RIGHTS RESERVED.</div>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="bolt" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-headline text-xs tracking-[0.2em]">POWERED BY KINETIC CORE</span>
+</div>
+</div>
+</footer>
+</body></html>
