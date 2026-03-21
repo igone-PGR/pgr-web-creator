@@ -122,30 +122,9 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           throw new Error("No se recibió HTML personalizado");
         }
       } else {
-        // "Otros" sector: use old template system
-        const { data: contentResult, error } = await supabase.functions.invoke("generate-web-content-legacy", {
-          body: {
-            businessName: project.businessName,
-            description: project.description,
-            sector: project.sector,
-            address: project.address,
-            phone: project.phone,
-            email: project.email,
-            slogan: project.slogan,
-            businessHours: project.businessHours,
-            servicesList: project.servicesList,
-            hasPhotos: photos.length > 0,
-            photoCount: photos.length,
-            language: project.language || "es",
-            corporateColors: [],
-          },
-        });
-
-        // Fallback: generate with default template
-        const content = contentResult?.content || DEFAULT_CONTENT;
-        const colors = content.colors || DEFAULT_COLORS;
+        // "Otros" sector: use old default template system
         const finalProject = { ...project, photos: photoUrls, logo: logoUrl };
-        const input = buildInputFromProjectData(finalProject, content, colors);
+        const input = buildInputFromProjectData(finalProject, DEFAULT_CONTENT, DEFAULT_COLORS);
         setFinalHtml(generateSiteHtml(input));
       }
     } catch (err: any) {
