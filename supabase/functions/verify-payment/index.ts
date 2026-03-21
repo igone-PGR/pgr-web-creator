@@ -87,7 +87,7 @@ serve(async (req) => {
 
         if (adminEmail && project) {
           await resend.emails.send({
-            from: "PGR Web Creator <onboarding@resend.dev>",
+            from: "PGR Web Creator <notificaciones@avisos.pgrdigital.tech>",
             to: [adminEmail],
             subject: `💰 Nuevo pago recibido: ${project.business_name}`,
             html: `
