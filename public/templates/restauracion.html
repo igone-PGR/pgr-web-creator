@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Sensory Sommelier | Experience Gastronomy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;600;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-container-lowest": "#ffffff",
+              "on-surface-variant": "#54433f",
+              "tertiary-container": "#5e5954",
+              "on-tertiary-fixed-variant": "#4b4641",
+              "surface-container-low": "#f3f3f6",
+              "inverse-primary": "#ffb4a3",
+              "on-secondary-container": "#785a1a",
+              "outline-variant": "#dac1bc",
+              "secondary-container": "#fed488",
+              "surface-container-high": "#e8e8ea",
+              "surface-container": "#eeeef0",
+              "on-error-container": "#93000a",
+              "on-error": "#ffffff",
+              "on-tertiary-container": "#d8d0c9",
+              "inverse-surface": "#2f3133",
+              "on-background": "#1a1c1e",
+              "primary-fixed": "#ffdad2",
+              "on-primary-fixed-variant": "#763221",
+              "inverse-on-surface": "#f0f0f3",
+              "primary-container": "#8e4432",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed": "#3c0700",
+              "on-tertiary-fixed": "#1f1b17",
+              "background": "#f9f9fc",
+              "surface-tint": "#944936",
+              "tertiary-fixed-dim": "#cdc5be",
+              "on-primary-container": "#ffc3b5",
+              "surface-dim": "#dadadc",
+              "secondary-fixed-dim": "#e9c176",
+              "outline": "#87726e",
+              "surface-container-highest": "#e2e2e5",
+              "secondary-fixed": "#ffdea5",
+              "on-tertiary": "#ffffff",
+              "error-container": "#ffdad6",
+              "tertiary": "#46423d",
+              "surface-bright": "#f9f9fc",
+              "on-secondary-fixed": "#261900",
+              "on-primary": "#ffffff",
+              "primary-fixed-dim": "#ffb4a3",
+              "error": "#ba1a1a",
+              "surface-variant": "#e2e2e5",
+              "surface": "#f9f9fc",
+              "primary": "#702e1d",
+              "on-secondary-fixed-variant": "#5d4201",
+              "tertiary-fixed": "#eae1da",
+              "secondary": "#775a19",
+              "on-surface": "#1a1c1e"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .noto-serif { font-family: 'Noto Serif', serif; }
+        .manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background manrope antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-tertiary/80 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+<a class="text-2xl font-serif italic text-primary dark:text-primary-container" href="#">The Sensory Sommelier</a>
+<div class="hidden md:flex items-center gap-8">
+<a class="label-md uppercase tracking-wider text-on-surface dark:text-on-surface-variant hover:text-primary-container dark:hover:text-secondary transition-colors duration-300" href="#concept">Concept</a>
+<a class="label-md uppercase tracking-wider text-on-surface dark:text-on-surface-variant hover:text-primary-container dark:hover:text-secondary transition-colors duration-300" href="#menu">Menu</a>
+<a class="label-md uppercase tracking-wider text-on-surface dark:text-on-surface-variant hover:text-primary-container dark:hover:text-secondary transition-colors duration-300" href="#reviews">Reviews</a>
+<a class="label-md uppercase tracking-wider text-on-surface dark:text-on-surface-variant hover:text-primary-container dark:hover:text-secondary transition-colors duration-300" href="#contact">Contact</a>
+</div>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-md font-semibold hover:opacity-90 transition-all active:scale-95 duration-200 ease-in-out">
+                Book a Table
+            </button>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative h-screen flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Chef Plating" class="w-full h-full object-cover" data-alt="Professional chef carefully plating a gourmet dish in a dark kitchen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3mRuu03zD026casc5YDFXhkbIzA_cerchzfsxjkLjjULGQyrR2yQ3Pm_Rgsasak6Ydj4tD_Jv2K5eK94rzEkGNW64RjcN34nPbOOVZGk9Ckx4LKUvfHoYQ3KSpDx-M_MovmA5ZzfZnZ_9nPBBdG9-tcJJVbmcUkQ6jDCXAsgNTbRsRo5OXrqcyAT-4tCtILl0f9EsYSvIGX2rkDuTDu7ZS9MfmYvWB2HuOlQzRDj7dK8zXooYNnfX-vuCjz-G4KQIszCNvxutJ8z7"/>
+<div class="absolute inset-0 bg-black/40"></div>
+</div>
+<div class="relative z-10 max-w-screen-2xl mx-auto px-8 w-full">
+<div class="max-w-3xl">
+<span class="label-md uppercase tracking-[0.3em] text-secondary-fixed mb-6 block">A Symphony of Flavors</span>
+<h1 class="noto-serif text-5xl md:text-7xl lg:text-8xl text-white leading-tight mb-8 -tracking-wider">
+                        Experience Gastronomy with All Your Senses
+                    </h1>
+<div class="flex flex-wrap gap-6">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-md text-lg font-semibold hover:bg-primary-container transition-all">
+                            Reservations
+                        </button>
+<button class="border border-white/30 backdrop-blur-sm text-white px-10 py-4 rounded-md text-lg font-semibold hover:bg-white/10 transition-all">
+                            View Menu
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Concept Section -->
+<section class="py-24 md:py-48 bg-surface" id="concept">
+<div class="max-w-screen-2xl mx-auto px-8 grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
+<div class="relative">
+<div class="aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
+<img alt="Farm Fresh" class="w-full h-full object-cover" data-alt="Fresh organic vegetables from a local farm on a wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk7ywKtWOHXjD3UF5GtuzGkblG35xJA4wElhKH3RuqSxwUrmNSrO7mJyNz1nZ_LoWFJ3iJgvlcN87xSiKyacSpWY38GjQ_ocY26HF6AuQVB5FP2AyvxcETifbcXljffaUPpouCEFN0JA3XATVND9MP7YkEZCUhNNojZYHxkx4ZfeMVUDgi9mqIYgwjZNmjDaxU2S2JX76OaZ3ScjVd9cIpbm6jqAvZwmwIbGsUd8hot7k--vt32A2bou5IKJg77bUJexkSpx260-7x"/>
+</div>
+<div class="absolute -bottom-12 -right-12 hidden lg:block w-72 aspect-square rounded-xl overflow-hidden shadow-2xl border-8 border-surface">
+<img alt="Kitchen Detail" class="w-full h-full object-cover" data-alt="Close up of high end kitchen utensils and ingredients" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD20JDr8mT_Stl8PiKkFlLDUbx27WIYxzuyfzx8qlUNZ6XEczFBEaXlCgymZ3OdWy98LLtNnCj0jqfAJlYGCCLsPX_BozdeSaETbEpgWtP89oVKw40eCTcJi-Em-GWQgRDMlHRUw5Chm5Uz4ZisRVlQ9OEPhoY7kxPO8tpNZeU0irOJ4avtdIHf5Zf_VulCnKgMUDs2Z_qKGeRRWXYvseuiLgHlFZ5G-wRGmX6UJnFYLrc1ibzLKY-fTRTqyg-fA7sDj4vwZbJTDDDd"/>
+</div>
+</div>
+<div>
+<span class="label-md uppercase tracking-wider text-secondary mb-4 block">Our Story</span>
+<h2 class="noto-serif text-4xl md:text-6xl text-on-surface mb-8 leading-tight">Our Concept</h2>
+<p class="manrope text-lg md:text-xl text-on-surface-variant leading-relaxed mb-8">
+                        At The Sensory Sommelier, we believe that dining is more than just nourishment; it's an evocative journey. Our farm-to-table philosophy ensures that every ingredient tells a story of the soil it sprang from and the hands that nurtured it.
+                    </p>
+<p class="manrope text-lg text-on-surface-variant leading-relaxed opacity-80">
+                        We harmonize time-honored traditions with avant-garde culinary techniques, creating a bridge between the heritage of the past and the innovation of the future. Every plate is a canvas, every meal a memory.
+                    </p>
+<div class="mt-12 flex items-center gap-4">
+<div class="h-[1px] w-12 bg-primary"></div>
+<span class="italic font-serif text-primary text-xl">Chef de Cuisine, Julian Vane</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Signature Dishes (Bento Grid Style) -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="text-center mb-20">
+<span class="label-md uppercase tracking-widest text-secondary block mb-4">Chef's Selection</span>
+<h2 class="noto-serif text-4xl md:text-5xl text-on-surface">Signature Dishes</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Dish 1 -->
+<div class="group bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+<div class="aspect-video overflow-hidden">
+<img alt="Iberico Pork" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Seared Iberico pork served with roasted root vegetables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbuaCtFGO3Pmh4YtOBXlYbPPZpLJkGruhOZQkO1lWO1EztV98wM9A4axLxzE90uXAdkWh852jJEMtHqEB-YUEZwbPdG_1sbNAs-ZDTuxkr48NGbK0ZmbiW9rNB9D6cfgX8AcpL7oDMKn9uNTCQJm2asqH5aJnfy_0CYLsNAeSTpvdogsS2dmvQSLodfeUwaUP0jQH4bi2MCFJN0k78H_HljYNcqEfssxAR25pj7zmsK2pV4Y_CVoktcjuiz-ouE8r1upzSmgMrIXhB"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="noto-serif text-2xl text-on-surface">Grilled Iberico Pork</h3>
+<span class="text-primary font-bold">$42</span>
+</div>
+<p class="manrope text-on-surface-variant mb-6 leading-relaxed">
+                                Acorn-fed pork, smoked apple purée, wild forest mushrooms, and a reduction of Pedro Ximénez.
+                            </p>
+<button class="text-primary uppercase label-sm font-bold tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+                                Discover Details <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Dish 2 -->
+<div class="group bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+<div class="aspect-video overflow-hidden">
+<img alt="Sea Bass" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Steamed sea bass with herbs and citrus slices in parchment paper" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA0ssYw9BKu02_QmuggS2uLWU69d5v8PefUCgHosgxrSK9WlCbYLSTvNYYe_kFBxzCM5TlfrUnwCcIRiQgepR2dZbvg_inyz6P9laufeisGVVQ8WKC1E96Rr6PzOotSBUm9sko5FeVW0AxbLTOnWg3NdvoiF9s0SVhyz2grYLwnEP9gNxXdTuw5_X7ZxjuNoWHJS5Y2jdlUUG3vA6DFntSov4kugTv8EVXBcxhaMPTkMdQqyhgj-vpLpOr-rSkJ1LzZhCQMX66Sqdi"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="noto-serif text-2xl text-on-surface">Sea Bass En Papillote</h3>
+<span class="text-primary font-bold">$38</span>
+</div>
+<p class="manrope text-on-surface-variant mb-6 leading-relaxed">
+                                Mediterranean sea bass steamed with seasonal herbs, lemon verbena, and organic heritage carrots.
+                            </p>
+<button class="text-primary uppercase label-sm font-bold tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+                                Discover Details <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Dish 3 -->
+<div class="group bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+<div class="aspect-video overflow-hidden">
+<img alt="Cheesecake" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Deconstructed cheesecake with berry coulis and crumble on a designer plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-08e0ibM7iwcfCoMgyVQL54E3NfuJ2AxX037el2BPJFcIVClaiiXymGUuqlui0xTgPg0iJ0Bs-qtpNE2iXx7Ri6NnDoKoX4p6_PNOyrBJhxYn1vD1EJxS5SfiErnW4ZJCThHZfiANdDeVTGAUiRkxuT_9B2VD_nDAPgbn4EI5ztR33qFvRuyh52ylEBjZ-CxxXQ00f_mcBlCCzWcyXU7ujwdl9tzZNTHSN7_p-Wasznj2ciTFBmxYzC5b1DtWpZwh4YDNXRfXI6Er"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<h3 class="noto-serif text-2xl text-on-surface">Deconstructed Cheesecake</h3>
+<span class="text-primary font-bold">$18</span>
+</div>
+<p class="manrope text-on-surface-variant mb-6 leading-relaxed">
+                                Madagascar vanilla bean mousse, Graham cracker crumble, and textures of wild summer berries.
+                            </p>
+<button class="text-primary uppercase label-sm font-bold tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+                                Discover Details <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- The Menu Section (Deep Charcoal Contrast) -->
+<section class="py-32 bg-tertiary text-white" id="menu">
+<div class="max-w-4xl mx-auto px-8">
+<div class="text-center mb-24">
+<span class="label-md uppercase tracking-[0.4em] text-secondary-fixed block mb-6">Curated Selection</span>
+<h2 class="noto-serif text-5xl md:text-7xl mb-4 italic">The Menu</h2>
+<div class="h-1 w-24 bg-primary mx-auto mt-8"></div>
+</div>
+<!-- Starters -->
+<div class="mb-24">
+<h3 class="label-md uppercase tracking-widest text-secondary-fixed mb-12 flex items-center gap-4">
+                        Starters <span class="h-[1px] flex-grow bg-white/10"></span>
+</h3>
+<div class="space-y-12">
+<div class="flex justify-between items-baseline group">
+<div class="max-w-lg">
+<h4 class="noto-serif text-2xl group-hover:text-secondary-fixed transition-colors">Truffle Arancini</h4>
+<p class="manrope text-sm text-on-tertiary-container mt-2">Risotto balls, black truffle oil, parmesan foam</p>
+</div>
+<span class="text-xl manrope">24</span>
+</div>
+<div class="flex justify-between items-baseline group">
+<div class="max-w-lg">
+<h4 class="noto-serif text-2xl group-hover:text-secondary-fixed transition-colors">Beef Tartare</h4>
+<p class="manrope text-sm text-on-tertiary-container mt-2">Hand-cut Wagyu, quail egg yolk, caper emulsion</p>
+</div>
+<span class="text-xl manrope">28</span>
+</div>
+</div>
+</div>
+<!-- Mains -->
+<div class="mb-24">
+<h3 class="label-md uppercase tracking-widest text-secondary-fixed mb-12 flex items-center gap-4">
+                        Main Course <span class="h-[1px] flex-grow bg-white/10"></span>
+</h3>
+<div class="space-y-12">
+<div class="flex justify-between items-baseline group">
+<div class="max-w-lg">
+<h4 class="noto-serif text-2xl group-hover:text-secondary-fixed transition-colors">Dry-Aged Ribeye</h4>
+<p class="manrope text-sm text-on-tertiary-container mt-2">45-day aged, bone marrow butter, charred leeks</p>
+</div>
+<span class="text-xl manrope">58</span>
+</div>
+<div class="flex justify-between items-baseline group">
+<div class="max-w-lg">
+<h4 class="noto-serif text-2xl group-hover:text-secondary-fixed transition-colors">Saffron Lobster Risotto</h4>
+<p class="manrope text-sm text-on-tertiary-container mt-2">Poached lobster tail, Carnaroli rice, gold leaf</p>
+</div>
+<span class="text-xl manrope">64</span>
+</div>
+</div>
+</div>
+<!-- Desserts -->
+<div>
+<h3 class="label-md uppercase tracking-widest text-secondary-fixed mb-12 flex items-center gap-4">
+                        Desserts <span class="h-[1px] flex-grow bg-white/10"></span>
+</h3>
+<div class="space-y-12">
+<div class="flex justify-between items-baseline group">
+<div class="max-w-lg">
+<h4 class="noto-serif text-2xl group-hover:text-secondary-fixed transition-colors">Dark Chocolate Ganache</h4>
+<p class="manrope text-sm text-on-tertiary-container mt-2">70% Valrhona, sea salt, olive oil drizzle</p>
+</div>
+<span class="text-xl manrope">16</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Guest Experiences Section -->
+<section class="py-32 bg-surface" id="reviews">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-16">
+<div class="lg:col-span-1">
+<h2 class="noto-serif text-5xl text-on-surface mb-8 leading-tight">Guest Experiences</h2>
+<p class="text-on-surface-variant text-lg">Read what our patrons have to say about their journey through our digital degustation.</p>
+<div class="mt-12">
+<span class="text-secondary font-bold text-4xl">4.9/5</span>
+<div class="flex gap-1 mt-2 text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary-container text-4xl mb-6">format_quote</span>
+<p class="manrope italic text-lg text-on-surface mb-8">"An absolute revelation. The pairing of the environment with the food creates an atmosphere I haven't experienced anywhere else in the world."</p>
+<div>
+<h5 class="font-bold text-on-surface">Eleanor Fitzroy</h5>
+<span class="text-sm text-on-surface-variant">Food Critic, The Herald</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined text-primary-container text-4xl mb-6">format_quote</span>
+<p class="manrope italic text-lg text-on-surface mb-8">"The Iberico Pork was a masterpiece. From the presentation to the last bite, it was pure perfection. We will be back for every special occasion."</p>
+<div>
+<h5 class="font-bold text-on-surface">Marcus Thorne</h5>
+<span class="text-sm text-on-surface-variant">Gastronomy Enthusiast</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Visit Us Section -->
+<section class="py-32 bg-surface-container" id="contact">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="grid grid-cols-1 gap-24">
+<!-- Reservation Form -->
+<!-- Map & Info -->
+<div class="flex flex-col items-center text-center max-w-xl mx-auto">
+<div class="mb-12">
+<h3 class="noto-serif text-3xl mb-6 mb-8">Visit Us</h3>
+<div class="space-y-4">
+<div class="flex items-start gap-4 justify-center">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<p class="text-on-surface-variant">124 Heritage Lane, Culinary District<br/>New York, NY 10013</p>
+</div>
+<div class="flex items-center gap-4 justify-center">
+<span class="material-symbols-outlined text-primary">call</span>
+<p class="text-on-surface-variant">+1 (212) 555-0198</p>
+</div>
+<div class="flex items-center gap-4 justify-center">
+<span class="material-symbols-outlined text-primary">mail</span>
+<p class="text-on-surface-variant">reservations@sensorysommelier.com</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-tertiary">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 px-12 py-24 max-w-screen-2xl mx-auto">
+<div>
+<a class="text-xl font-serif text-primary dark:text-primary-container mb-6 block" href="#">The Sensory Sommelier</a>
+<p class="text-on-surface-variant dark:text-outline-variant max-w-xs mb-8">
+                    An editorial experience where white space acts as a palate cleanser and typography carries the weight of an heirloom menu.
+                </p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">social_leaderboard</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">public</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="label-sm uppercase font-bold tracking-widest text-on-surface mb-8">Quick Links</h4>
+<ul class="space-y-4">
+<li><a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-all" href="#">Experience</a></li>
+<li><a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-all" href="#">Private Events</a></li>
+<li><a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-all" href="#">Our Farmers</a></li>
+<li><a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-all" href="#">Careers</a></li>
+</ul>
+</div>
+<div>
+<h4 class="label-sm uppercase font-bold tracking-widest text-on-surface mb-8">Newsletter</h4>
+<p class="text-on-surface-variant dark:text-outline-variant mb-6">Join our mailing list for seasonal menu updates and exclusive events.</p>
+<div class="flex border-b border-outline-variant/30 py-2">
+<input class="bg-transparent w-full focus:outline-none manrope" placeholder="Email Address" type="email"/>
+<button class="text-primary font-bold uppercase label-sm tracking-widest">Join</button>
+</div>
+</div>
+</div>
+<div class="max-w-screen-2xl mx-auto px-12 py-8 flex flex-col md:flex-row justify-between items-center border-t border-outline-variant/10 text-xs uppercase tracking-widest text-on-surface-variant">
+<span>© 2024 The Sensory Sommelier. All rights reserved.</span>
+<div class="flex gap-8 mt-4 md:mt-0">
+<a class="hover:text-primary transition-all" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-all" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-all" href="#">Accessibility</a>
+</div>
+</div>
+</footer>
+</body></html>

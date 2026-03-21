@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-container": "#c2c8d0",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#d5e5f1",
+              "on-surface": "#1a1c1a",
+              "secondary": "#51606b",
+              "tertiary-fixed-dim": "#c1c7cf",
+              "error-container": "#ffdad6",
+              "surface-dim": "#dbdad7",
+              "on-surface-variant": "#4e453f",
+              "on-tertiary": "#ffffff",
+              "primary": "#6a5c50",
+              "surface-container": "#efeeeb",
+              "surface-container-highest": "#e3e2e0",
+              "on-tertiary-fixed-variant": "#41474e",
+              "error": "#ba1a1a",
+              "tertiary-fixed": "#dde3eb",
+              "inverse-on-surface": "#f2f1ee",
+              "surface-container-low": "#f4f3f1",
+              "primary-container": "#d7c4b5",
+              "on-tertiary-fixed": "#161c22",
+              "on-primary-fixed-variant": "#514439",
+              "on-error": "#ffffff",
+              "outline": "#7f756e",
+              "surface": "#faf9f6",
+              "background": "#faf9f6",
+              "on-secondary-container": "#55656f",
+              "inverse-surface": "#2f312f",
+              "on-primary-container": "#5e5145",
+              "outline-variant": "#d1c4bc",
+              "primary-fixed-dim": "#d6c3b4",
+              "primary-fixed": "#f3dfd0",
+              "on-secondary-fixed": "#0e1d26",
+              "on-secondary-fixed-variant": "#3a4953",
+              "on-background": "#1a1c1a",
+              "surface-variant": "#e3e2e0",
+              "surface-tint": "#6a5c50",
+              "on-error-container": "#93000a",
+              "tertiary": "#595f66",
+              "secondary-fixed-dim": "#b9c9d5",
+              "inverse-primary": "#d6c3b4",
+              "surface-bright": "#faf9f6",
+              "on-primary-fixed": "#231a10",
+              "on-primary": "#ffffff",
+              "on-tertiary-container": "#4d545b",
+              "secondary-container": "#d2e2ee",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#e9e8e5"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .tonal-transition { transition: background-color 0.5s ease; }
+        .scale-102:hover { transform: scale(1.02); }
+        .glass-nav { backdrop-filter: blur(20px); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-stone-950/80 backdrop-blur-xl shadow-[0_20px_40px_rgba(26,28,26,0.05)]">
+<div class="flex justify-between items-center px-8 py-6 max-w-screen-2xl mx-auto">
+<span class="text-xl font-bold tracking-widest text-stone-800 dark:text-stone-100 font-headline">LUXE AESTHETICS</span>
+<div class="hidden md:flex items-center gap-12">
+<a class="font-noto-serif tracking-[0.02em] text-sm uppercase text-stone-900 dark:text-white border-b border-stone-400 dark:border-stone-500 pb-1" href="#">Services</a>
+<a class="font-noto-serif tracking-[0.02em] text-sm uppercase text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors" href="#">About</a>
+<a class="font-noto-serif tracking-[0.02em] text-sm uppercase text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors" href="#">Gallery</a>
+<a class="font-noto-serif tracking-[0.02em] text-sm uppercase text-stone-500 dark:text-stone-400 hover:text-stone-800 dark:hover:text-stone-200 transition-colors" href="#">Treatments</a>
+</div>
+<button class="bg-primary text-on-primary px-8 py-2.5 text-xs tracking-widest uppercase font-semibold scale-102 transition-transform duration-500 rounded-lg">
+                Inquire
+            </button>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative h-screen w-full flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Elegant salon interior" class="w-full h-full object-cover" data-alt="Close up of high-end salon workspace with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVByQjsSDGD88TEVAundLDnv1fStfozzpQithZ_oxGejLiTCroRjsy7ot_yGWu1RNEl2envLk4FemrA9m9f9-KEyWHWiKnb-h3ZEp47dPp7epgp7eJ2QdaAgKUS-aUUkkDmXy7kAVWjb7CEo2NDtuJkiT3ENsl01Bji8HPlG0eQNAYYurQu8RtZKexUxLMU3pQPCEpVSo6n4DnR-0qawry-P7qkC4UPNGsSIPtG0rOiF00CCxSrx1RW6G1PYZB_narHqIJrbijrIVb"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface/60 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-screen-xl px-8 w-full">
+<div class="max-w-2xl">
+<h1 class="font-headline text-6xl md:text-8xl text-on-surface leading-tight tracking-[0.02em] mb-8">
+                        The Poetry of <br/><span class="italic font-normal">Pure Radiance.</span>
+</h1>
+<p class="font-body text-lg md:text-xl text-on-surface-variant max-w-md leading-relaxed mb-10">
+                        Where clinical precision meets the softness of art. We don't just transform your reflection; we curate your light.
+                    </p>
+<div class="flex gap-6 items-center">
+<button class="bg-primary text-on-primary px-10 py-4 text-sm tracking-widest uppercase font-bold rounded-lg scale-102 transition-transform">
+                            Discover the Menu
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- About Us Section -->
+<section class="py-32 bg-surface-container-low relative overflow-hidden">
+<div class="max-w-screen-xl mx-auto px-8 grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
+<div class="md:col-span-5 relative">
+<div class="relative z-10 aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
+<img alt="Stylist working" class="w-full h-full object-cover" data-alt="Professional stylist focusing on detailed hair treatment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSbwZqtx0wM4zNYtFfKC3JBZB7pQ1ueGI15xMxqy4RQVpwpS7ynQtZ0KCEvBVoEeQZgNyZEeDBgyvFUWeH_VPxtkLPTdTFMiCRtmFGjMG2KrDoNZGzwHBf8u2r9PB3-PpYFWLS33EIw0G8qRGDf8WPDk3aHB5STJ1FS1a0duypcC9IXoJucVtY2dHsLcZsFB05BhmBSqGp1s9aUmGBZhP04qTn77FhGyt5tLffR02fmC3LEx-w3KuV_glXb9H9dyftMjyWQrx4bTcy"/>
+</div>
+<div class="absolute -bottom-10 -right-10 w-2/3 aspect-square bg-surface-container-lowest rounded-xl shadow-lg p-8 hidden md:block border border-outline-variant/10">
+<span class="font-headline italic text-4xl text-primary">Est. 2012</span>
+<p class="mt-4 text-sm text-secondary leading-relaxed">Dedicated to the pursuit of timeless elegance and the science of skin health.</p>
+</div>
+</div>
+<div class="md:col-span-7">
+<span class="font-label text-xs tracking-[0.4em] uppercase text-primary mb-6 block">Our Philosophy</span>
+<h2 class="font-headline text-5xl text-on-surface mb-8 leading-tight">A Sanctuary Designed for the <span class="italic">Modern Muse.</span></h2>
+<div class="space-y-6 text-lg text-on-surface-variant font-light leading-relaxed">
+<p>Luxe Aesthetics is more than a destination; it is a curated canvas where your individual beauty is the primary inspiration. Founded on the principle of "Quiet Luxury," we believe that the most profound transformations are those that feel entirely natural.</p>
+<p>Our team of master artisans and aesthetic specialists combine years of technical expertise with a deeply intuitive approach to style and wellness. In our atelier, every treatment is a bespoke ceremony, tailored to the unique geometry of your face and the rhythm of your life.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Services Section (Bento Grid Style) -->
+<section class="py-32 bg-surface">
+<div class="max-w-screen-xl mx-auto px-8">
+<div class="text-center mb-20">
+<span class="font-label text-xs tracking-[0.4em] uppercase text-primary mb-4 block">The Menu</span>
+<h2 class="font-headline text-5xl text-on-surface">Curated Services</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Hair Design -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0_20px_40px_rgba(26,28,26,0.02)] border border-outline-variant/5 group">
+<div class="mb-8 overflow-hidden rounded-lg aspect-video">
+<img class="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" data-alt="Close up of masterfully styled wavy hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsiZSa9SlYA10cgD0NDJ-h0py-ZX-giVcygrpxklQx3ru4qM3l49mDNjguakW8sRdojT8Lmtko44A7zjAe492qE7G6Z0C387iRG1yYuEDi2Tf2QlYRYNY_6F03LJJlPRyjYsgLnUs8pMXlDq0GF6sKlFrRl_tetLO7bRHmdr5XKYqAEGBp9HDQADIN63c6ans9b_SkTilUkpx9M5Cyu90jEc4IQ_MVAuqE28PBUl9F8rjNAV6h424jQqFyTbrz0jDC-bDhGuZ6yDGD"/>
+</div>
+<h3 class="font-headline text-2xl mb-6 text-on-surface">Hair Design</h3>
+<ul class="space-y-4">
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Sculptural Cut &amp; Style</span>
+<span class="font-headline text-primary">$120+</span>
+</li>
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Signature Balayage</span>
+<span class="font-headline text-primary">$350+</span>
+</li>
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Luxe Gloss Treatment</span>
+<span class="font-headline text-primary">$85+</span>
+</li>
+</ul>
+</div>
+<!-- Facial Treatments -->
+<div class="bg-surface-container p-10 rounded-xl shadow-[0_20px_40px_rgba(26,28,26,0.02)] border border-outline-variant/5 group">
+<div class="mb-8 overflow-hidden rounded-lg aspect-video">
+<img class="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" data-alt="Aesthetician performing a delicate facial massage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7gpKfpwHJaXddRL9snoH2BFQem2I6KtwF_12o53Z9NZZft1UL7CsVrJ4EV5HQSktY28pyDw80ZlEES_d8eBGO2UkJp2HMCBhPMtfROFxWsgScZtsDDvbQDHnCFTYCsnoi8FGtzoPin4yGebKsAI4Ifc_Yw8XCDCeADRwvFTXDnKPHbpnR3sftR4Yfbbbu2l-tA0-icdneAFCjVatdbvd_QUYjFssKJ_PJKPRS354wXmI6cLu_EZ8YNgvkwYCfP7-yvk4HYbC58iWD"/>
+</div>
+<h3 class="font-headline text-2xl mb-6 text-on-surface">Skin Clinic</h3>
+<ul class="space-y-4">
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Lumière Signature Facial</span>
+<span class="font-headline text-primary">$180</span>
+</li>
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Microneedling Therapy</span>
+<span class="font-headline text-primary">$450</span>
+</li>
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Dermal Sculpting</span>
+<span class="font-headline text-primary">Inquire</span>
+</li>
+</ul>
+</div>
+<!-- Mani-Pedi -->
+<div class="bg-surface-container-lowest p-10 rounded-xl shadow-[0_20px_40px_rgba(26,28,26,0.02)] border border-outline-variant/5 group">
+<div class="mb-8 overflow-hidden rounded-lg aspect-video">
+<img class="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" data-alt="Elegant minimalist nail art on clean hands" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDAdQwAJjx8JV2FnaYCccse4ZY-1aHU4YHw1JZQmOgT3NIGINGT2sph-GoCyh15TM-Yyu-lY355q2LQzxbIocSjjEruotNuTmNqhgDe8lV_VKeAln8o0cTfsLjLPVqci9kDug-0AhulUtkT_v4GUPMi9hG7BdICaP_8ye1E3AoC0Lm-qFxPkzJQ01g7E8ggjVsjevyDN4pZ9-pWaCkwQMC5YN63LVVF45IifsnmVkb6Q8dXBBVNUA0nQvIzMRZ_6FLph5yx2P3XSEHe"/>
+</div>
+<h3 class="font-headline text-2xl mb-6 text-on-surface">Nail Artistry</h3>
+<ul class="space-y-4">
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Minimalist Manicure</span>
+<span class="font-headline text-primary">$65</span>
+</li>
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Structure Gel Set</span>
+<span class="font-headline text-primary">$110</span>
+</li>
+<li class="flex justify-between items-baseline border-b border-outline-variant/20 pb-2">
+<span class="text-on-surface-variant">Pedicure Ritual</span>
+<span class="font-headline text-primary">$95</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<!-- Gallery Section (Asymmetrical Layout) -->
+<section class="py-32 bg-surface-container-low">
+<div class="max-w-screen-2xl mx-auto px-8">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+<div class="max-w-xl">
+<span class="font-label text-xs tracking-[0.4em] uppercase text-primary mb-4 block">Visual Stories</span>
+<h2 class="font-headline text-5xl text-on-surface">The Curated Gallery</h2>
+</div>
+<p class="text-secondary max-w-sm font-light italic">A celebration of our clients' unique journeys and the art of aesthetic balance.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<div class="md:col-span-2 aspect-[4/5] rounded-xl overflow-hidden group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Fashion editorial portrait highlighting hair texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADo1YlIodd1PtXLJXlbWPaFEf1TKf9mY3bmCpvOcVNh7Aet2irazZpKh0EEovsT7w9Az-81Qi8_pmXCpHAEbN6kcdrXw-L-sm9SOYcpAIEt9xV0WM69X8ltrNvCcPtD2f_Mz_gwPFKDfUXxZGLQSpn7ziZHJcD0fhBcbNnphez4nj2OI-WcW5ZSGLI3--VOa7B6D0WMPD0WSHlANw369aBQnIFzNI-RKu6_H33oubAwg6bYhwqcRsOWwqa8I20R9ICc_ucYBdHR-vs"/>
+</div>
+<div class="aspect-square rounded-xl overflow-hidden group md:mt-12">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Macro shot of healthy glowing skin" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJsESlPquRvHF3lip7C6rr0gqnMP6VJQi3Z8i3WYwACE3Vhf2tavgGskAAZKMpQ601GXLrxabvbhPm42mXyJ5oimg-J-VB4y8lGqLh3nCUbtMbWMjnCnqAlcElfZEOgAYNiYvZrl8Orb2XcxIdnBrygamOqUzFqRLmcY1huyfln95pvpnVflsuo2slTEdNYLwUa7ebWQ2VBUR5oWGuTZxfuHqq3MKC9xLgVCU_Nh7lChlwgLMroyi7hS9uBXkovfinIhNQ0Gv6ZcuE"/>
+</div>
+<div class="aspect-[3/4] rounded-xl overflow-hidden group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Interior shot of luxury treatment room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfotgJupsiiSC30T6sCfpIlbUlkBN5_o5zkt1E0OR3WQ7oLyzLypHjY5MBUVk5UzKU0ydSKXebMC1QlRlGGJTIeTn-YHXm5skJBK7mNXul-r2zZkMGEVpcmbFfhEVSSm3A_chI3pP8qcmO2MDkCZ2rIFX8vvprU_1PaiCF45FyS6jApAIzEdiamBxZ5XuSTw8ghovJBO99pwgVyea0kR7zlphf-o43943O4UmAtxkdqod0a14B6sfQ0LmcDef3Fv1Q5eJG29d6qWZ_"/>
+</div>
+<div class="aspect-square rounded-xl overflow-hidden group md:-mt-20">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Elegant hair styling detail with pearl accessory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8l8HNiG7nEbpB1NBq0OQUtpjka7yv0Sm2wW9NR3bxo3muQV1z9a6ObzNWXGGHvwvmMhPrM7H5HB1MKF9HucNPwHmpQVIwnDBq0wIBse0Do4aXKnTrrJ65Cz4LZsMOMKGQcoJIAriGSr2psr4sY1r2R5ZVef30-mOhtz4gcXA999ahr9jfRqKAVHN1GE9tafVbmLqw3gtZubny5BMil-iyWIz0OghRTvARf5ZFtIIrVVKQz9PfFr0x4eP_q0zeCFD2gPJlYdy_9tZ0"/>
+</div>
+<div class="md:col-span-2 aspect-video rounded-xl overflow-hidden group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Wide shot of the stylish reception area" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3NzjzbQixbYXQDeCabNPWn2HUiDWGVUB-WpHYRBZfUm36WwVihYPcAZfZOleG2u2VYUUM13UbPc7fgfG-Wz6KHOdQ_3Ds6tTTyvzidMk-LToP3CmMQclv4hJ5hAkUyiUQDothq-Z7lSggSBMsJSE4xqFIAVXzJ2X68AeGOe-L6yGX0wwOI_sQeQl7jrgAagyD5mwaZdaJ75HWn7I7HsoRoli6IFXem9cw5ubzUjrqFc-QARwAckx8W3Xy1Lz27E3tBTdbV9FsiNrM"/>
+</div>
+<div class="aspect-square rounded-xl overflow-hidden group">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" data-alt="Skincare products arranged artistically" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWGs8RToO1Q7vGH-RR4ioQWWbvJXzoPi22zq90KMehlVIPRhPzz60snA4BgZE33iM3sK3ZL843C2_2p8iPQwQVxRf9kBWlLrQHZPIFv96zk3emBjCKqrh-6DcZjQW3vapGYA_g4_sfiST4-MWvWyCLA_3tyxK4sLBouo0FHWG73aXB5WU2r_2rxcfSkPaqvVTLDBtnFhvMoTnyhCg2hBk9-p59gge33lUfOs9JsAydqIJqEwaOdjkuFaNDcn7JJPl84EGjcOhCvLvI"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Signature Quote (Visual Break) -->
+<section class="py-40 bg-white text-center px-8">
+<div class="max-w-3xl mx-auto">
+<span class="material-symbols-outlined text-primary text-4xl mb-8">auto_awesome</span>
+<blockquote class="font-headline text-4xl italic text-on-surface leading-snug">
+                    "True beauty is not about perfection, but the confidence that radiates when your inner light finds its perfect reflection."
+                </blockquote>
+<div class="w-20 h-px bg-outline-variant mx-auto mt-12"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-stone-200 dark:bg-stone-900 w-full pt-20 pb-10 tonal-shift surface-dim">
+<div class="flex flex-col items-center gap-8 px-10 max-w-screen-2xl mx-auto">
+<span class="text-lg font-noto-serif italic text-stone-800 dark:text-stone-200">LUXE AESTHETICS</span>
+<div class="flex flex-wrap justify-center gap-12 font-manrope text-xs tracking-widest uppercase">
+<a class="text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline-offset-4 hover:underline transition-colors" href="#">Privacy</a>
+<a class="text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline-offset-4 hover:underline transition-colors" href="#">Terms</a>
+<a class="text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline-offset-4 hover:underline transition-colors" href="#">Editorial</a>
+</div>
+<div class="w-full h-px bg-stone-300 dark:bg-stone-800 opacity-50"></div>
+<div class="flex flex-col items-center gap-4">
+<p class="font-manrope text-xs tracking-widest uppercase text-stone-600 dark:text-stone-400">
+                    © 2024 LUXE AESTHETICS. THE CURATED CANVAS.
+                </p>
+<div class="flex gap-6 mt-2">
+<span class="material-symbols-outlined text-stone-500 text-sm">local_mall</span>
+<span class="material-symbols-outlined text-stone-500 text-sm">spa</span>
+<span class="material-symbols-outlined text-stone-500 text-sm">content_cut</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

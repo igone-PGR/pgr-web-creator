@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, CreditCard, Loader2, Sparkles,
@@ -6,48 +6,16 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProjectData } from "@/types/project";
-import type { WebContent, ColorPalette } from "@/types/web-content";
-import { DEFAULT_CONTENT, DEFAULT_COLORS } from "@/types/web-content";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getTemplateFile } from "@/lib/sector-templates";
 import { generateSiteHtml, buildInputFromProjectData } from "@/lib/templates";
+import { DEFAULT_CONTENT, DEFAULT_COLORS } from "@/types/web-content";
 
 interface GeneratedWebProps {
   data: ProjectData;
   onBack: () => void;
 }
-
-const BASE_DARK_COLOR = "#131313";
-const HEX_COLOR_REGEX = /^#([0-9a-f]{6})$/i;
-
-const normalizeHex = (value?: string | null) => {
-  if (!value) return null;
-  const trimmed = value.trim();
-  return HEX_COLOR_REGEX.test(trimmed) ? trimmed.toUpperCase() : null;
-};
-
-const getContrastText = (hex: string) => {
-  const clean = hex.replace("#", "");
-  const r = parseInt(clean.slice(0, 2), 16);
-  const g = parseInt(clean.slice(2, 4), 16);
-  const b = parseInt(clean.slice(4, 6), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.62 ? "#131313" : "#FFFFFF";
-};
-
-const normalizePalette = (palette: ColorPalette | undefined, corporateColors?: string[]): ColorPalette => {
-  const preferredAccent = normalizeHex(corporateColors?.[0]);
-  const accent = preferredAccent || normalizeHex(palette?.accent) || DEFAULT_COLORS.accent;
-  return {
-    ...DEFAULT_COLORS,
-    ...palette,
-    accent,
-    accentText: preferredAccent ? getContrastText(accent) : palette?.accentText || DEFAULT_COLORS.accentText,
-    accentDark: BASE_DARK_COLOR,
-    text1: normalizeHex(palette?.text1) || DEFAULT_COLORS.text1,
-    text2: normalizeHex(palette?.text2) || DEFAULT_COLORS.text2,
-  };
-};
 
 const EXTRAS_OPTIONS = [
   { id: "price_1TBbCdL3Sa5XsYOcUPt1GXYK", icon: ShoppingCart, name: "E-commerce", price: 400, description: "Tienda online con catálogo y pasarela de pago" },
@@ -55,63 +23,20 @@ const EXTRAS_OPTIONS = [
   { id: "price_1TBbE8L3Sa5XsYOcNTDC02en", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
 ];
 
+const ACCENT_COLOR = "#F48763";
+
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [project] = useState<ProjectData>(data);
-  const [content, setContent] = useState<WebContent>(DEFAULT_CONTENT);
+  const [finalHtml, setFinalHtml] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [showExtrasPanel, setShowExtrasPanel] = useState(false);
   const { toast } = useToast();
 
-  const colors: ColorPalette = normalizePalette(content.colors, project.corporateColors);
   const photos = project.photos || [];
 
   useEffect(() => { generateContent(); }, []);
-
-  const generateContent = async () => {
-    try {
-      const { data: result, error } = await supabase.functions.invoke("generate-web-content", {
-        body: {
-          businessName: project.businessName,
-          description: project.description,
-          sector: project.sector,
-          address: project.address,
-          phone: project.phone,
-          email: project.email,
-          slogan: project.slogan,
-          businessHours: project.businessHours,
-          servicesList: project.servicesList,
-          hasPhotos: photos.length > 0,
-          photoCount: photos.length,
-          language: project.language || "es",
-          corporateColors: project.corporateColors || [],
-        },
-      });
-      if (error) throw error;
-      if (result?.content) setContent(result.content);
-    } catch (err) {
-      console.error("Error generating content:", err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  // Generate HTML for iframe preview
-  const previewHtml = useMemo(() => {
-    if (isGenerating) return "";
-    const input = buildInputFromProjectData(project, content, colors);
-    return generateSiteHtml(input);
-  }, [isGenerating, content, colors, project]);
-
-  const toggleExtra = (id: string) => {
-    setSelectedExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
-  };
-
-  const extrasTotal = selectedExtras.reduce((sum, id) => {
-    const ext = EXTRAS_OPTIONS.find(e => e.id === id);
-    return sum + (ext?.price || 0);
-  }, 0);
 
   const uploadPhotosToStorage = async (): Promise<string[]> => {
     const urls: string[] = [];
@@ -119,7 +44,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     for (let i = 0; i < photos.length; i++) {
       const base64 = photos[i];
       if (!base64.startsWith("data:")) {
-        urls.push(base64); // Already a URL
+        urls.push(base64);
         continue;
       }
       const match = base64.match(/^data:image\/(\w+);base64,/);
@@ -152,27 +77,95 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
     return urlData.publicUrl;
   };
 
-  const handleCheckout = async () => {
-    setIsCheckingOut(true);
+  const generateContent = async () => {
     try {
-      toast({ title: "Subiendo imágenes...", description: "Esto puede tardar unos segundos." });
-
+      // Upload images first so we have public URLs
       const [photoUrls, logoUrl] = await Promise.all([
         uploadPhotosToStorage(),
         uploadLogoToStorage(),
       ]);
 
-      // Generate final HTML with real URLs for deployment
-      const finalProject = { ...project, photos: photoUrls, logo: logoUrl };
-      const finalColors = normalizePalette(content.colors, project.corporateColors);
-      const finalInput = buildInputFromProjectData(finalProject, content, finalColors);
-      const finalHtml = generateSiteHtml(finalInput);
+      const templateFile = getTemplateFile(project.sector);
 
+      if (templateFile) {
+        // Fetch template HTML from public directory
+        const templateRes = await fetch(templateFile);
+        if (!templateRes.ok) throw new Error("No se pudo cargar la plantilla");
+        const templateHtml = await templateRes.text();
+
+        // Send to edge function for AI personalization
+        const { data: result, error } = await supabase.functions.invoke("generate-web-content", {
+          body: {
+            templateHtml,
+            businessName: project.businessName,
+            description: project.description,
+            sector: project.sector,
+            address: project.address,
+            phone: project.phone,
+            email: project.email,
+            businessEmail: project.businessEmail,
+            businessPhone: project.businessPhone,
+            slogan: project.slogan,
+            businessHours: project.businessHours,
+            servicesList: project.servicesList,
+            instagram: project.instagram,
+            facebook: project.facebook,
+            photoUrls,
+            logoUrl,
+            language: project.language || "es",
+          },
+        });
+        if (error) throw error;
+        if (result?.html) {
+          setFinalHtml(result.html);
+        } else {
+          throw new Error("No se recibió HTML personalizado");
+        }
+      } else {
+        // "Otros" sector: use old default template system
+        const finalProject = { ...project, photos: photoUrls, logo: logoUrl };
+        const input = buildInputFromProjectData(finalProject, DEFAULT_CONTENT, DEFAULT_COLORS);
+        setFinalHtml(generateSiteHtml(input));
+      }
+    } catch (err: any) {
+      console.error("Error generating content:", err);
+      toast({
+        title: "Error al generar",
+        description: err?.message || "No se pudo generar el contenido.",
+        variant: "destructive",
+      });
+      // Fallback to default template
+      const input = buildInputFromProjectData(project, DEFAULT_CONTENT, DEFAULT_COLORS);
+      setFinalHtml(generateSiteHtml(input));
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const toggleExtra = (id: string) => {
+    setSelectedExtras(prev => prev.includes(id) ? prev.filter(e => e !== id) : [...prev, id]);
+  };
+
+  const extrasTotal = selectedExtras.reduce((sum, id) => {
+    const ext = EXTRAS_OPTIONS.find(e => e.id === id);
+    return sum + (ext?.price || 0);
+  }, 0);
+
+  const handleCheckout = async () => {
+    setIsCheckingOut(true);
+    try {
       const { photos: _photos, logo: _logo, ...projectWithoutBinaries } = project;
+
+      // Re-upload for final URLs (may already be uploaded)
+      const [photoUrls, logoUrl] = await Promise.all([
+        uploadPhotosToStorage(),
+        uploadLogoToStorage(),
+      ]);
+
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           project: { ...projectWithoutBinaries, logo: logoUrl, photos: photoUrls },
-          generatedContent: { ...content, finalHtml },
+          generatedContent: { finalHtml },
           extras: selectedExtras,
         },
       });
@@ -204,12 +197,11 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           </Button>
           <div className="flex items-center gap-3">
             <button onClick={() => setShowExtrasPanel(true)}
-              className="text-xs font-medium px-3 py-1.5 rounded-full border transition-all hover:shadow-md flex items-center gap-1.5"
-              style={{ borderColor: colors.accent, color: colors.accent }}>
+              className="text-xs font-medium px-3 py-1.5 rounded-full border transition-all hover:shadow-md flex items-center gap-1.5 border-accent text-accent">
               🚀 Añadir extras {selectedExtras.length > 0 && `(${selectedExtras.length})`}
             </button>
-            <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm" className="text-xs font-semibold rounded-full px-5"
-              style={{ backgroundColor: colors.accent, color: colors.accentText }}>
+            <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm"
+              className="text-xs font-semibold rounded-full px-5 bg-accent text-accent-foreground hover:bg-accent/90">
               {isCheckingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <CreditCard className="w-3.5 h-3.5 mr-1.5" />}
               Publicar · {500 + extrasTotal}€
             </Button>
@@ -238,25 +230,19 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
                   const selected = selectedExtras.includes(ext.id);
                   return (
                     <button key={ext.id} onClick={() => toggleExtra(ext.id)}
-                      className="w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all"
-                      style={{
-                        borderColor: selected ? colors.accent : undefined,
-                        backgroundColor: selected ? `${colors.accent}10` : undefined,
-                      }}>
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: `${colors.accent}15` }}>
-                        <ext.icon className="w-5 h-5" style={{ color: colors.accent }} />
+                      className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all ${selected ? "border-accent bg-accent/10" : "border-border"}`}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-accent/10">
+                        <ext.icon className="w-5 h-5 text-accent" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-sm">{ext.name}</span>
-                          <span className="font-extrabold text-sm" style={{ color: colors.accent }}>{ext.price}€</span>
+                          <span className="font-extrabold text-sm text-accent">{ext.price}€</span>
                         </div>
                         <p className="text-xs text-muted-foreground mt-1">{ext.description}</p>
                       </div>
-                      <div className="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5"
-                        style={{ borderColor: selected ? colors.accent : undefined, backgroundColor: selected ? colors.accent : "transparent" }}>
-                        {selected && <Check className="w-3 h-3" style={{ color: colors.accentText }} />}
+                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${selected ? "border-accent bg-accent" : "border-border"}`}>
+                        {selected && <Check className="w-3 h-3 text-accent-foreground" />}
                       </div>
                     </button>
                   );
@@ -264,14 +250,13 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
 
                 {/* Diseño extra */}
                 <div className="flex items-start gap-3 p-4 rounded-xl border text-left">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: `${colors.accent}15` }}>
-                    <Palette className="w-5 h-5" style={{ color: colors.accent }} />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-accent/10">
+                    <Palette className="w-5 h-5 text-accent" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm">Diseño extra (2 rondas)</span>
-                      <span className="font-bold text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: `${colors.accent}15`, color: colors.accent }}>A consultar</span>
+                      <span className="font-bold text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent">A consultar</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">2 rondas de revisiones de diseño personalizado</p>
                   </div>
@@ -285,8 +270,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
                 </div>
                 <button onClick={() => { setShowExtrasPanel(false); handleCheckout(); }}
                   disabled={isCheckingOut}
-                  className="w-full py-3 rounded-full font-bold text-sm transition-all hover:scale-[1.02]"
-                  style={{ backgroundColor: colors.accent, color: colors.accentText }}>
+                  className="w-full py-3 rounded-full font-bold text-sm transition-all hover:scale-[1.02] bg-accent text-accent-foreground">
                   {isCheckingOut ? "Procesando..." : `Publicar mi web · ${500 + extrasTotal}€`}
                 </button>
               </div>
@@ -301,21 +285,21 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5 }}
             className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-5 bg-background">
             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }}>
-              <Sparkles className="w-10 h-10" style={{ color: colors.accent }} />
+              <Sparkles className="w-10 h-10 text-accent" />
             </motion.div>
             <div className="text-center">
               <p className="text-sm font-semibold mb-1">Diseñando tu web con IA</p>
-              <p className="text-xs text-muted-foreground">Creando un diseño único para tu negocio...</p>
+              <p className="text-xs text-muted-foreground">Personalizando la plantilla para tu negocio...</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Iframe preview - 1:1 with deploy */}
-      {!isGenerating && previewHtml && (
+      {/* Iframe preview */}
+      {!isGenerating && finalHtml && (
         <div className="flex-1">
           <iframe
-            srcDoc={previewHtml}
+            srcDoc={finalHtml}
             className="w-full border-0"
             style={{ height: "calc(100vh - 56px)" }}
             title={`Preview - ${project.businessName}`}

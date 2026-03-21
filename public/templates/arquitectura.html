@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MONOLITH | Architectural Group</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;700;800&amp;family=Inter:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error-container": "#ffdad6",
+              "on-tertiary": "#e2e2e2",
+              "primary-container": "#3b3b3b",
+              "on-error": "#ffffff",
+              "on-tertiary-container": "#ffffff",
+              "on-surface": "#1a1c1c",
+              "secondary-container": "#d6d4d3",
+              "primary": "#000000",
+              "tertiary-fixed": "#5d5f5f",
+              "inverse-on-surface": "#f0f1f1",
+              "surface-tint": "#5e5e5e",
+              "tertiary-container": "#737575",
+              "on-primary": "#e2e2e2",
+              "on-tertiary-fixed": "#ffffff",
+              "primary-fixed": "#5e5e5e",
+              "surface-variant": "#e2e2e2",
+              "surface-bright": "#f9f9f9",
+              "surface-container-high": "#e8e8e8",
+              "primary-fixed-dim": "#474747",
+              "on-secondary-container": "#1b1c1c",
+              "on-surface-variant": "#474747",
+              "on-tertiary-fixed-variant": "#e2e2e2",
+              "surface-dim": "#dadada",
+              "outline": "#777777",
+              "background": "#f9f9f9",
+              "on-background": "#1a1c1c",
+              "on-primary-container": "#ffffff",
+              "inverse-primary": "#c6c6c6",
+              "inverse-surface": "#2f3131",
+              "tertiary": "#3a3c3c",
+              "secondary": "#5f5e5e",
+              "on-primary-fixed": "#ffffff",
+              "surface": "#f9f9f9",
+              "on-primary-fixed-variant": "#e2e2e2",
+              "secondary-fixed-dim": "#acabab",
+              "tertiary-fixed-dim": "#454747",
+              "surface-container-low": "#f3f3f4",
+              "surface-container-highest": "#e2e2e2",
+              "on-error-container": "#410002",
+              "error": "#ba1a1a",
+              "surface-container": "#eeeeee",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-fixed": "#1b1c1c",
+              "outline-variant": "#c6c6c6",
+              "on-secondary-fixed-variant": "#3b3b3b",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#c8c6c6"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .brand-font { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-white/70 dark:bg-black/70 backdrop-blur-xl no-border bg-surface-container-low">
+<div class="flex justify-between items-center w-full px-8 py-6 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-black tracking-tighter text-black dark:text-white">MONOLITH</div>
+<!-- Desktop Links -->
+<div class="hidden md:flex items-center space-x-12">
+<a class="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors font-manrope font-bold tracking-tight" href="#services">Services</a>
+<a class="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors font-manrope font-bold tracking-tight" href="#projects">Projects</a>
+<a class="text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors font-manrope font-bold tracking-tight" href="#about">About</a>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-manrope font-bold tracking-tight hover:opacity-80 transition-opacity active:scale-95 duration-200">Connect</button>
+</div>
+<!-- Mobile Menu Icon (Placeholder) -->
+<div class="md:hidden">
+<span class="material-symbols-outlined text-black">menu</span>
+</div>
+</div>
+</nav>
+<main>
+<!-- Section 1: Hero -->
+<section class="relative min-h-screen flex items-center pt-24 px-8 bg-surface">
+<div class="max-w-screen-2xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12">
+<div class="lg:col-span-8">
+<span class="text-[0.75rem] font-manrope font-bold uppercase tracking-[0.3em] text-outline mb-6 block">Est. 2024</span>
+<h1 class="text-[clamp(3.5rem,10vw,8rem)] leading-[0.9] font-extrabold tracking-tighter mb-12">
+                        WE BUILD<br/>SILENT<br/>GIANTS.
+                    </h1>
+<p class="text-xl md:text-2xl max-w-xl font-light text-on-surface-variant leading-relaxed">
+                        Redefining the modern skyline through minimalist precision and structural honesty. We create spaces that demand presence without making a sound.
+                    </p>
+<div class="mt-16 flex items-center space-x-8">
+<a class="group flex items-center space-x-4" href="#projects">
+<span class="bg-primary text-on-primary p-4 rounded-full group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined">arrow_outward</span>
+</span>
+<span class="font-manrope font-bold tracking-tight uppercase text-sm">View Portfolio</span>
+</a>
+</div>
+</div>
+<div class="lg:col-span-4 self-end hidden lg:block">
+<div class="aspect-[3/4] bg-surface-container overflow-hidden rounded-lg">
+<img alt="Brutalist concrete skyscraper" class="w-full h-full object-cover grayscale brightness-90 contrast-125" data-alt="Monolithic concrete skyscraper reaching into clouds" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUv97LS8WCSeEfqlZHeIo1NT3qnfPAVKVnPqLhII-tkCMkuSQOAqRgB6EjuwUns3QmHOKiV8XqcMLqBBhmyQtPdvSTnk4N4eYTvvOLhI_j_nrkgRzvSCjxKD3Du1GywH1uT5hqJcDdEah7DO6eDNgtN9bI09l6kNfSQXEPqI67NM4ZvHOCRizlDLztntnXBeO8d_LXZIlj6s6b4chr78BO8gvxii-mu4w080---myFsDQMU825rrxO2KfFc6Q_vo49WqFOyl8CZXQ"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Services -->
+<section class="py-32 bg-surface-container-low px-8" id="services">
+<div class="max-w-screen-2xl mx-auto">
+<div class="mb-24">
+<span class="text-[0.75rem] font-manrope font-bold uppercase tracking-[0.3em] text-outline mb-4 block">Expertise</span>
+<h2 class="text-5xl md:text-7xl font-extrabold tracking-tighter">OUR DISCIPLINES</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-1px bg-outline-variant/20">
+<!-- Service 1 -->
+<div class="bg-surface-container-low p-12 hover:bg-surface-container-lowest transition-colors group">
+<div class="mb-8 w-12 h-12 flex items-center justify-center bg-primary text-on-primary">
+<span class="material-symbols-outlined" data-icon="architecture">architecture</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 tracking-tight">Urban Planning</h3>
+<p class="text-on-surface-variant leading-relaxed font-light">Holistic strategies for high-density environments, prioritizing flow and monumental presence.</p>
+<div class="mt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">east</span>
+</div>
+</div>
+<!-- Service 2 -->
+<div class="bg-surface-container-low p-12 hover:bg-surface-container-lowest transition-colors group">
+<div class="mb-8 w-12 h-12 flex items-center justify-center bg-primary text-on-primary">
+<span class="material-symbols-outlined" data-icon="apartment">apartment</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 tracking-tight">Structural Design</h3>
+<p class="text-on-surface-variant leading-relaxed font-light">Engineering the impossible. Heavy-weight materials meet gravity-defying geometries.</p>
+<div class="mt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">east</span>
+</div>
+</div>
+<!-- Service 3 -->
+<div class="bg-surface-container-low p-12 hover:bg-surface-container-lowest transition-colors group">
+<div class="mb-8 w-12 h-12 flex items-center justify-center bg-primary text-on-primary">
+<span class="material-symbols-outlined" data-icon="square_foot">square_foot</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 tracking-tight">Interior Volume</h3>
+<p class="text-on-surface-variant leading-relaxed font-light">Crafting the void. We treat interior space as a physical material to be sculpted.</p>
+<div class="mt-8 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">east</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Projects (Bento Grid) -->
+<section class="py-32 bg-surface px-8" id="projects">
+<div class="max-w-screen-2xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+<div>
+<span class="text-[0.75rem] font-manrope font-bold uppercase tracking-[0.3em] text-outline mb-4 block">Selected Works</span>
+<h2 class="text-5xl md:text-7xl font-extrabold tracking-tighter leading-none">THE PORTFOLIO</h2>
+</div>
+<div class="text-right">
+<p class="max-w-xs text-on-surface-variant text-sm font-light">A curated selection of monolithic structures completed across three continents.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 grid-rows-2 gap-6 h-full md:h-[1200px]">
+<!-- Project 1 -->
+<div class="md:col-span-8 md:row-span-1 group relative overflow-hidden bg-surface-container">
+<img alt="Modern concrete museum" class="w-full h-full object-cover grayscale hover:scale-105 transition-transform duration-700" data-alt="Minimalist concrete museum building with sharp angles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAu96M8GxE2eUZ4F8DIWW4Pb2mevFZwVCeh_f-dGvXjwO7jHaH1CfseRXqIcNfIAJk7Hn1qJMrpQpkMbpLLKji59sWISGOvBAzn_M4CBEwpf6301eA_k2RjTtKx4r8WLfM6mb3GQyWuUP9VqyGXXZWlBO_YDV-eQRdZtiV7ifVh_bBTIivQVgsE8CV_zW-O2oOEzLVkVTLL1dE1aiUYMsijDf9Q-Z5e8D9hGhFmrKYXS-YeLe5FHQiCtnFAOoPstMniagBU1j_cuUk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-12 flex flex-col justify-end">
+<span class="text-on-primary/60 text-xs font-bold tracking-[0.2em] uppercase mb-2">Berlin, DE</span>
+<h4 class="text-3xl text-on-primary font-bold">The Void Gallery</h4>
+</div>
+</div>
+<!-- Project 2 -->
+<div class="md:col-span-4 md:row-span-2 group relative overflow-hidden bg-surface-container">
+<img alt="Shadowy architectural detail" class="w-full h-full object-cover grayscale hover:scale-105 transition-transform duration-700" data-alt="Dramatic shadow play on a concrete staircase" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp2WhGSP2zDk556tETAj3cKUxWDAfl3k0FTnm7AdgK0S8lT9g_5Y8bV1NC2k4w1sV9H4-6xL_UsDuHaicbz_Jgwu-GYSfNp8fGLl_xWCu0_ke096yVxd7EpsqCZLg46ahC3O_Zg7X7WYvuynC3hWFrNIO3WRnZMLROQGLunk54l1nzlC70Ulb7p0hhDkUWQclXsIZVeWOZg8y5zqR0peJvgYVTYBcL_0ZZHJVMVjI6g3VoW-81mG3bvQrkqkeVy7MUxQXtDjtuKfU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-12 flex flex-col justify-end">
+<span class="text-on-primary/60 text-xs font-bold tracking-[0.2em] uppercase mb-2">Tokyo, JP</span>
+<h4 class="text-3xl text-on-primary font-bold">Zenith Tower</h4>
+</div>
+</div>
+<!-- Project 3 -->
+<div class="md:col-span-4 md:row-span-1 group relative overflow-hidden bg-surface-container">
+<img alt="High-end minimalist office" class="w-full h-full object-cover grayscale hover:scale-105 transition-transform duration-700" data-alt="Clean minimal office interior with glass walls" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOrB5glEMtAtQ33oGZGDoXL9TCND8BVNz04iMr_H_7v8A1mwb8aAbtHoK4naNrzTTyrJ99k0HMmv9f6kRnpIpR7qwEcAwn7jvRaSyRr2ZQTHZeT16CbTUqH1e8HnZSdNCM1-zfLFDlmvJcIZgQ5WnKKxLNWZXerXsCeFKePOaHGolHDq5tx6cPiQU6voMhFw-9CIhehfgXZLpVjFE0Oh6EruFUrXVCGL5FXylL39c2sqlWk9AMdAwzYiin94DF6zTomnz8EuuF98M"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-12 flex flex-col justify-end">
+<span class="text-on-primary/60 text-xs font-bold tracking-[0.2em] uppercase mb-2">London, UK</span>
+<h4 class="text-3xl text-on-primary font-bold">Nexus HQ</h4>
+</div>
+</div>
+<!-- Project 4 -->
+<div class="md:col-span-4 md:row-span-1 group relative overflow-hidden bg-surface-container">
+<img alt="Brutalist housing complex" class="w-full h-full object-cover grayscale hover:scale-105 transition-transform duration-700" data-alt="Massive modular concrete housing complex" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgJ2Rex2AmpwXie73TVzpp7dxdSA121PuAaKtLWHGnlz7PgORAvDgdEKeUQ5GSKPZa1lBZHcCc9rBGzWz0aJVAIPh360QJQNqWUCMTOGdPDbmPN6oqpRgPxYUEq3z1CZZ6Z5V3qQ19dh9_DxM1roCClM4qABWo9FRJXW-iNA7IfKUDJgcF9FqUwb3cfh3RLvW_oVD6sjZzTl-0-it85baeoGTTAUtwKrcgoiEF6vAYCF0KREnz7Vcw6_gxf_YpRg99cMofyKQhvM8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-12 flex flex-col justify-end">
+<span class="text-on-primary/60 text-xs font-bold tracking-[0.2em] uppercase mb-2">Oslo, NO</span>
+<h4 class="text-3xl text-on-primary font-bold">The Monolith Blocks</h4>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: About Us -->
+<section class="py-32 bg-surface-container px-8" id="about">
+<div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row items-center gap-24">
+<div class="lg:w-1/2">
+<span class="text-[0.75rem] font-manrope font-bold uppercase tracking-[0.3em] text-outline mb-4 block">Philosophy</span>
+<h2 class="text-5xl md:text-7xl font-extrabold tracking-tighter mb-12">BUILT TO LAST.<br/>DESIGNED TO BE FORGOTTEN.</h2>
+<p class="text-xl font-light text-on-surface-variant leading-relaxed mb-8">
+                        At Monolith, we believe that the most successful architecture is that which integrates so perfectly into its environment that it feels inevitable. We don't build landmarks; we build foundations.
+                    </p>
+<div class="grid grid-cols-2 gap-12 mt-16">
+<div>
+<h4 class="text-4xl font-black mb-2">150+</h4>
+<p class="text-xs uppercase tracking-widest text-outline">Structures Delivered</p>
+</div>
+<div>
+<h4 class="text-4xl font-black mb-2">24</h4>
+<p class="text-xs uppercase tracking-widest text-outline">Global Awards</p>
+</div>
+</div>
+</div>
+<div class="lg:w-1/2 relative">
+<div class="aspect-square bg-white p-4 shadow-xl rotate-3">
+<img alt="Architects in studio" class="w-full h-full object-cover grayscale" data-alt="Architects reviewing blueprints in a bright modern studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ1d0N0Dhc9eXwW4GXcPx2lNHluMYFLdp59aDDROlsMdUmNupQCDCf7E4FmVlecDVt80NFOQFoImBh2ph0gTaWyv8q6N0VmeiCj8xjBrxUmj199GTJHTFG0_7d1NCtjxDtqQb_0VfhJOSsPjw-_sEy2dH_PIzAenbTUSTJCymVJz0aZbKnXhDoOcG2l4W9bZG6yoX04L3wLud-FhZAA6NjxGrrCenJUnBUuElVKGrZtXzHwhsc4Q1D36D05cZWdbiX2c38_klNCkQ"/>
+</div>
+<div class="absolute -bottom-10 -left-10 w-48 h-48 bg-primary text-on-primary flex flex-col items-center justify-center -rotate-6 hidden md:flex">
+<span class="text-sm font-bold tracking-[0.3em] uppercase mb-2">Since</span>
+<span class="text-5xl font-black">24</span>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-48 px-8 bg-surface text-center">
+<div class="max-w-4xl mx-auto">
+<h2 class="text-5xl md:text-8xl font-black tracking-tighter mb-16">READY TO SCALE?</h2>
+<a class="text-3xl md:text-6xl font-light border-b-4 border-primary pb-4 hover:bg-primary hover:text-on-primary px-8 transition-all duration-300" href="mailto:contact@monolith.com">
+                    hello@monolith.com
+                </a>
+<div class="mt-24 flex justify-center space-x-12 opacity-40">
+<span class="material-symbols-outlined text-4xl">hexagon</span>
+<span class="material-symbols-outlined text-4xl">change_history</span>
+<span class="material-symbols-outlined text-4xl">filter_tilt_shift</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#eeeeee] dark:bg-zinc-900 w-full pt-24 pb-12">
+<div class="flex flex-col md:flex-row justify-between items-end px-12 w-full max-w-screen-2xl mx-auto">
+<div class="mb-12 md:mb-0 w-full md:w-auto">
+<div class="text-black dark:text-white font-black text-4xl tracking-tighter mb-8">MONOLITH</div>
+<div class="flex flex-col space-y-4">
+<a class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-all hover:translate-x-1 duration-300 font-manrope uppercase tracking-widest text-[0.75rem]" href="#">Email</a>
+<a class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-all hover:translate-x-1 duration-300 font-manrope uppercase tracking-widest text-[0.75rem]" href="#">LinkedIn</a>
+<a class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-all hover:translate-x-1 duration-300 font-manrope uppercase tracking-widest text-[0.75rem]" href="#">Instagram</a>
+<a class="text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-all hover:translate-x-1 duration-300 font-manrope uppercase tracking-widest text-[0.75rem]" href="#">Twitter</a>
+</div>
+</div>
+<div class="text-right w-full md:w-auto">
+<div class="mb-12 flex space-x-12 justify-end">
+<div class="flex flex-col">
+<span class="text-[0.6rem] font-bold text-outline uppercase tracking-widest mb-4">Location</span>
+<span class="font-manrope uppercase tracking-widest text-[0.75rem]">Berlin / Tokyo / London</span>
+</div>
+</div>
+<p class="text-black dark:text-white font-manrope uppercase tracking-widest text-[0.75rem]">© 2024 MONOLITH ARCHITECTURAL GROUP</p>
+</div>
+</div>
+</footer>
+</body></html>
