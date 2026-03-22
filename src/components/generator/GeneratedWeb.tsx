@@ -303,7 +303,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
             className="w-full border-0"
             style={{ height: "calc(100vh - 56px)" }}
             title={`Preview - ${project.businessName}`}
-            sandbox="allow-scripts allow-popups"
+            sandbox="allow-scripts allow-same-origin allow-popups"
           />
         </div>
       )}

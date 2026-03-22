@@ -79,20 +79,25 @@ Si hay más imágenes en la plantilla que fotos del cliente, reutiliza las fotos
 REGLAS CRÍTICAS:
 1. NO modifiques la estructura HTML, CSS, clases de Tailwind, estilos, ni el diseño de ninguna manera.
 2. NO añadas ni elimines secciones, divs, ni elementos HTML.
-3. SOLO reemplaza el contenido de texto y atributos src/href/alt de imágenes.
+3. SOLO reemplaza el contenido de texto dentro de las etiquetas y los atributos alt de imágenes.
 4. Todo el texto debe estar en ${lang}.
 5. Genera textos profesionales, persuasivos y adaptados al sector "${input.sector}".
 6. Los testimonios deben sonar naturales y creíbles para el sector.
 7. Mantén el mismo número de elementos (servicios, testimonios, etc.) que la plantilla original.
 8. Asegúrate de que los datos de contacto reales aparezcan en las secciones de contacto/footer.
 
+IMÁGENES - MUY IMPORTANTE:
+9. Si NO se proporcionan fotos del cliente, NUNCA modifiques los atributos src="" de las etiquetas <img>. Mantén TODAS las URLs de imagen de la plantilla EXACTAMENTE iguales, carácter por carácter.
+10. Si se proporcionan fotos del cliente, reemplaza los src="" con las URLs proporcionadas.
+11. NUNCA inventes URLs de imagen. NUNCA uses URLs como "https://example.com/..." o "https://placeholder.com/...".
+
 NAVEGACIÓN - MUY IMPORTANTE:
-9. La web DEBE ser una single-page con scroll suave. TODOS los enlaces del menú de navegación superior deben ser anclas internas que hagan scroll a secciones de la MISMA página.
-10. El menú de navegación DEBE tener exactamente estos 3 enlaces: "Sobre nosotros" (href="#sobre-nosotros"), "Servicios" (href="#servicios"), "Contacto" (href="#contacto").
-11. Añade los atributos id correspondientes a las secciones de la plantilla: id="sobre-nosotros" en la sección de descripción/about, id="servicios" en la sección de servicios, id="contacto" en la sección de contacto/formulario.
-12. Si el menú original tiene enlaces a otras páginas (href="about.html", href="services.html", etc.), cámbialos TODOS por las anclas internas (#sobre-nosotros, #servicios, #contacto).
-13. Elimina cualquier enlace del menú que apunte a páginas externas o subpáginas. Solo deben quedar los 3 enlaces de ancla interna.
-14. Si la plantilla no tiene smooth scroll, añade este CSS al <head>: html { scroll-behavior: smooth; }
+12. La web DEBE ser una single-page con scroll suave. TODOS los enlaces del menú de navegación superior deben ser anclas internas que hagan scroll a secciones de la MISMA página.
+13. El menú de navegación DEBE tener exactamente estos 3 enlaces: "Sobre nosotros" (href="#sobre-nosotros"), "Servicios" (href="#servicios"), "Contacto" (href="#contacto").
+14. Añade los atributos id correspondientes a las secciones de la plantilla: id="sobre-nosotros" en la sección de descripción/about, id="servicios" en la sección de servicios, id="contacto" en la sección de contacto/formulario.
+15. Si el menú original tiene enlaces a otras páginas (href="about.html", href="services.html", etc.), cámbialos TODOS por las anclas internas (#sobre-nosotros, #servicios, #contacto).
+16. Elimina cualquier enlace del menú que apunte a páginas externas o subpáginas. Solo deben quedar los 3 enlaces de ancla interna.
+17. Si la plantilla no tiene smooth scroll, añade este CSS al <head>: html { scroll-behavior: smooth; }
 
 RESPONDE SOLO CON EL HTML COMPLETO PERSONALIZADO, nada más. Sin explicaciones, sin bloques de código markdown.`;
 
