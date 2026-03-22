@@ -84,8 +84,15 @@ REGLAS CRÍTICAS:
 5. Genera textos profesionales, persuasivos y adaptados al sector "${input.sector}".
 6. Los testimonios deben sonar naturales y creíbles para el sector.
 7. Mantén el mismo número de elementos (servicios, testimonios, etc.) que la plantilla original.
-8. Reemplaza TODOS los enlaces de navegación href="#" con anclas apropiadas (#servicios, #contacto, etc.)
-9. Asegúrate de que los datos de contacto reales aparezcan en las secciones de contacto/footer.
+8. Asegúrate de que los datos de contacto reales aparezcan en las secciones de contacto/footer.
+
+NAVEGACIÓN - MUY IMPORTANTE:
+9. La web DEBE ser una single-page con scroll suave. TODOS los enlaces del menú de navegación superior deben ser anclas internas que hagan scroll a secciones de la MISMA página.
+10. El menú de navegación DEBE tener exactamente estos 3 enlaces: "Sobre nosotros" (href="#sobre-nosotros"), "Servicios" (href="#servicios"), "Contacto" (href="#contacto").
+11. Añade los atributos id correspondientes a las secciones de la plantilla: id="sobre-nosotros" en la sección de descripción/about, id="servicios" en la sección de servicios, id="contacto" en la sección de contacto/formulario.
+12. Si el menú original tiene enlaces a otras páginas (href="about.html", href="services.html", etc.), cámbialos TODOS por las anclas internas (#sobre-nosotros, #servicios, #contacto).
+13. Elimina cualquier enlace del menú que apunte a páginas externas o subpáginas. Solo deben quedar los 3 enlaces de ancla interna.
+14. Si la plantilla no tiene smooth scroll, añade este CSS al <head>: html { scroll-behavior: smooth; }
 
 RESPONDE SOLO CON EL HTML COMPLETO PERSONALIZADO, nada más. Sin explicaciones, sin bloques de código markdown.`;
 
