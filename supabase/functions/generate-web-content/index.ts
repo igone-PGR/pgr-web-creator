@@ -65,10 +65,10 @@ serve(async (req) => {
 
     // Build photo replacement instructions
     const photoInstructions = input.photoUrls.length > 0
-      ? `FOTOS DEL CLIENTE: El cliente ha subido ${input.photoUrls.length} fotos. Reemplaza las URLs de imagen existentes (src="https://lh3.googleusercontent.com/...") con estas URLs en orden:
+      ? `FOTOS DEL CLIENTE: El cliente ha subido ${input.photoUrls.length} fotos. Reemplaza SOLO las URLs de imagen existentes en atributos src="" con estas URLs en orden:
 ${input.photoUrls.map((url, i) => `  Foto ${i + 1}: ${url}`).join("\n")}
 Si hay más imágenes en la plantilla que fotos del cliente, reutiliza las fotos del cliente cíclicamente.`
-      : `NO HAY FOTOS DEL CLIENTE: Mantén las imágenes placeholder existentes de la plantilla tal cual.`;
+      : `NO HAY FOTOS DEL CLIENTE: Es ABSOLUTAMENTE CRÍTICO que mantengas TODAS las URLs de imágenes existentes en la plantilla EXACTAMENTE como están. NO modifiques, elimines ni cambies ningún atributo src de las etiquetas <img>. Copia cada URL de imagen tal cual aparece en la plantilla original.`;
 
     const logoInstruction = input.logoUrl
       ? `LOGO: El cliente tiene un logo. Donde haya un logo o nombre de marca como imagen, usa esta URL: ${input.logoUrl}`
