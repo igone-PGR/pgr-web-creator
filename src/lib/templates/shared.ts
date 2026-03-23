@@ -99,6 +99,9 @@ export function socialLinksHtml(p: TemplateInput["project"], colors: ColorPalett
   if (p.facebook) {
     items.push(`<a href="${safeHref(p.facebook)}" target="_blank" rel="noreferrer" class="social-link">Facebook</a>`);
   }
+  if (p.linkedin) {
+    items.push(`<a href="${safeHref(p.linkedin)}" target="_blank" rel="noreferrer" class="social-link">LinkedIn</a>`);
+  }
   return items.length ? `<div class="social-links">${items.join(" · ")}</div>` : "";
 }
 
