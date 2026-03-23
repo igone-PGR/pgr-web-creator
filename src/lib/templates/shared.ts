@@ -72,6 +72,7 @@ export function buildInputFromProjectData(
       businessHours: project.businessHours,
       instagram: project.instagram,
       facebook: project.facebook,
+      linkedin: project.linkedin,
       language: project.language,
     },
     content,
