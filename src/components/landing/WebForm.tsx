@@ -15,28 +15,32 @@ interface WebFormProps {
 const STEPS = [
   { key: "contacto", label: "Contacto", icon: User },
   { key: "negocio", label: "Negocio", icon: Building2 },
-  { key: "config", label: "Configuración", icon: Settings },
+  { key: "config", label: "Diseño", icon: Settings },
 ];
 
 const WebForm = ({ onSubmit }: WebFormProps) => {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
+    // Internal client contact (step 0)
+    contactName: "",
+    email: "",
+    phone: "",
+    // Business info (step 1)
     businessName: "",
     description: "",
     sector: "",
-    logo: null as string | null,
+    slogan: "",
     address: "",
-    instagram: "",
-    facebook: "",
-    email: "",
-    phone: "",
-    contactName: "",
+    businessHours: "",
     businessEmail: "",
     businessPhone: "",
-    slogan: "",
-    businessHours: "",
-    servicesList: [] as { name: string; description: string }[],
+    instagram: "",
+    facebook: "",
+    linkedin: "",
+    // Design/config (step 2)
+    logo: null as string | null,
     photos: [] as string[],
+    servicesList: [] as { name: string; description: string }[],
     preferredDomain: "",
   });
 
@@ -177,11 +181,12 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.25 }}
               >
+                {/* STEP 0: Internal client contact */}
                 {step === 0 && (
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-xl font-bold mb-1">Datos de contacto</h3>
-                      <p className="text-sm text-muted-foreground">Tu información personal para contacto.</p>
+                      <p className="text-sm text-muted-foreground">Tu información personal (uso interno, no aparecerá en la web).</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="contactName">Nombre *</Label>
@@ -198,6 +203,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                   </div>
                 )}
 
+                {/* STEP 1: Business info + business contact + social */}
                 {step === 1 && (
                   <div className="space-y-6">
                     <div>
@@ -233,6 +239,52 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                     <div className="space-y-2">
                       <Label htmlFor="businessHours">Horario de apertura</Label>
                       <Input id="businessHours" placeholder="Ej: Lunes a Viernes 9:00 - 20:00" value={form.businessHours} onChange={(e) => update("businessHours", e.target.value)} />
+                    </div>
+
+                    {/* Business contact for the website */}
+                    <div className="pt-4 border-t border-border">
+                      <h4 className="text-base font-semibold mb-1">Contacto del negocio</h4>
+                      <p className="text-xs text-muted-foreground mb-4">Estos datos aparecerán en tu web.</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="businessEmail">Email del negocio</Label>
+                          <Input id="businessEmail" type="email" placeholder="info@tunegocio.com" value={form.businessEmail} onChange={(e) => update("businessEmail", e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="businessPhone">Teléfono / WhatsApp</Label>
+                          <Input id="businessPhone" placeholder="+34 600 000 000" value={form.businessPhone} onChange={(e) => update("businessPhone", e.target.value)} />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Social media */}
+                    <div className="pt-4 border-t border-border">
+                      <h4 className="text-base font-semibold mb-1">Redes sociales</h4>
+                      <p className="text-xs text-muted-foreground mb-4">Opcional — se mostrarán en tu web.</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="instagram">Instagram</Label>
+                          <Input id="instagram" placeholder="@tunegocio" value={form.instagram} onChange={(e) => update("instagram", e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="facebook">Facebook</Label>
+                          <Input id="facebook" placeholder="facebook.com/tunegocio" value={form.facebook} onChange={(e) => update("facebook", e.target.value)} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="linkedin">LinkedIn</Label>
+                          <Input id="linkedin" placeholder="linkedin.com/in/tunegocio" value={form.linkedin} onChange={(e) => update("linkedin", e.target.value)} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 2: Design & content */}
+                {step === 2 && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-xl font-bold mb-1">Diseño y contenido</h3>
+                      <p className="text-sm text-muted-foreground">Logo, fotos, servicios y dominio.</p>
                     </div>
 
                     {/* Logo */}
@@ -297,35 +349,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                         <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
                       )}
                     </div>
-                  </div>
-                )}
 
-                {step === 2 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-xl font-bold mb-1">Configuración</h3>
-                      <p className="text-sm text-muted-foreground">Datos de contacto para tu web y redes sociales.</p>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="businessEmail">Email corporativo (para tu web)</Label>
-                        <Input id="businessEmail" type="email" placeholder="info@tunegocio.com" value={form.businessEmail} onChange={(e) => update("businessEmail", e.target.value)} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="businessPhone">Teléfono WhatsApp (para tu web)</Label>
-                        <Input id="businessPhone" placeholder="+34 600 000 000" value={form.businessPhone} onChange={(e) => update("businessPhone", e.target.value)} />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="instagram">Instagram</Label>
-                        <Input id="instagram" placeholder="@tunegocio" value={form.instagram} onChange={(e) => update("instagram", e.target.value)} />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="facebook">Facebook</Label>
-                        <Input id="facebook" placeholder="facebook.com/tunegocio" value={form.facebook} onChange={(e) => update("facebook", e.target.value)} />
-                      </div>
-                    </div>
                     <div className="space-y-2">
                       <Label htmlFor="preferredDomain">Dominio preferido</Label>
                       <Input id="preferredDomain" placeholder="Ej: www.tunegocio.com" value={form.preferredDomain} onChange={(e) => update("preferredDomain", e.target.value)} />

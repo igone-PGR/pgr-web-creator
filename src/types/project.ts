@@ -6,6 +6,7 @@ export interface ProjectData {
   address: string;
   instagram: string;
   facebook: string;
+  linkedin: string;
   email: string;
   phone: string;
   contactName: string;

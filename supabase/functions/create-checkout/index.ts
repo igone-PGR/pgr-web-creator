@@ -23,6 +23,7 @@ const ProjectSchema = z.object({
   address: z.string().max(500).optional().nullable(),
   instagram: z.string().max(100).optional().nullable(),
   facebook: z.string().max(200).optional().nullable(),
+  linkedin: z.string().max(200).optional().nullable(),
   email: z.string().email().max(255),
   phone: z.string().max(30).optional().nullable(),
   contactName: z.string().max(200).optional().nullable(),
