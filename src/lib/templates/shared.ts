@@ -16,6 +16,7 @@ export interface TemplateInput {
     businessHours?: string;
     instagram?: string;
     facebook?: string;
+    linkedin?: string;
     language?: string;
   };
   content: WebContent;
