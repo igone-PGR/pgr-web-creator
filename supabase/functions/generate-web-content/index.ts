@@ -336,6 +336,20 @@ ${input.templateHtml}`;
       throw new Error("AI did not return valid HTML");
     }
 
+    // Inject script to keep anchor navigation inside the iframe (preview)
+    const anchorFixScript = `<script>
+document.addEventListener('click', function(e) {
+  var a = e.target.closest('a');
+  if (a && a.getAttribute('href') && a.getAttribute('href').startsWith('#')) {
+    e.preventDefault();
+    var id = a.getAttribute('href').substring(1);
+    var el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }
+});
+</script>`;
+    html = html.replace('</body>', anchorFixScript + '</body>');
+
     return new Response(JSON.stringify({ success: true, html }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
