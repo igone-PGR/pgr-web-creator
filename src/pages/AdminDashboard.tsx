@@ -16,8 +16,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
-  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package, ExternalLink, Image,
+  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package, ExternalLink, Image, Trash2,
 } from "lucide-react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Project {
   id: string;
@@ -80,6 +84,16 @@ const AdminDashboard = () => {
 
     if (!error && data) setProjects(data as Project[]);
     setLoading(false);
+  };
+
+  const deleteProject = async (id: string) => {
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+    if (!error) {
+      toast({ title: "Proyecto eliminado" });
+      fetchProjects();
+    } else {
+      toast({ title: "Error al eliminar", variant: "destructive" });
+    }
   };
 
   const markAsDelivered = async (id: string) => {
@@ -381,6 +395,29 @@ const AdminDashboard = () => {
                           <CheckCircle className="w-4 h-4 text-green-600" />
                         </Button>
                       )}
+
+                      {/* Delete */}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" title="Eliminar proyecto">
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>¿Eliminar proyecto?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Se eliminará permanentemente «{p.business_name}». Esta acción no se puede deshacer.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteProject(p.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                              Eliminar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                   </TableRow>
                 ))}
