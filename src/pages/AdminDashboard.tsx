@@ -86,6 +86,16 @@ const AdminDashboard = () => {
     setLoading(false);
   };
 
+  const deleteProject = async (id: string) => {
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+    if (!error) {
+      toast({ title: "Proyecto eliminado" });
+      fetchProjects();
+    } else {
+      toast({ title: "Error al eliminar", variant: "destructive" });
+    }
+  };
+
   const markAsDelivered = async (id: string) => {
     const { error } = await supabase
       .from("projects")
