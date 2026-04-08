@@ -119,6 +119,7 @@ serve(async (req) => {
       customer_email: project.email,
       line_items: lineItems,
       mode: "payment",
+      allow_promotion_codes: true,
       success_url: `${req.headers.get("origin")}/payment-success?session_id={CHECKOUT_SESSION_ID}&project_id=${savedProject.id}`,
       cancel_url: `${req.headers.get("origin")}/?canceled=true`,
       metadata: {
