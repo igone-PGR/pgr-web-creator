@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowRight, ArrowLeft, Upload, Plus, Trash2, User, Building2, Settings } from "lucide-react";
+import { ArrowRight, ArrowLeft, Upload, Plus, Trash2, User, Building2 } from "lucide-react";
 import type { ProjectData } from "@/types/project";
 import { SECTORS } from "@/lib/sector-templates";
 
