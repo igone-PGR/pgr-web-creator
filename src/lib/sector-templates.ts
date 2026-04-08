@@ -7,7 +7,6 @@ export const SECTOR_TEMPLATE_MAP: Record<string, string> = {
   "Estética": "estetica",
   "Consultoría / Asesoría": "consultoria",
   "Arquitectura / Portfolio": "arquitectura",
-  "Otros": "default", // will use old default template system
 };
 
 export const SECTORS = Object.keys(SECTOR_TEMPLATE_MAP);

@@ -15,7 +15,6 @@ interface WebFormProps {
 const STEPS = [
   { key: "contacto", label: "Contacto", icon: User },
   { key: "negocio", label: "Negocio", icon: Building2 },
-  { key: "config", label: "Diseño", icon: Settings },
 ];
 
 const WebForm = ({ onSubmit }: WebFormProps) => {
@@ -112,7 +111,6 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     switch (step) {
       case 0: return !!(form.contactName && form.email);
       case 1: return !!(form.businessName && form.sector && form.description);
-      case 2: return true;
       default: return false;
     }
   };
@@ -276,28 +274,29 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
 
-                {/* STEP 2: Design & content */}
-                {step === 2 && (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-xl font-bold mb-1">Diseño y contenido</h3>
-                      <p className="text-sm text-muted-foreground">Logo, fotos, servicios y dominio.</p>
+                    {/* Domain */}
+                    <div className="pt-4 border-t border-border">
+                      <div className="space-y-2">
+                        <Label htmlFor="preferredDomain">Dominio personalizado</Label>
+                        <Input id="preferredDomain" placeholder="Ej: www.tunegocio.com" value={form.preferredDomain} onChange={(e) => update("preferredDomain", e.target.value)} />
+                        <p className="text-xs text-muted-foreground">Opcional — si deseas un dominio propio (sujeto a disponibilidad)</p>
+                      </div>
                     </div>
 
                     {/* Logo */}
-                    <div className="space-y-2">
-                      <Label>Logo (opcional)</Label>
-                      <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
-                        {logoPreview ? (
-                          <img src={logoPreview} alt="Logo" className="w-16 h-16 object-contain rounded-lg" />
-                        ) : (
-                          <><Upload className="w-5 h-5 text-muted-foreground" /><span className="text-sm text-muted-foreground">Sube tu logo</span></>
-                        )}
-                        <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-                      </label>
+                    <div className="pt-4 border-t border-border">
+                      <div className="space-y-2">
+                        <Label>Logo (opcional)</Label>
+                        <label className="flex items-center justify-center gap-3 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-accent/50 transition-colors">
+                          {logoPreview ? (
+                            <img src={logoPreview} alt="Logo" className="w-16 h-16 object-contain rounded-lg" />
+                          ) : (
+                            <><Upload className="w-5 h-5 text-muted-foreground" /><span className="text-sm text-muted-foreground">Sube tu logo</span></>
+                          )}
+                          <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                        </label>
+                      </div>
                     </div>
 
                     {/* Photos */}
@@ -348,12 +347,6 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                       {form.servicesList.length === 0 && (
                         <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
                       )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="preferredDomain">Dominio preferido</Label>
-                      <Input id="preferredDomain" placeholder="Ej: www.tunegocio.com" value={form.preferredDomain} onChange={(e) => update("preferredDomain", e.target.value)} />
-                      <p className="text-xs text-muted-foreground">*Sujeto a disponibilidad</p>
                     </div>
                   </div>
                 )}
