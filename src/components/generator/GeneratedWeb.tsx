@@ -61,6 +61,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [showExtrasPanel, setShowExtrasPanel] = useState(false);
+  const [generationStep, setGenerationStep] = useState("");
   const { toast } = useToast();
 
   const photos = project.photos || [];
