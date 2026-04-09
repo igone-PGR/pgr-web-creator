@@ -189,7 +189,6 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         const input = buildInputFromProjectData(finalProject, DEFAULT_CONTENT, DEFAULT_COLORS);
         setFinalHtml(generateSiteHtml(input));
       }
-      }
     } catch (err: any) {
       console.error("Error generating content:", err);
       toast({
