@@ -351,7 +351,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
             </motion.div>
             <div className="text-center">
               <p className="text-sm font-semibold mb-1">Diseñando tu web con IA</p>
-              <p className="text-xs text-muted-foreground">Personalizando la plantilla para tu negocio...</p>
+              <p className="text-xs text-muted-foreground">{generationStep || "Personalizando la plantilla para tu negocio..."}</p>
             </div>
           </motion.div>
         )}
