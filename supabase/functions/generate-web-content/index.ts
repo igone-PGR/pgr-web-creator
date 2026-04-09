@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://esm.sh/zod@3.23.8";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,139 +32,6 @@ const GenerateContentSchema = z.object({
   language: z.string().max(10).optional().default("es"),
 });
 
-// Extract image placeholders from template HTML
-function extractImageSlots(html: string): { index: number; alt: string; dataAlt: string }[] {
-  const slots: { index: number; alt: string; dataAlt: string }[] = [];
-  const imgRegex = /<img[^>]*>/gi;
-  let match;
-  let idx = 0;
-  while ((match = imgRegex.exec(html)) !== null) {
-    const tag = match[0];
-    const altMatch = tag.match(/\balt="([^"]*)"/i);
-    const dataAltMatch = tag.match(/\bdata-alt="([^"]*)"/i);
-    slots.push({
-      index: idx++,
-      alt: altMatch?.[1] || "",
-      dataAlt: dataAltMatch?.[1] || "",
-    });
-  }
-  return slots;
-}
-
-// Generate a single image using AI
-async function generateImage(
-  prompt: string,
-  apiKey: string
-): Promise<string | null> {
-  try {
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
-        messages: [{ role: "user", content: prompt }],
-        modalities: ["image", "text"],
-      }),
-    });
-
-    if (!response.ok) {
-      console.error("Image gen error:", response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    return imageUrl || null;
-  } catch (e) {
-    console.error("Image generation failed:", e);
-    return null;
-  }
-}
-
-// Upload base64 image to Supabase storage
-async function uploadToStorage(
-  supabase: ReturnType<typeof createClient>,
-  base64Data: string,
-  fileName: string
-): Promise<string | null> {
-  try {
-    // Extract the actual base64 content
-    const base64Content = base64Data.replace(/^data:image\/\w+;base64,/, "");
-    const binaryString = atob(base64Content);
-    const bytes = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-
-    const contentType = base64Data.startsWith("data:image/jpeg") ? "image/jpeg" : "image/png";
-    const ext = contentType === "image/jpeg" ? "jpg" : "png";
-    const fullPath = `generated/${fileName}.${ext}`;
-
-    const { error } = await supabase.storage
-      .from("project-photos")
-      .upload(fullPath, bytes, {
-        contentType,
-        upsert: true,
-      });
-
-    if (error) {
-      console.error("Storage upload error:", error);
-      return null;
-    }
-
-    const { data: publicData } = supabase.storage
-      .from("project-photos")
-      .getPublicUrl(fullPath);
-
-    return publicData?.publicUrl || null;
-  } catch (e) {
-    console.error("Upload failed:", e);
-    return null;
-  }
-}
-
-// Generate all images for a template
-async function generateAllImages(
-  slots: { index: number; alt: string; dataAlt: string }[],
-  businessName: string,
-  sector: string,
-  description: string,
-  apiKey: string,
-  supabase: ReturnType<typeof createClient>
-): Promise<string[]> {
-  const urls: string[] = [];
-  const timestamp = Date.now();
-
-  // Generate in batches of 3 to avoid rate limits
-  for (let i = 0; i < slots.length; i += 3) {
-    const batch = slots.slice(i, i + 3);
-    const promises = batch.map(async (slot) => {
-      const context = slot.dataAlt || slot.alt || `imagen profesional para ${sector}`;
-      const prompt = `Generate a high-quality, professional photograph for a ${sector} business called "${businessName}". The image should depict: ${context}. Business description: ${description}. Style: modern, clean, commercial photography quality. NO text, NO watermarks, NO logos in the image.`;
-
-      const base64 = await generateImage(prompt, apiKey);
-      if (!base64) return null;
-
-      const fileName = `${timestamp}_img_${slot.index}`;
-      const publicUrl = await uploadToStorage(supabase, base64, fileName);
-      return publicUrl;
-    });
-
-    const results = await Promise.all(promises);
-    urls.push(...results.map((r) => r || ""));
-
-    // Small delay between batches to avoid rate limiting
-    if (i + 3 < slots.length) {
-      await new Promise((r) => setTimeout(r, 2000));
-    }
-  }
-
-  return urls;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -177,12 +43,6 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("API key not configured");
-
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Supabase config missing");
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const langMap: Record<string, string> = {
       es: "español",
@@ -203,46 +63,16 @@ serve(async (req) => {
       : "";
     const facebookUrl = input.facebook || "";
 
-    // --- IMAGE HANDLING ---
+    // Photo instructions - images are already resolved URLs (client or AI-generated)
     let photoInstructions: string;
-    const imageSlots = extractImageSlots(input.templateHtml);
-    console.log(`Found ${imageSlots.length} image slots in template`);
-
     if (input.photoUrls.length > 0) {
-      // Client provided photos - use them
-      photoInstructions = `FOTOS DEL CLIENTE: El cliente ha subido ${input.photoUrls.length} fotos. Reemplaza los atributos src="" de las etiquetas <img> con estas URLs en orden:
-${input.photoUrls.map((url, i) => `  Foto ${i + 1}: ${url}`).join("\n")}
-Si hay más imágenes en la plantilla que fotos del cliente, reutiliza las fotos del cliente cíclicamente.
-NUNCA inventes URLs de imagen.`;
-    } else if (imageSlots.length > 0) {
-      // No client photos - generate with AI
-      console.log("Generating AI images for", imageSlots.length, "slots...");
-      const generatedUrls = await generateAllImages(
-        imageSlots,
-        input.businessName,
-        input.sector,
-        input.description,
-        LOVABLE_API_KEY,
-        supabase
-      );
-
-      const validUrls = generatedUrls.filter((u) => u);
-      console.log(`Generated ${validUrls.length}/${imageSlots.length} images`);
-
-      if (validUrls.length > 0) {
-        photoInstructions = `IMÁGENES GENERADAS POR IA: Se han generado ${validUrls.length} imágenes para este negocio. Reemplaza los atributos src="" de las etiquetas <img> con estas URLs en el MISMO ORDEN en que aparecen las imágenes en la plantilla:
-${generatedUrls.map((url, i) => `  Imagen ${i + 1}: ${url || "MANTENER_ORIGINAL"}`).join("\n")}
-Para las imágenes marcadas como MANTENER_ORIGINAL, mantén el src original de la plantilla.
-NUNCA inventes URLs de imagen. Usa SOLO las URLs proporcionadas aquí.`;
-      } else {
-        photoInstructions = `NO SE PUDIERON GENERAR IMÁGENES: Mantén TODAS las URLs de imágenes existentes en la plantilla EXACTAMENTE como están. NO modifiques ningún atributo src.`;
-      }
+      photoInstructions = `FOTOS: Reemplaza los atributos src="" de las etiquetas <img> con estas URLs en orden:\n${input.photoUrls.map((url, i) => `  Foto ${i + 1}: ${url}`).join("\n")}\nSi hay más imágenes en la plantilla que fotos proporcionadas, reutiliza las fotos cíclicamente.\nNUNCA inventes URLs de imagen.`;
     } else {
-      photoInstructions = `NO HAY IMÁGENES EN LA PLANTILLA.`;
+      photoInstructions = `NO HAY FOTOS: Mantén TODAS las URLs de imágenes existentes en la plantilla EXACTAMENTE como están. NO modifiques ningún atributo src de imágenes.`;
     }
 
     const logoInstruction = input.logoUrl
-      ? `LOGO: El cliente tiene un logo. Donde haya un logo o nombre de marca como imagen, usa esta URL: ${input.logoUrl}`
+      ? `LOGO: Donde haya un logo o nombre de marca como imagen, usa esta URL: ${input.logoUrl}`
       : "LOGO: No hay logo. Usa solo texto para el nombre del negocio.";
 
     const systemPrompt = `Eres un experto en personalización de plantillas HTML. Tu trabajo es tomar una plantilla HTML existente y reemplazar TODO el contenido placeholder (textos, información de contacto, nombre del negocio) con los datos reales del cliente, manteniendo EXACTAMENTE la misma estructura HTML, CSS, clases y diseño visual.
@@ -310,6 +140,8 @@ ${input.templateHtml}`;
 
     if (!response.ok) {
       const status = response.status;
+      const errText = await response.text();
+      console.error("AI gateway error:", status, errText);
       if (status === 429) {
         return new Response(JSON.stringify({ error: "Demasiadas solicitudes. Inténtalo de nuevo." }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -320,7 +152,6 @@ ${input.templateHtml}`;
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      console.error("AI gateway error:", status, await response.text());
       return new Response(JSON.stringify({ error: "Error al generar el contenido." }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
