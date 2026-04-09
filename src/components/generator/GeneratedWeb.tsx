@@ -18,9 +18,9 @@ interface GeneratedWebProps {
 }
 
 const EXTRAS_OPTIONS = [
-  { id: "price_1TBbCdL3Sa5XsYOcUPt1GXYK", icon: ShoppingCart, name: "E-commerce", price: 400, description: "Tienda online con catálogo y pasarela de pago" },
-  { id: "price_1TBbDnL3Sa5XsYOcyHoLWTOj", icon: CalendarCheck, name: "Agenda de citas / Reservas", price: 250, description: "Sistema de reservas online integrado" },
-  { id: "price_1TBbE8L3Sa5XsYOcNTDC02en", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
+  { id: "price_1TJxuVLF4UOuurCrNS5eWDsK", icon: ShoppingCart, name: "E-commerce", price: 400, description: "Tienda online con catálogo y pasarela de pago" },
+  { id: "price_1TKBjPLF4UOuurCrD0zUpe12", icon: CalendarCheck, name: "Agenda de citas / Reservas", price: 250, description: "Sistema de reservas online integrado" },
+  { id: "price_1TKBjkLF4UOuurCrGRNsnFrh", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
 ];
 
 const ACCENT_COLOR = "#F48763";
