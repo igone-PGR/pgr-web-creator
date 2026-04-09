@@ -109,7 +109,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
 
   const generateContent = async () => {
     try {
-      // Upload images first so we have public URLs
+      setGenerationStep("Subiendo imágenes...");
       const [photoUrls, logoUrl] = await Promise.all([
         uploadPhotosToStorage(),
         uploadLogoToStorage(),
@@ -118,12 +118,45 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       const templateFile = getTemplateFile(project.sector);
 
       if (templateFile) {
-        // Fetch template HTML from public directory
         const templateRes = await fetch(templateFile);
         if (!templateRes.ok) throw new Error("No se pudo cargar la plantilla");
         const templateHtml = await templateRes.text();
 
-        // Send to edge function for AI personalization
+        // If no client photos, generate AI images for all slots
+        let finalPhotoUrls = photoUrls;
+        if (photoUrls.length === 0) {
+          setGenerationStep("Generando imágenes con IA...");
+          const imageSlots = extractImageSlots(templateHtml);
+          console.log(`Found ${imageSlots.length} image slots, generating AI images...`);
+          
+          const timestamp = Date.now();
+          const aiUrls: string[] = [];
+          
+          // Generate in batches of 2 to avoid rate limits
+          for (let i = 0; i < imageSlots.length; i += 2) {
+            const batch = imageSlots.slice(i, i + 2);
+            setGenerationStep(`Generando imagen ${i + 1} de ${imageSlots.length}...`);
+            
+            const results = await Promise.all(
+              batch.map((slot) => {
+                const context = slot.dataAlt || slot.alt || `imagen profesional para ${project.sector}`;
+                const prompt = `Generate a high-quality, professional photograph for a ${project.sector} business called "${project.businessName}". The image should depict: ${context}. Business description: ${project.description}. Style: modern, clean, commercial photography quality. NO text, NO watermarks, NO logos in the image.`;
+                return generateAiImage(prompt, `${timestamp}_img_${slot.index}`);
+              })
+            );
+            
+            aiUrls.push(...results.map(r => r || ""));
+            
+            if (i + 2 < imageSlots.length) {
+              await new Promise(r => setTimeout(r, 1500));
+            }
+          }
+          
+          finalPhotoUrls = aiUrls.filter(u => u);
+          console.log(`Generated ${finalPhotoUrls.length}/${imageSlots.length} AI images`);
+        }
+
+        setGenerationStep("Personalizando contenido con IA...");
         const { data: result, error } = await supabase.functions.invoke("generate-web-content", {
           body: {
             templateHtml,
@@ -140,7 +173,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
             servicesList: project.servicesList,
             instagram: project.instagram,
             facebook: project.facebook,
-            photoUrls,
+            photoUrls: finalPhotoUrls,
             logoUrl,
             language: project.language || "es",
           },
@@ -152,10 +185,10 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           throw new Error("No se recibió HTML personalizado");
         }
       } else {
-        // "Otros" sector: use old default template system
         const finalProject = { ...project, photos: photoUrls, logo: logoUrl };
         const input = buildInputFromProjectData(finalProject, DEFAULT_CONTENT, DEFAULT_COLORS);
         setFinalHtml(generateSiteHtml(input));
+      }
       }
     } catch (err: any) {
       console.error("Error generating content:", err);
