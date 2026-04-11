@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 const RequestSchema = z.object({
-  prompt: z.string().min(1).max(1000),
+  prompt: z.string().min(1).max(5000),
   fileName: z.string().min(1).max(200),
 });
 
