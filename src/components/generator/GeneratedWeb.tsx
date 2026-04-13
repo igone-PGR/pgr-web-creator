@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getTemplateFile } from "@/lib/sector-templates";
 import { generateSiteHtml, buildInputFromProjectData } from "@/lib/templates";
 import { DEFAULT_CONTENT, DEFAULT_COLORS } from "@/types/web-content";
+import { uploadProjectAsset } from "@/lib/project-media";
 
 // Extract image slots from template HTML
 function extractImageSlots(html: string): { index: number; alt: string; dataAlt: string }[] {
@@ -52,8 +53,6 @@ const EXTRAS_OPTIONS = [
   { id: "price_1TKBjkLF4UOuurCrGRNsnFrh", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
 ];
 
-const ACCENT_COLOR = "#F48763";
-
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [project] = useState<ProjectData>(data);
   const [finalHtml, setFinalHtml] = useState<string>("");
@@ -64,56 +63,39 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [generationStep, setGenerationStep] = useState("");
   const { toast } = useToast();
 
-  const photos = project.photos || [];
-
   useEffect(() => { generateContent(); }, []);
 
   const uploadPhotosToStorage = async (): Promise<string[]> => {
+    const photoSources = project.photoFiles?.length
+      ? project.photoFiles
+      : (project.photos || []).filter((photo) => !photo.startsWith("blob:"));
+
+    if (photoSources.length === 0) return [];
+
     const urls: string[] = [];
     const projectId = crypto.randomUUID();
-    for (let i = 0; i < photos.length; i++) {
-      const base64 = photos[i];
-      if (!base64.startsWith("data:")) {
-        urls.push(base64);
-        continue;
-      }
-      const match = base64.match(/^data:image\/(\w+);base64,/);
-      const ext = match?.[1] || "jpg";
-      const raw = base64.replace(/^data:image\/\w+;base64,/, "");
-      const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
-      const path = `${projectId}/photo-${i}.${ext}`;
-      const { error } = await supabase.storage
-        .from("project-photos")
-        .upload(path, bytes, { contentType: `image/${ext}`, upsert: true });
-      if (error) { console.error("Photo upload error:", error); continue; }
-      const { data: urlData } = supabase.storage.from("project-photos").getPublicUrl(path);
-      urls.push(urlData.publicUrl);
+
+    for (let i = 0; i < photoSources.length; i += 1) {
+      setGenerationStep(`Subiendo imagen ${i + 1} de ${photoSources.length}...`);
+      const url = await uploadProjectAsset(photoSources[i], `${projectId}/photo-${i}`, "jpg");
+      if (url) urls.push(url);
     }
+
     return urls;
   };
 
   const uploadLogoToStorage = async (): Promise<string | null> => {
-    if (!project.logo || !project.logo.startsWith("data:")) return project.logo || null;
-    const match = project.logo.match(/^data:image\/(\w+);base64,/);
-    const ext = match?.[1] || "png";
-    const raw = project.logo.replace(/^data:image\/\w+;base64,/, "");
-    const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
-    const path = `logos/${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage
-      .from("project-photos")
-      .upload(path, bytes, { contentType: `image/${ext}`, upsert: true });
-    if (error) { console.error("Logo upload error:", error); return null; }
-    const { data: urlData } = supabase.storage.from("project-photos").getPublicUrl(path);
-    return urlData.publicUrl;
+    const logoSource = project.logoFile || (project.logo?.startsWith("blob:") ? null : project.logo);
+    return uploadProjectAsset(logoSource, `logos/${crypto.randomUUID()}`, "png");
   };
 
   const generateContent = async () => {
     try {
-      setGenerationStep("Subiendo imágenes...");
-      const [photoUrls, logoUrl] = await Promise.all([
-        uploadPhotosToStorage(),
-        uploadLogoToStorage(),
-      ]);
+      setGenerationStep("Preparando imágenes...");
+      const photoUrls = await uploadPhotosToStorage();
+      const logoUrl = project.logo || project.logoFile
+        ? await uploadLogoToStorage()
+        : null;
 
       const templateFile = getTemplateFile(project.sector);
 

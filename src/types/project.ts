@@ -1,3 +1,8 @@
+export interface UploadedMediaFile {
+  file: File;
+  previewUrl: string;
+}
+
 export interface ProjectData {
   businessName: string;
   description: string;
@@ -18,6 +23,8 @@ export interface ProjectData {
   businessHours?: string;
   servicesList?: { name: string; description: string }[];
   photos?: string[];
+  logoFile?: UploadedMediaFile | null;
+  photoFiles?: UploadedMediaFile[];
   preferredDomain?: string;
   language?: string;
   corporateColors?: string[];
