@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, ArrowLeft, Upload, Plus, Trash2, User, Building2 } from "lucide-react";
-import type { ProjectData } from "@/types/project";
+import type { ProjectData, UploadedMediaFile } from "@/types/project";
 import { SECTORS } from "@/lib/sector-templates";
 
 interface WebFormProps {
@@ -16,6 +16,10 @@ const STEPS = [
   { key: "contacto", label: "Contacto", icon: User },
   { key: "negocio", label: "Negocio", icon: Building2 },
 ];
+
+const MAX_PHOTOS = 5;
+
+const isBlobUrl = (value: string | null | undefined): value is string => Boolean(value?.startsWith("blob:"));
 
 const WebForm = ({ onSubmit }: WebFormProps) => {
   const [step, setStep] = useState(0);
@@ -38,36 +42,74 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     linkedin: "",
     // Design/config (step 2)
     logo: null as string | null,
+      logoFile: null as UploadedMediaFile | null,
     photos: [] as string[],
+      photoFiles: [] as UploadedMediaFile[],
     servicesList: [] as { name: string; description: string }[],
     preferredDomain: "",
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const photosRef = useRef<string[]>([]);
+  const logoRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    photosRef.current = form.photos;
+  }, [form.photos]);
+
+  useEffect(() => {
+    logoRef.current = logoPreview;
+  }, [logoPreview]);
+
+  useEffect(() => () => {
+    photosRef.current.forEach((url) => {
+      if (isBlobUrl(url)) URL.revokeObjectURL(url);
+    });
+
+    if (isBlobUrl(logoRef.current)) {
+      URL.revokeObjectURL(logoRef.current);
+    }
+  }, []);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const result = ev.target?.result as string;
-        setForm((f) => ({ ...f, logo: result }));
-        setLogoPreview(result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+
+    if (isBlobUrl(logoPreview)) {
+      URL.revokeObjectURL(logoPreview);
     }
+
+    setForm((f) => ({
+      ...f,
+      logo: previewUrl,
+      logoFile: { file, previewUrl },
+    }));
+    setLogoPreview(previewUrl);
+    e.currentTarget.value = "";
   };
 
   const handlePhotosUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const result = ev.target?.result as string;
-        setForm((f) => ({ ...f, photos: [...f.photos, result] }));
-      };
-      reader.readAsDataURL(file);
-    });
+    const availableSlots = Math.max(0, MAX_PHOTOS - form.photoFiles.length);
+    const files = Array.from(e.target.files || []).slice(0, availableSlots);
+
+    if (files.length === 0) {
+      e.currentTarget.value = "";
+      return;
+    }
+
+    const uploadedFiles = files.map<UploadedMediaFile>((file) => ({
+      file,
+      previewUrl: URL.createObjectURL(file),
+    }));
+
+    setForm((f) => ({
+      ...f,
+      photos: [...f.photos, ...uploadedFiles.map((item) => item.previewUrl)],
+      photoFiles: [...f.photoFiles, ...uploadedFiles],
+    }));
+    e.currentTarget.value = "";
   };
 
   const addService = () => {
@@ -101,6 +143,8 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
       darkMode: false,
       servicesList: form.servicesList.filter((s) => s.name.trim()),
       photos: form.photos,
+      photoFiles: form.photoFiles,
+      logoFile: form.logoFile,
       language: "es",
     } as any);
   };
@@ -314,7 +358,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                             <div key={idx} className="relative group">
                               <img src={photo} alt={`Foto ${idx + 1}`} className="w-20 h-20 object-cover rounded-lg" />
                               <button type="button"
-                                onClick={() => setForm((f) => ({ ...f, photos: f.photos.filter((_, i) => i !== idx) }))}
+                                onClick={() => setForm((f) => {
+                                  const removedPhoto = f.photos[idx];
+                                  if (isBlobUrl(removedPhoto)) {
+                                    URL.revokeObjectURL(removedPhoto);
+                                  }
+
+                                  return {
+                                    ...f,
+                                    photos: f.photos.filter((_, i) => i !== idx),
+                                    photoFiles: f.photoFiles.filter((_, i) => i !== idx),
+                                  };
+                                })}
                                 className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                               >×</button>
                             </div>
