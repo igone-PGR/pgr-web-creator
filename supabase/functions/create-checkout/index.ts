@@ -39,8 +39,8 @@ const ProjectSchema = z.object({
 });
 
 const VALID_EXTRAS = [
-  "price_1TJxuVLF4UOuurCrNS5eWDsK", // E-commerce 400€
-  "price_1TKBjPLF4UOuurCrD0zUpe12", // Agenda citas 250€
+  "price_1TLiCALF4UOuurCrMrJrXxno", // E-commerce 399€
+  "price_1TKBjPLF4UOuurCrD0zUpe12", // Agenda citas 249€
   "price_1TKBjkLF4UOuurCrGRNsnFrh", // Logo + marca 150€
 ];
 
@@ -106,7 +106,7 @@ serve(async (req) => {
 
     // Build line items: base product + validated extras
     const lineItems: { price: string; quantity: number }[] = [
-      { price: "price_1TJxu6LF4UOuurCrNbO0swbB", quantity: 1 },
+      { price: "price_1TLiD3LF4UOuurCrvAvzeKUh", quantity: 1 },
     ];
 
     for (const extraPriceId of extras) {
