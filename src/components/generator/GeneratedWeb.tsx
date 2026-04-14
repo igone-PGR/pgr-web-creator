@@ -247,7 +247,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
             <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm"
               className="text-xs font-semibold rounded-full px-5 bg-accent text-accent-foreground hover:bg-accent/90">
               {isCheckingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <CreditCard className="w-3.5 h-3.5 mr-1.5" />}
-              Publicar · {500 + extrasTotal}€
+              Publicar · {499 + extrasTotal}€
             </Button>
           </div>
         </div>
@@ -310,12 +310,12 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               <div className="mt-6 pt-4 border-t">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm font-semibold">Total</span>
-                  <span className="text-xl font-extrabold">{500 + extrasTotal}€</span>
+                  <span className="text-xl font-extrabold">{499 + extrasTotal}€</span>
                 </div>
                 <button onClick={() => { setShowExtrasPanel(false); handleCheckout(); }}
                   disabled={isCheckingOut}
                   className="w-full py-3 rounded-full font-bold text-sm transition-all hover:scale-[1.02] bg-accent text-accent-foreground">
-                  {isCheckingOut ? "Procesando..." : `Publicar mi web · ${500 + extrasTotal}€`}
+                  {isCheckingOut ? "Procesando..." : `Publicar mi web · ${499 + extrasTotal}€`}
                 </button>
               </div>
             </motion.div>
