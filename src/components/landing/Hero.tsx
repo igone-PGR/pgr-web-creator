@@ -24,7 +24,7 @@ const Hero = () => {
         >
           <div className="inline-flex items-center gap-2 bg-accent/10 text-accent rounded-full px-4 py-1.5 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            Web profesional por solo 500€
+            Web profesional por solo 499€
           </div>
 
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight mb-6">
@@ -55,7 +55,7 @@ const Hero = () => {
           className="flex flex-wrap items-center justify-center gap-8 md:gap-16 mt-16 text-center"
         >
           {[
-            { value: "500€", label: "Precio fijo" },
+            { value: "499€", label: "Precio fijo" },
             { value: "2 min", label: "Tiempo de creación" },
             { value: "100%", label: "Profesional" },
           ].map((stat) => (
