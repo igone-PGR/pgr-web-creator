@@ -17,8 +17,8 @@ const included = [
 ];
 
 const extras = [
-  { icon: ShoppingCart, name: "E-commerce", price: "400€", description: "Tienda online con catálogo de productos y pasarela de pago" },
-  { icon: CalendarCheck, name: "Agenda de citas / Reservas", price: "250€", description: "Sistema de reservas online integrado en tu web" },
+  { icon: ShoppingCart, name: "E-commerce", price: "399€", description: "Tienda online con catálogo de productos y pasarela de pago" },
+  { icon: CalendarCheck, name: "Agenda de citas / Reservas", price: "249€", description: "Sistema de reservas online integrado en tu web" },
   { icon: Palette, name: "Diseño extra", price: "A consultar", description: "2 rondas de revisiones de diseño personalizado" },
   { icon: PenTool, name: "Logo + Manual de marca", price: "150€", description: "Logotipo profesional y manual de identidad visual" },
 ];
@@ -59,7 +59,7 @@ const Pricing = () => {
 
             <div className="mb-8">
               <div className="flex items-end gap-2 mb-2">
-                <span className="text-5xl font-extrabold">500€</span>
+                <span className="text-5xl font-extrabold">499€</span>
               </div>
               <p className="text-sm text-muted-foreground">Pago único · Web publicada para siempre</p>
             </div>
