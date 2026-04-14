@@ -48,8 +48,8 @@ interface GeneratedWebProps {
 }
 
 const EXTRAS_OPTIONS = [
-  { id: "price_1TJxuVLF4UOuurCrNS5eWDsK", icon: ShoppingCart, name: "E-commerce", price: 400, description: "Tienda online con catálogo y pasarela de pago" },
-  { id: "price_1TKBjPLF4UOuurCrD0zUpe12", icon: CalendarCheck, name: "Agenda de citas / Reservas", price: 250, description: "Sistema de reservas online integrado" },
+  { id: "price_1TLiCALF4UOuurCrMrJrXxno", icon: ShoppingCart, name: "E-commerce", price: 399, description: "Tienda online con catálogo y pasarela de pago" },
+  { id: "price_1TKBjPLF4UOuurCrD0zUpe12", icon: CalendarCheck, name: "Agenda de citas / Reservas", price: 249, description: "Sistema de reservas online integrado" },
   { id: "price_1TKBjkLF4UOuurCrGRNsnFrh", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
 ];
 
