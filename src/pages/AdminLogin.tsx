@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,9 +15,15 @@ const AdminLogin = () => {
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"login" | "register">("login");
-  const { signIn } = useAuth();
+  const { signIn, isAdmin, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (!authLoading && user && isAdmin) {
+      navigate("/admin");
+    }
+  }, [authLoading, user, isAdmin, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +34,7 @@ const AdminLogin = () => {
     if (error) {
       toast({ title: "Error de acceso", description: "Credenciales incorrectas o cuenta no autorizada.", variant: "destructive" });
     } else {
-      navigate("/admin");
+      toast({ title: "Acceso verificado", description: "Entrando al panel de administración..." });
     }
   };
 
