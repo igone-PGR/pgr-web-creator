@@ -16,59 +16,83 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  // NOTE: isAdmin is for UI display only. All admin operations are enforced
-  // server-side via RLS policies using has_role(auth.uid(), 'admin').
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const checkAdmin = async (userId: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
-  };
+  const [authLoading, setAuthLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await checkAdmin(session.user.id);
-        } else {
-          setIsAdmin(false);
-        }
-        setLoading(false);
-      }
-    );
+    let mounted = true;
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await checkAdmin(session.user.id);
-      }
-      setLoading(false);
+    const syncSession = (nextSession: Session | null) => {
+      if (!mounted) return;
+
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+      setIsAdmin(false);
+      setAuthLoading(false);
+      setRoleLoading(!!nextSession?.user);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      syncSession(nextSession);
     });
 
-    return () => subscription.unsubscribe();
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      syncSession(initialSession);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+
+    if (!user?.id) {
+      setIsAdmin(false);
+      setRoleLoading(false);
+      return;
+    }
+
+    supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!active) return;
+        setIsAdmin(!error && !!data);
+        setRoleLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user?.id]);
+
   const signIn = async (email: string, password: string) => {
+    setAuthLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      setAuthLoading(false);
+      setRoleLoading(false);
+    }
+
     return { error: error as Error | null };
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
+    setRoleLoading(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, loading: authLoading || roleLoading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
