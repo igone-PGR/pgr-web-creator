@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "secondary-fixed": "#ffdad4",
+              "secondary-container": "#fed7d0",
+              "surface-tint": "#9e4126",
+              "background": "#ffffff",
+              "inverse-primary": "#ffb5a0",
+              "outline": "#89726c",
+              "tertiary": "#595e4b",
+              "on-secondary": "#ffffff",
+              "on-tertiary-container": "#fbffe6",
+              "primary-container": "#bb563a",
+              "on-primary-fixed-variant": "#7f2a11",
+              "on-secondary-fixed": "#2b1613",
+              "surface-dim": "#dfd9d1",
+              "on-primary-container": "#fffbff",
+              "on-tertiary": "#ffffff",
+              "primary-fixed": "#ffdbd1",
+              "outline-variant": "#ddc0b9",
+              "tertiary-fixed": "#e0e5cc",
+              "on-primary-fixed": "#3b0900",
+              "on-error-container": "#93000a",
+              "on-background": "#1d1b16",
+              "surface-container-highest": "#e7e2d9",
+              "on-secondary-fixed-variant": "#5b403c",
+              "on-tertiary-fixed-variant": "#444937",
+              "tertiary-fixed-dim": "#c4c9b1",
+              "on-primary": "#ffffff",
+              "secondary": "#745853",
+              "inverse-on-surface": "#f6f0e7",
+              "tertiary-container": "#727762",
+              "inverse-surface": "#32302a",
+              "on-secondary-container": "#795c57",
+              "on-error": "#ffffff",
+              "surface": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "surface-bright": "#ffffff",
+              "primary": "#9b3f24",
+              "on-surface": "#1d1b16",
+              "error": "#ba1a1a",
+              "surface-variant": "#e7e2d9",
+              "surface-container": "#f3ede4",
+              "primary-fixed-dim": "#ffb5a0",
+              "secondary-fixed-dim": "#e3beb8",
+              "surface-container-low": "#f9f3ea",
+              "surface-container-high": "#ede7de",
+              "on-tertiary-fixed": "#191d0e",
+              "on-surface-variant": "#56423d",
+              "error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Newsreader", "serif"],
+              "body": ["Plus Jakarta Sans", "sans-serif"],
+              "label": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; color: #1d1b16; }
+        .font-serif { font-family: 'Newsreader', serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .editorial-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 1.5rem; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-stone-900/80 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-7xl mx-auto">
+<div class="text-2xl font-serif italic text-[#9b3f24] dark:text-[#bb563a]">
+                Tierra y Trigo
+            </div>
+<div class="hidden md:flex items-center space-gap-8 gap-8">
+<a class="text-[#9b3f24] font-bold border-b-2 border-[#9b3f24] pb-1 text-sm font-medium tracking-wide transition-all active:scale-95" href="#">Menu</a>
+<a class="text-[#1d1b16] dark:text-[#f3ede4] hover:text-[#9b3f24] transition-colors text-sm font-medium tracking-wide hover:scale-105 duration-300 active:scale-95" href="#">Location</a>
+<a class="text-[#1d1b16] dark:text-[#f3ede4] hover:text-[#9b3f24] transition-colors text-sm font-medium tracking-wide hover:scale-105 duration-300 active:scale-95" href="#">Our Story</a>
+<a class="text-[#1d1b16] dark:text-[#f3ede4] hover:text-[#9b3f24] transition-colors text-sm font-medium tracking-wide hover:scale-105 duration-300 active:scale-95" href="#">Reserve</a>
+</div>
+<div class="w-10 md:hidden"></div> <!-- Spacer for mobile symmetry if needed -->
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex items-center px-8 max-w-7xl mx-auto overflow-hidden">
+<div class="editorial-grid w-full items-center">
+<div class="col-span-12 md:col-span-6 z-10">
+<h1 class="text-display-lg text-6xl md:text-8xl font-serif leading-[1.1] text-on-background mb-6">
+                        Madrid <span class="italic text-primary">Mornings</span>, Curated.
+                    </h1>
+<p class="text-body-lg text-lg text-on-surface-variant max-w-md mb-8 leading-relaxed">
+                        An artisanal sanctuary in the heart of the city. We blend traditional sourdough techniques with modern brunch culture.
+                    </p>
+<div class="flex gap-4">
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-8 py-4 rounded-xl font-medium hover:scale-105 transition-transform">
+                            View Menu
+                        </button>
+</div>
+</div>
+<div class="col-span-12 md:col-span-6 relative h-[500px] md:h-[700px] mt-12 md:mt-0">
+<div class="absolute inset-0 bg-surface-container-high rounded-3xl overflow-hidden -rotate-2 scale-95 origin-bottom-left"></div>
+<img alt="Artisanal sourdough bread and a latte" class="absolute inset-0 w-full h-full object-cover rounded-3xl shadow-2xl rotate-1 scale-100 hover:rotate-0 transition-transform duration-700" data-alt="Artisanal sourdough bread and a perfectly poured latte" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYdRohKa5iWiprCm-GXNQGPEmvBRCESBNHgDP5CpXXoOL_7rEyB7c78VuDg8BQmeTYG-tY48Nsqwpm9CUNKCvEzQRI1FihQGHCRru1mNNfc8XhGwSWmOeC5LAX4rvRRg48AwW94RZ3MI3ajL6rjqduaDAr0yLj0Ppigeymz9SFbzzqFW_0dgM9eoIt8P7NKjUSb7HTdlyC5k0UGUh0UrzHAnnAVh52Uq_kDwjcA2N5p6uSq9NYBVkGZV4TgwL966y5kph3Xf82Yvo"/>
+</div>
+</div>
+</section>
+<!-- Signature Dishes (Bento Grid Style) -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-8">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
+<div>
+<span class="text-tertiary font-medium tracking-widest uppercase text-xs mb-2 block">The Essentials</span>
+<h2 class="text-5xl font-serif text-on-background">Signature <span class="italic">Dishes</span></h2>
+</div>
+<p class="text-on-surface-variant max-w-xs text-sm">Every plate is a canvas of local ingredients and seasonal flavors.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Feature Card 1 -->
+<div class="md:col-span-7 group relative overflow-hidden rounded-xl bg-white h-[450px]">
+<img alt="Avocado toast" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Gourmet avocado toast on thick sourdough bread" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmRtCoF9gfrV07TcTLymQdZ6mMB1_KMH1bs5-oRrC77yqDVD0rQBZm9BOlBv1ZDrKec0F9fJE9Mx1-G_z5uqObpUoz1yM_dzumA2seaMkT94gxEkdCmzpMqr1VzpGVqjY28TkdmDp8c1IBXkbJPMZ7PyVCAOBLarHjGkTUoTAaG2rYO4akb8WGYY1VS1Atx1oEux1oWoU_1V12YvUcTEnZ2hs32BZgHD-uFXfxTPv8SIxLe3k32qIxnEqsBAihOgIlv9ES1OJ0A6M"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-8 text-white">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-xs font-bold mb-3 inline-block">CHEF'S CHOICE</span>
+<h3 class="text-3xl font-serif mb-2">Avocado Sourdough</h3>
+<p class="text-sm opacity-90 max-w-sm">Whipped feta, chili oil, and micro-greens on our signature 48-hour fermented loaf.</p>
+</div>
+</div>
+<!-- Feature Card 2 -->
+<div class="md:col-span-5 bg-surface-container-highest rounded-xl p-8 flex flex-col justify-between">
+<div>
+<span class="text-primary font-bold text-xs tracking-widest uppercase mb-4 block">Classic Refresh</span>
+<h3 class="text-3xl font-serif text-on-background mb-4">Eggs <span class="italic">Benedict</span></h3>
+<p class="text-on-surface-variant leading-relaxed">Poached farm eggs, smoked salmon, and a citrus-infused hollandaise sauce on artisanal brioche.</p>
+</div>
+<div class="mt-8 rounded-xl overflow-hidden h-48">
+<img alt="Eggs benedict" class="w-full h-full object-cover" data-alt="Eggs benedict with smoked salmon on brioche" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGeEol-PdeemMNb46cLcIQN2CyLOKTyxONcl5vslAMhiaLH45W8_ksCLEQdrt-txd2Y_Bg444Vb66TzRnWbwyvZBvNNOMBtBfXcmpyQbhcp8jZIWTEN5NturiupthJpfysrs0ocirLsPRGLuJMlTI8NslJAKV7BLRf9yzc7HVlRITc_diNFcD9tWFzKIPWS3YddMFKAovEvw2aGd51NVnVvjBv-VydDfg_xzrAvEvos0byRUdrimUr3zN6L8BKIwyK3HX_Xt0HD7g"/>
+</div>
+</div>
+<!-- Small Bento Items -->
+<div class="md:col-span-4 bg-tertiary-fixed rounded-xl p-6 flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-tertiary text-on-tertiary rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-3xl">eco</span>
+</div>
+<h4 class="font-serif text-xl mb-2 text-on-tertiary-fixed">100% Organic</h4>
+<p class="text-on-tertiary-fixed-variant text-sm">Sourced from small farms in the Madrid region.</p>
+</div>
+<div class="md:col-span-4 bg-primary-fixed rounded-xl p-6 flex flex-col items-center text-center">
+<div class="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-3xl">coffee</span>
+</div>
+<h4 class="font-serif text-xl mb-2 text-on-primary-fixed">Specialty Roast</h4>
+<p class="text-on-primary-fixed-variant text-sm">Direct-trade beans roasted in small batches.</p>
+</div>
+<div class="md:col-span-4 bg-white rounded-xl p-6 flex flex-col items-center text-center shadow-sm border border-surface-variant">
+<div class="w-16 h-16 bg-surface-container-highest text-primary rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-3xl">bakery_dining</span>
+</div>
+<h4 class="font-serif text-xl mb-2">Handmade Daily</h4>
+<p class="text-on-surface-variant text-sm">Baked fresh every morning before the sun rises.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Our Story Section (Asymmetrical Editorial) -->
+<section class="py-24 px-8 max-w-7xl mx-auto overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+<div class="md:col-span-5 order-2 md:order-1 relative">
+<img alt="Cafe interior" class="rounded-2xl z-10 relative" data-alt="Cozy interior of Tierra y Trigo cafe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUvmq-M_UFGW751IXmLxuUMBzT3lyAUxgu0g7rnYJFV4eYZSu5ceAZ73YVYgeLANUa8WBpvBlHpJ2J6436lxFwDtVHLofE6_3Af5ykfEHHREXsUTxFE4i7dGXC2DddOGcQ3g6xTtvQB942BFaH7jBFqYljNJNAjFH4_wFQ8yHVkrhfIvut8YIN0fdpin6rNSThkbs5L81c8Jd6YaLjcObp4AW20EyKUICivmSiDIcTBrt2JquP1RQ4b3MktJz6XeRlkjOMb02Mv_w"/>
+<div class="absolute -top-6 -left-6 w-32 h-32 bg-tertiary-fixed rounded-full -z-10"></div>
+</div>
+<div class="md:col-span-7 order-1 md:order-2 md:pl-12">
+<span class="text-primary font-bold tracking-widest uppercase text-xs mb-4 block">Our Philosophy</span>
+<h2 class="text-5xl font-serif text-on-background mb-8 leading-tight">Roots in the <span class="italic">Soil</span>, Heart in the <span class="italic">Grain</span>.</h2>
+<div class="space-y-6 text-on-surface-variant leading-relaxed">
+<p>Tierra y Trigo was born from a simple desire: to bring the authentic flavors of the Spanish countryside to the bustling streets of Madrid. We believe that a meal is only as good as its origin.</p>
+<p>That's why we partner exclusively with local millers for our heritage flours and organic farmers for our seasonal produce. Our sourdough starter has been nurtured for five years, capturing the unique micro-flora of our neighborhood.</p>
+</div>
+<div class="mt-10 flex gap-12">
+<div>
+<span class="block text-3xl font-serif text-primary">12+</span>
+<span class="text-xs uppercase tracking-widest font-bold">Local Partners</span>
+</div>
+<div>
+<span class="block text-3xl font-serif text-primary">48h</span>
+<span class="text-xs uppercase tracking-widest font-bold">Slow Fermentation</span>
+</div>
+<div>
+<span class="block text-3xl font-serif text-primary">0%</span>
+<span class="text-xs uppercase tracking-widest font-bold">Additives</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Visit Us Section -->
+<section class="py-24 bg-white">
+<div class="max-w-7xl mx-auto px-8">
+<div class="bg-surface-container rounded-3xl p-1 md:p-12 overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-2">
+<div class="p-8 md:p-12">
+<h2 class="text-4xl font-serif mb-8 text-on-background">Visit <span class="italic">Us</span></h2>
+<div class="space-y-8">
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<div>
+<h4 class="font-bold text-sm uppercase tracking-wider mb-1">Address</h4>
+<p class="text-on-surface-variant">Calle de la Luna, 14<br/>28004 Madrid, Spain</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<div>
+<h4 class="font-bold text-sm uppercase tracking-wider mb-1">Opening Hours</h4>
+<div class="grid grid-cols-2 gap-x-8 text-on-surface-variant">
+<span>Mon — Fri</span>
+<span>08:00 – 19:00</span>
+<span>Sat — Sun</span>
+<span>09:00 – 20:00</span>
+</div>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<span class="material-symbols-outlined text-primary">mail</span>
+<div>
+<h4 class="font-bold text-sm uppercase tracking-wider mb-1">Contact</h4>
+<p class="text-on-surface-variant">hola@tierraytrigo.com<br/>+34 912 345 678</p>
+</div>
+</div>
+</div>
+<button class="mt-12 bg-on-surface text-white px-8 py-4 rounded-xl font-medium flex items-center gap-2 hover:bg-primary transition-colors">
+                                Get Directions
+                                <span class="material-symbols-outlined">directions</span>
+</button>
+</div>
+<div class="relative min-h-[400px] h-full rounded-2xl overflow-hidden m-4 md:m-0">
+<img alt="Map location" class="absolute inset-0 w-full h-full object-cover" data-alt="Artistic map rendering of Madrid Malasaña district" data-location="Madrid" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0cq6a-7AANwxs7Ix0GvKsHBLN9Hs9U-90csHqMtq5RgcTYNcHIlx7_1OuXe-ifCMwptQKMYc7iiEMyjwULRLWsD_O_XwpVCk15trKY6EFK7fDle99NkOK2xnTIPhD9209mCc91ox4GGpmCk2sRT-hwbgvutk2LwVzUZkOZHxjPJpkjI7DEu_xVc3IVluur7a5Sr25Ufi-osyzVZB4HUzB8x8ui_zYnlYYFtUwRqdoaG3i_JIWZGaxb80cugCViqRD9Unrd8hExCo"/>
+<!-- Overlay Glass Card for Map label -->
+<div class="absolute bottom-6 left-6 right-6 bg-white/80 backdrop-blur-md p-4 rounded-xl flex items-center justify-between shadow-sm">
+<span class="font-serif italic text-lg text-primary">En el corazón de Malasaña</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">explore</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-white dark:bg-stone-800 w-full py-12 px-8 border-t border-surface-variant">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto text-center md:text-left">
+<div>
+<div class="text-xl font-serif text-[#9b3f24] mb-4">Tierra y Trigo</div>
+<p class="text-sm font-body text-[#595e4b] dark:text-[#e0e5cc]">Crafting the perfect Madrid morning through sourdough and specialty coffee.</p>
+</div>
+<div class="flex flex-col gap-2">
+<h4 class="font-serif text-lg text-[#595e4b] dark:text-[#e0e5cc] mb-2">Connect</h4>
+<a class="text-[#795c57] dark:text-[#ddc0b9] text-sm font-body hover:text-[#9b3f24] transition-colors" href="#">Instagram</a>
+<a class="text-[#795c57] dark:text-[#ddc0b9] text-sm font-body hover:text-[#9b3f24] transition-colors" href="#">Facebook</a>
+</div>
+<div class="flex flex-col gap-2">
+<h4 class="font-serif text-lg text-[#595e4b] dark:text-[#e0e5cc] mb-2">Legal</h4>
+<a class="text-[#795c57] dark:text-[#ddc0b9] text-sm font-body hover:text-[#9b3f24] transition-colors" href="#">Privacy Policy</a>
+<a class="text-[#795c57] dark:text-[#ddc0b9] text-sm font-body hover:text-[#9b3f24] transition-colors" href="#">Contact Us</a>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-outline-variant/20 text-center">
+<p class="text-sm font-body text-[#595e4b] dark:text-[#e0e5cc]">© 2024 Tierra y Trigo Madrid. Artisanal Coffee &amp; Brunch.</p>
+</div>
+</footer>
+</body></html>

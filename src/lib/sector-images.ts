@@ -8,9 +8,8 @@ import otroImg from "@/assets/sectors/otro.jpg";
 
 // Reuse existing images for new sector names
 export const SECTOR_IMAGES: Record<string, string> = {
-  "Hostelería": hosteleriaImg,
-  "Estética": esteticaImg,
-  "Restaurante": restauracionImg,
+  "Hostelería / Restaurante": restauracionImg,
+  "Estética / Peluquería": esteticaImg,
   "Consultoría / Asesoría": consultoriaImg,
   "Fitness / Deportes": fitnessImg,
   "Servicios": comercioImg,
