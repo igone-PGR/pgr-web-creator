@@ -1,12 +1,12 @@
 // Maps form sector values to template file names
 export const SECTOR_TEMPLATE_MAP: Record<string, string> = {
-  "Hostelería": "hosteleria",
+  "Hostelería / Restaurante": "restauracion",
   "Servicios": "servicios",
   "Fitness / Deportes": "fitness",
-  "Restaurante": "restauracion",
-  "Estética": "estetica",
+  "Estética / Peluquería": "estetica",
   "Consultoría / Asesoría": "consultoria",
   "Arquitectura / Portfolio": "arquitectura",
+  "Otros": "otros",
 };
 
 export const SECTORS = Object.keys(SECTOR_TEMPLATE_MAP);

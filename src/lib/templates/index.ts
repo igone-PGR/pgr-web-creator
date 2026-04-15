@@ -8,11 +8,9 @@ import { generateFitnessHtml } from "./fitness";
 import { generateDefaultHtml } from "./default";
 
 const SECTOR_TEMPLATE_MAP: Record<string, (input: TemplateInput) => string> = {
-  "Hostelería": generateHosteleriaHtml,
-  "Restauración": generateHosteleriaHtml,
-  "Estética": generateEsteticaHtml,
-  "Salud": generateEsteticaHtml,
-  "Fitness": generateFitnessHtml,
+  "Hostelería / Restaurante": generateHosteleriaHtml,
+  "Estética / Peluquería": generateEsteticaHtml,
+  "Fitness / Deportes": generateFitnessHtml,
 };
 
 export function generateSiteHtml(input: TemplateInput): string {
