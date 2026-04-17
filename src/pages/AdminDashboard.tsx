@@ -196,7 +196,7 @@ const AdminDashboard = () => {
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Total pagados</CardTitle></CardHeader>
             <CardContent><p className="text-3xl font-bold">{projects.length}</p></CardContent>
@@ -209,18 +209,29 @@ const AdminDashboard = () => {
             <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Entregados</CardTitle></CardHeader>
             <CardContent><p className="text-3xl font-bold">{projects.filter(p => p.status === "delivered").length}</p></CardContent>
           </Card>
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Leads (sin pago)</CardTitle></CardHeader>
+            <CardContent><p className="text-3xl font-bold">{leads.length}</p></CardContent>
+          </Card>
         </div>
 
-        {/* Search */}
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nombre o email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        <Tabs defaultValue="projects" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="projects">Proyectos pagados ({projects.length})</TabsTrigger>
+            <TabsTrigger value="leads">Leads ({leads.length})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="projects" className="space-y-4">
+            {/* Search */}
+            <div className="relative max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nombre o email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
         {/* Table */}
         {loading ? (
