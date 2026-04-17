@@ -168,13 +168,19 @@ serve(async (req) => {
       <div style="background:#f8f7f4;border-radius:12px;padding:24px;margin:24px 0;">
         <h2 style="font-size:18px;color:#1a1a1a;margin:0 0 12px;">✏️ Tu ronda de cambios incluida</h2>
         <p style="font-size:14px;color:#555;line-height:1.6;margin:0 0 16px;">
-          Tu web incluye <strong>1 ronda de cambios gratuita</strong>. Para solicitar tus modificaciones:
+          Tu web incluye <strong>1 ronda de cambios gratuita</strong>. Para solicitar tus modificaciones, sigue estos pasos:
         </p>
         <ol style="font-size:14px;color:#555;line-height:1.8;margin:0 0 16px;padding-left:20px;">
-          <li>Agenda una cita con Igone para mostrarle los cambios que necesitas</li>
-          <li>Realizaremos los ajustes y te los enviaremos para tu aprobación</li>
+          <li>
+            Primero, indícanos los cambios que deseas realizar a través de este formulario:
+            <br/>
+            <a href="https://pgrdigital.tech/formulario-de-cambios-web-creator/" target="_blank" style="color:#FF6B4A;font-weight:600;text-decoration:underline;word-break:break-all;">
+              https://pgrdigital.tech/formulario-de-cambios-web-creator/
+            </a>
+          </li>
+          <li>Una vez nos hayas dejado la información necesaria, reserva una cita con Igone para comentarlos o que te mostremos los cambios ya realizados.</li>
         </ol>
-        <div style="text-align:center;">
+        <div style="text-align:center;margin-top:16px;">
           <a href="${CALENDAR_LINK}" target="_blank" style="display:inline-block;padding:14px 28px;background:#FF6B4A;color:#ffffff;text-decoration:none;border-radius:10px;font-weight:bold;font-size:14px;">
             📅 Agendar cita con Igone
           </a>
