@@ -16,12 +16,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import {
-  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package, ExternalLink, Image, Trash2,
+  LogOut, Search, Eye, Edit, CheckCircle, Loader2, Package, ExternalLink, Image, Trash2, Copy,
 } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Project {
   id: string;
@@ -58,8 +59,10 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [leads, setLeads] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [searchLeads, setSearchLeads] = useState("");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [saving, setSaving] = useState(false);
@@ -71,7 +74,10 @@ const AdminDashboard = () => {
   }, [authLoading, user, isAdmin, navigate]);
 
   useEffect(() => {
-    if (isAdmin) fetchProjects();
+    if (isAdmin) {
+      fetchProjects();
+      fetchLeads();
+    }
   }, [isAdmin]);
 
   const fetchProjects = async () => {
@@ -84,6 +90,31 @@ const AdminDashboard = () => {
 
     if (!error && data) setProjects(data as Project[]);
     setLoading(false);
+  };
+
+  const fetchLeads = async () => {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("paid", false)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) setLeads(data as Project[]);
+  };
+
+  const copyEmail = (email: string) => {
+    navigator.clipboard.writeText(email);
+    toast({ title: "Email copiado", description: email });
+  };
+
+  const deleteLead = async (id: string) => {
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+    if (!error) {
+      toast({ title: "Lead eliminado" });
+      fetchLeads();
+    } else {
+      toast({ title: "Error al eliminar", variant: "destructive" });
+    }
   };
 
   const deleteProject = async (id: string) => {
@@ -165,7 +196,7 @@ const AdminDashboard = () => {
 
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Total pagados</CardTitle></CardHeader>
             <CardContent><p className="text-3xl font-bold">{projects.length}</p></CardContent>
@@ -178,18 +209,29 @@ const AdminDashboard = () => {
             <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Entregados</CardTitle></CardHeader>
             <CardContent><p className="text-3xl font-bold">{projects.filter(p => p.status === "delivered").length}</p></CardContent>
           </Card>
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Leads (sin pago)</CardTitle></CardHeader>
+            <CardContent><p className="text-3xl font-bold">{leads.length}</p></CardContent>
+          </Card>
         </div>
 
-        {/* Search */}
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar por nombre o email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+        <Tabs defaultValue="projects" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="projects">Proyectos pagados ({projects.length})</TabsTrigger>
+            <TabsTrigger value="leads">Leads ({leads.length})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="projects" className="space-y-4">
+            {/* Search */}
+            <div className="relative max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nombre o email..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10"
+              />
+            </div>
 
         {/* Table */}
         {loading ? (
@@ -432,6 +474,102 @@ const AdminDashboard = () => {
             </Table>
           </Card>
         )}
+          </TabsContent>
+
+          <TabsContent value="leads" className="space-y-4">
+            <div className="relative max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar leads por nombre o email..."
+                value={searchLeads}
+                onChange={(e) => setSearchLeads(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Personas que iniciaron el formulario o generaron una web pero no completaron el pago.
+            </p>
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Negocio</TableHead>
+                    <TableHead>Contacto</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Teléfono</TableHead>
+                    <TableHead>Sector</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {leads
+                    .filter((l) =>
+                      l.business_name.toLowerCase().includes(searchLeads.toLowerCase()) ||
+                      l.email.toLowerCase().includes(searchLeads.toLowerCase())
+                    )
+                    .map((l) => {
+                      const hasGenerated = !!l.generated_content;
+                      return (
+                        <TableRow key={l.id}>
+                          <TableCell className="font-medium">{l.business_name}</TableCell>
+                          <TableCell>{l.contact_name || "—"}</TableCell>
+                          <TableCell className="text-xs">{l.email}</TableCell>
+                          <TableCell className="text-xs">{l.phone || "—"}</TableCell>
+                          <TableCell className="capitalize">{l.sector}</TableCell>
+                          <TableCell>
+                            <Badge variant={hasGenerated ? "default" : "secondary"}>
+                              {hasGenerated ? "Web generada" : "Formulario iniciado"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs">{new Date(l.created_at).toLocaleDateString("es-ES")}</TableCell>
+                          <TableCell className="text-right space-x-1">
+                            <Button variant="ghost" size="icon" title="Copiar email" onClick={() => copyEmail(l.email)}>
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" asChild title="Enviar email">
+                              <a href={`mailto:${l.email}?subject=Tu web en PGR Web Creator`}>
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon" title="Eliminar lead">
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>¿Eliminar lead?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Se eliminará «{l.business_name}» de la base de datos.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteLead(l.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                    Eliminar
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {leads.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                        No hay leads pendientes
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
