@@ -59,8 +59,10 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [projects, setProjects] = useState<Project[]>([]);
+  const [leads, setLeads] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [searchLeads, setSearchLeads] = useState("");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [editProject, setEditProject] = useState<Project | null>(null);
   const [saving, setSaving] = useState(false);
@@ -72,7 +74,10 @@ const AdminDashboard = () => {
   }, [authLoading, user, isAdmin, navigate]);
 
   useEffect(() => {
-    if (isAdmin) fetchProjects();
+    if (isAdmin) {
+      fetchProjects();
+      fetchLeads();
+    }
   }, [isAdmin]);
 
   const fetchProjects = async () => {
@@ -85,6 +90,31 @@ const AdminDashboard = () => {
 
     if (!error && data) setProjects(data as Project[]);
     setLoading(false);
+  };
+
+  const fetchLeads = async () => {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("paid", false)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) setLeads(data as Project[]);
+  };
+
+  const copyEmail = (email: string) => {
+    navigator.clipboard.writeText(email);
+    toast({ title: "Email copiado", description: email });
+  };
+
+  const deleteLead = async (id: string) => {
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+    if (!error) {
+      toast({ title: "Lead eliminado" });
+      fetchLeads();
+    } else {
+      toast({ title: "Error al eliminar", variant: "destructive" });
+    }
   };
 
   const deleteProject = async (id: string) => {
