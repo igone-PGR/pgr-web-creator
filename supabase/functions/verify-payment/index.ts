@@ -83,12 +83,16 @@ serve(async (req) => {
       // Send notification email to admin
       try {
         const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
-        const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL");
+        const adminEmailRaw = Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || "";
+        const adminEmails = adminEmailRaw
+          .split(",")
+          .map((e) => e.trim())
+          .filter((e) => e.length > 0);
 
-        if (adminEmail && project) {
+        if (adminEmails.length > 0 && project) {
           await resend.emails.send({
             from: "PGR Web Creator <notificaciones@avisos.pgrdigital.tech>",
-            to: [adminEmail],
+            to: adminEmails,
             subject: `💰 Nuevo pago recibido: ${project.business_name}`,
             html: `
               <h1>¡Nuevo pago recibido!</h1>
