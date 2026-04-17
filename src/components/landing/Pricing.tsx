@@ -10,13 +10,14 @@ const included = [
   "WhatsApp, email, teléfono, Instagram",
   "Deploy automático en Vercel",
   "Diseño responsive (móvil, tablet, desktop)",
+  "Alojamiento web y dominio por 12 meses",
   "1 ronda de cambios incluida",
 ];
 
 const extras = [
   { icon: ShoppingCart, name: "E-commerce", price: "399€", description: "Tienda online con catálogo de productos y pasarela de pago" },
   { icon: CalendarCheck, name: "Agenda de citas / Reservas", price: "249€", description: "Sistema de reservas online integrado en tu web" },
-  { icon: Palette, name: "Diseño extra", price: "A consultar", description: "2 rondas de revisiones de diseño personalizado" },
+  { icon: Palette, name: "+1 ronda de revisiones de diseño personalizado", price: "99€", description: "Una ronda adicional de revisiones de diseño personalizado" },
   { icon: PenTool, name: "Logo + Manual de marca", price: "150€", description: "Logotipo profesional y manual de identidad visual" },
 ];
 
