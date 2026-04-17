@@ -474,6 +474,102 @@ const AdminDashboard = () => {
             </Table>
           </Card>
         )}
+          </TabsContent>
+
+          <TabsContent value="leads" className="space-y-4">
+            <div className="relative max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar leads por nombre o email..."
+                value={searchLeads}
+                onChange={(e) => setSearchLeads(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Personas que iniciaron el formulario o generaron una web pero no completaron el pago.
+            </p>
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Negocio</TableHead>
+                    <TableHead>Contacto</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Teléfono</TableHead>
+                    <TableHead>Sector</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {leads
+                    .filter((l) =>
+                      l.business_name.toLowerCase().includes(searchLeads.toLowerCase()) ||
+                      l.email.toLowerCase().includes(searchLeads.toLowerCase())
+                    )
+                    .map((l) => {
+                      const hasGenerated = !!l.generated_content;
+                      return (
+                        <TableRow key={l.id}>
+                          <TableCell className="font-medium">{l.business_name}</TableCell>
+                          <TableCell>{l.contact_name || "—"}</TableCell>
+                          <TableCell className="text-xs">{l.email}</TableCell>
+                          <TableCell className="text-xs">{l.phone || "—"}</TableCell>
+                          <TableCell className="capitalize">{l.sector}</TableCell>
+                          <TableCell>
+                            <Badge variant={hasGenerated ? "default" : "secondary"}>
+                              {hasGenerated ? "Web generada" : "Formulario iniciado"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-xs">{new Date(l.created_at).toLocaleDateString("es-ES")}</TableCell>
+                          <TableCell className="text-right space-x-1">
+                            <Button variant="ghost" size="icon" title="Copiar email" onClick={() => copyEmail(l.email)}>
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" asChild title="Enviar email">
+                              <a href={`mailto:${l.email}?subject=Tu web en PGR Web Creator`}>
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon" title="Eliminar lead">
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>¿Eliminar lead?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Se eliminará «{l.business_name}» de la base de datos.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => deleteLead(l.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                    Eliminar
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  {leads.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                        No hay leads pendientes
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
