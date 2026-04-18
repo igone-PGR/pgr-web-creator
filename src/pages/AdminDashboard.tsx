@@ -525,6 +525,69 @@ const AdminDashboard = () => {
                           </TableCell>
                           <TableCell className="text-xs">{new Date(l.created_at).toLocaleDateString("es-ES")}</TableCell>
                           <TableCell className="text-right space-x-1">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" title="Ver respuestas del formulario" onClick={() => setSelectedProject(l)}>
+                                  <Eye className="w-4 h-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+                                <DialogHeader>
+                                  <DialogTitle>{selectedProject?.business_name} — Respuestas del formulario</DialogTitle>
+                                </DialogHeader>
+                                {selectedProject && (
+                                  <div className="space-y-4 text-sm">
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <p><strong>Contacto:</strong> {selectedProject.contact_name || "—"}</p>
+                                      <p><strong>Email:</strong> {selectedProject.email}</p>
+                                      <p><strong>Teléfono:</strong> {selectedProject.phone || "—"}</p>
+                                      <p><strong>Email negocio:</strong> {selectedProject.business_email || "—"}</p>
+                                      <p><strong>Tel. negocio:</strong> {selectedProject.business_phone || "—"}</p>
+                                      <p><strong>Dirección:</strong> {selectedProject.address || "—"}</p>
+                                      <p><strong>Sector:</strong> {selectedProject.sector}</p>
+                                      <p><strong>Slogan:</strong> {selectedProject.slogan || "—"}</p>
+                                      <p><strong>Horario:</strong> {selectedProject.business_hours || "—"}</p>
+                                      <p><strong>Instagram:</strong> {selectedProject.instagram || "—"}</p>
+                                      <p><strong>Facebook:</strong> {selectedProject.facebook || "—"}</p>
+                                      <p><strong>Idioma:</strong> {selectedProject.language || "es"}</p>
+                                      <p><strong>Dominio preferido:</strong> {selectedProject.preferred_domain || "—"}</p>
+                                      <p><strong>Modo oscuro:</strong> {selectedProject.dark_mode ? "Sí" : "No"}</p>
+                                    </div>
+                                    <p><strong>Descripción:</strong> {selectedProject.description}</p>
+                                    {selectedProject.logo && (
+                                      <div>
+                                        <strong>Logo:</strong>
+                                        <div className="mt-2">
+                                          <img src={selectedProject.logo} alt="Logo" className="w-20 h-20 object-contain rounded-lg border" />
+                                        </div>
+                                      </div>
+                                    )}
+                                    {selectedProject.photos && selectedProject.photos.length > 0 && (
+                                      <div>
+                                        <strong className="flex items-center gap-1"><Image className="w-4 h-4" /> Fotos ({selectedProject.photos.length}):</strong>
+                                        <div className="grid grid-cols-3 gap-2 mt-2">
+                                          {selectedProject.photos.map((photo, i) => (
+                                            <a key={i} href={photo} target="_blank" rel="noopener noreferrer">
+                                              <img src={photo} alt={`Foto ${i + 1}`} className="w-full h-32 object-cover rounded-lg border hover:opacity-80 transition-opacity" />
+                                            </a>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                    {selectedProject.services_list && Array.isArray(selectedProject.services_list) && selectedProject.services_list.length > 0 && (
+                                      <div>
+                                        <strong>Servicios:</strong>
+                                        <ul className="mt-1 space-y-1 list-disc list-inside">
+                                          {selectedProject.services_list.map((s: any, i: number) => (
+                                            <li key={i}><strong>{s.name}</strong>: {s.description}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </DialogContent>
+                            </Dialog>
                             <Button variant="ghost" size="icon" title="Copiar email" onClick={() => copyEmail(l.email)}>
                               <Copy className="w-4 h-4" />
                             </Button>
