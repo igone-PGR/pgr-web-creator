@@ -83,11 +83,14 @@ serve(async (req) => {
       // Send notification email to admin
       try {
         const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+        const SUPER_ADMIN_EMAIL = "igone@patriciagarciarodriguez.com";
         const adminEmailRaw = Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || "";
-        const adminEmails = adminEmailRaw
+        const extraAdmins = adminEmailRaw
           .split(",")
-          .map((e) => e.trim())
-          .filter((e) => e.length > 0);
+          .map((e) => e.trim().toLowerCase())
+          .filter((e) => e.length > 0 && e !== SUPER_ADMIN_EMAIL.toLowerCase());
+        // Super admin SIEMPRE primero, luego el resto
+        const adminEmails = [SUPER_ADMIN_EMAIL, ...extraAdmins];
 
         if (adminEmails.length > 0 && project) {
           await resend.emails.send({
