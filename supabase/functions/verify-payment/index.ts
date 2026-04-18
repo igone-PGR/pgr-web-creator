@@ -20,7 +20,7 @@ const CALENDAR_LINK = "https://calendar.app.google/NmeuL6F9Mt3qKx4b9";
 const EXTRAS = [
   { name: "E-commerce", price: "399€", description: "Tienda online con catálogo y pasarela de pago" },
   { name: "Agenda de citas / Reservas", price: "249€", description: "Sistema de reservas online integrado" },
-  { name: "Diseño extra (2 rondas de revisiones)", price: "A consultar", description: "Diseño personalizado con 2 rondas de revisiones adicionales" },
+  { name: "+1 Ronda de revisiones de diseño personalizado", price: "99€", description: "Una ronda adicional de revisiones de diseño personalizado" },
   { name: "Logo + Manual de marca", price: "150€", description: "Logotipo profesional y manual de identidad" },
 ];
 

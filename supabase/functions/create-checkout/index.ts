@@ -41,6 +41,7 @@ const ProjectSchema = z.object({
 const VALID_EXTRAS = [
   "price_1TLiCALF4UOuurCrMrJrXxno", // E-commerce 399€
   "price_1TKBjPLF4UOuurCrD0zUpe12", // Agenda citas 249€
+  "price_1TNUwPLF4UOuurCrnElc0j71", // +1 Ronda de revisiones 99€
   "price_1TKBjkLF4UOuurCrGRNsnFrh", // Logo + marca 150€
 ];
 

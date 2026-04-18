@@ -50,6 +50,7 @@ interface GeneratedWebProps {
 const EXTRAS_OPTIONS = [
   { id: "price_1TLiCALF4UOuurCrMrJrXxno", icon: ShoppingCart, name: "E-commerce", price: 399, description: "Tienda online con catálogo y pasarela de pago" },
   { id: "price_1TKBjPLF4UOuurCrD0zUpe12", icon: CalendarCheck, name: "Agenda de citas / Reservas", price: 249, description: "Sistema de reservas online integrado" },
+  { id: "price_1TNUwPLF4UOuurCrnElc0j71", icon: PenTool, name: "+1 Ronda de revisiones de diseño personalizado", price: 99, description: "Una ronda adicional de revisiones de diseño personalizado" },
   { id: "price_1TKBjkLF4UOuurCrGRNsnFrh", icon: PenTool, name: "Logo + Manual de marca", price: 150, description: "Logotipo profesional y manual de identidad" },
 ];
 
