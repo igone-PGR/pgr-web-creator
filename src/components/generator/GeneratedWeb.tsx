@@ -271,16 +271,13 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         )}
       </AnimatePresence>
 
-      {/* Iframe preview */}
-      {!isGenerating && finalHtml && (
-        <div className="flex-1">
-          <iframe
-            srcDoc={finalHtml}
-            className="w-full border-0"
-            style={{ height: "calc(100vh - 56px)" }}
-            title={`Preview - ${project.businessName}`}
-            sandbox="allow-scripts allow-same-origin allow-popups"
-          />
+      {/* Site preview (block-based renderer) */}
+      {!isGenerating && site && (
+        <div
+          className="flex-1 overflow-auto"
+          style={{ height: "calc(100vh - 56px)" }}
+        >
+          <SiteRenderer site={site} />
         </div>
       )}
     </div>
