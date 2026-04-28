@@ -678,14 +678,30 @@ serve(async (req) => {
       rationale: identity.rationale,
     };
 
-    // ── Step 2: blocks ───────────────────────────────────────────────────────
-    const bp = buildBlocksPrompts(input, brief, moodId);
-    const blocksResult = await callAiTool(bp.system, bp.user, BLOCKS_TOOL, apiKey);
+    // ── Step 2: skeleton (type + variant only) ───────────────────────────────
+    const sp = buildSkeletonPrompts(input, brief, moodId);
+    const skeletonResult = await callAiTool(sp.system, sp.user, SKELETON_TOOL, apiKey);
+    const skeleton: { type: string; variant: string }[] = (skeletonResult.blocks || [])
+      .filter((b: any) => b && FILL_SCHEMAS[b.type] && (b.variant === "a" || b.variant === "b"));
 
-    const cleanedBlocks = sanitizeBlocks(blocksResult.blocks || [], input.imagePool);
-    if (cleanedBlocks.length < 4) {
-      throw new Error("AI returned too few valid blocks");
-    }
+    if (skeleton.length < 4) throw new Error("AI returned too few skeleton blocks");
+
+    // ── Step 3: fill each block in parallel ──────────────────────────────────
+    const fills = await Promise.all(
+      skeleton.map(async (b, i) => {
+        try {
+          const fp = buildFillPrompts(input, brief, moodId, b.type, b.variant, i, skeleton.length);
+          const content = await callAiTool(fp.system, fp.user, fillToolFor(b.type), apiKey);
+          return { type: b.type, variant: b.variant, content };
+        } catch (err) {
+          console.error(`Failed to fill block ${b.type}:`, err);
+          return null;
+        }
+      }),
+    );
+
+    const cleanedBlocks = sanitizeBlocks(fills.filter(Boolean) as any[], input.imagePool);
+    if (cleanedBlocks.length < 4) throw new Error("AI returned too few valid blocks");
 
     const site = {
       version: 2,
