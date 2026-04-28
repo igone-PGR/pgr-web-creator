@@ -9,7 +9,7 @@ export function ContactBlock({ content, variant }: Props) {
     content.email && { icon: Mail, label: "Email", value: content.email, href: `mailto:${content.email}` },
     content.phone && { icon: Phone, label: "Teléfono", value: content.phone, href: `tel:${content.phone.replace(/\s/g, "")}` },
     content.address && { icon: MapPin, label: "Dirección", value: content.address },
-  ].filter(Boolean) as { icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; label: string; value: string; href?: string }[];
+  ].filter(Boolean) as { icon: React.ComponentType<React.SVGProps<SVGSVGElement> & { strokeWidth?: number }>; label: string; value: string; href?: string }[];
 
   if (variant === "b") {
     return (
