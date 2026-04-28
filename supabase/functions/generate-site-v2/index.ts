@@ -446,134 +446,160 @@ function fillToolFor(blockType: string) {
     },
   };
 }
-      additionalProperties: false,
-    },
-  },
-};
-
 // ─── Prompts ─────────────────────────────────────────────────────────────────
 
 function langName(code: string): string {
   return ({ es: "español", en: "inglés", fr: "francés" } as Record<string, string>)[code] || "español";
 }
 
-function buildIdentityPrompts(input: z.infer<typeof BodySchema>) {
-  const lang = langName(input.language);
-
-  const moodCatalog = Object.entries(MOODS)
-    .map(([id, m]) => `- ${id} (${m.label}): ${m.description}`)
-    .join("\n");
-
-  const system = `Eres un director creativo experto en branding para PYMES. Tu trabajo es destilar la esencia de un negocio y elegir la dirección visual adecuada.
-
-Idioma de salida: ${lang}.
-
-Catálogo de moods disponibles:
-${moodCatalog}
-
-Reglas:
-- "brandPositioning" debe ser una declaración clara de posicionamiento, no un slogan.
-- "toneOfVoice" son 2-5 adjetivos que describen cómo habla la marca (ej. "cercano", "experto", "directo").
-- "audience" describe al cliente objetivo en una frase.
-- "keyMessages" son exactamente 3 propuestas de valor que la web debe transmitir.
-- "recommendedMood" debe encajar con el sector, el tono y la audiencia. NO repitas siempre el mismo mood.
-- "rationale" justifica brevemente la elección (uso interno, no aparece en la web).`;
-
-  const user = `Negocio:
-- Nombre: ${input.businessName}
-- Sector: ${input.sector}
-- Descripción: ${input.description}
-- Slogan del cliente: ${input.slogan || "ninguno"}
-- Servicios: ${input.servicesList?.length ? input.servicesList.map((s) => s.name).join(", ") : "no especificados"}
-- Ubicación: ${input.address || "no especificada"}
-
-Define la identidad y elige el mood.`;
-
-  return { system, user };
-}
-
-function buildBlocksPrompts(
-  input: z.infer<typeof BodySchema>,
-  brief: any,
-  mood: MoodId,
-) {
-  const lang = langName(input.language);
-  const pool = input.imagePool;
-
+function buildBusinessContext(input: z.infer<typeof BodySchema>) {
   const contactEmail = input.businessEmail || input.email;
   const contactPhone = input.businessPhone || input.phone || "";
   const services = input.servicesList?.length
     ? input.servicesList.map((s) => `- ${s.name}: ${s.description}`).join("\n")
-    : "(no proporcionados — invéntalos coherentes con el sector y la descripción)";
-
+    : "(no proporcionados — invéntalos coherentes con el sector)";
   const socials: string[] = [];
   if (input.instagram) socials.push(`Instagram: https://instagram.com/${input.instagram.replace("@", "")}`);
   if (input.facebook) socials.push(`Facebook: ${input.facebook.startsWith("http") ? input.facebook : `https://${input.facebook}`}`);
   if (input.linkedin) socials.push(`LinkedIn: ${input.linkedin.startsWith("http") ? input.linkedin : `https://${input.linkedin}`}`);
 
-  const imageGuide = `IMÁGENES DISPONIBLES (URLs reales, NUNCA inventes otras):
-- Hero (1-3): ${pool.hero.slice(0, 3).join(" | ") || "(ninguna)"}
-- About (1-2): ${pool.about.slice(0, 2).join(" | ") || "(ninguna)"}
-- Gallery (3-5): ${pool.gallery.slice(0, 6).join(" | ") || "(ninguna)"}
-Si un bloque necesita una imagen y no hay disponible, omite el campo o el bloque entero.`;
-
-  const system = `Eres un director de arte web. Vas a componer una landing page completa eligiendo bloques de una biblioteca tipada.
-
-Idioma: ${lang}. Mood elegido: ${mood} (ya está aplicado por design tokens; no decidas colores).
-
-BIBLIOTECA DE BLOQUES (cada uno con variantes "a" o "b"):
-1. nav        — content: { brand: string, links: [{label,href}], cta?: {label,href} }
-2. hero       — content: { eyebrow?, title, subtitle?, primaryCta?:{label,href}, secondaryCta?:{label,href}, image?, imageAlt? }
-3. categories — content: { eyebrow?, title, items: [{title, description?, image?}] (4-6) }
-4. about      — content: { eyebrow?, title, body (markdown-lite, párrafos con \\n\\n), image?, imageAlt?, bullets?: string[] (2-4) }
-5. services   — content: { eyebrow?, title, subtitle?, items: [{title, description, icon?, image?}] (3-6). icon es nombre lucide ej "Sparkles","BookOpen","Calculator","Heart","Users","TrendingUp","Building2","Scissors","UtensilsCrossed","Dumbbell","Briefcase" }
-6. stats      — content: { title?, items: [{value, label}] (3-4) }
-7. process    — content: { eyebrow?, title, steps: [{title, description}] (3-5) }
-8. gallery    — content: { eyebrow?, title?, images: [{src, alt?, caption?}] (3-5) }
-9. testimonials — content: { eyebrow?, title?, items: [{quote, author, role?}] (2-3) }
-10. cta       — content: { title, subtitle?, primaryCta:{label,href}, secondaryCta?:{label,href} }
-11. faq       — content: { eyebrow?, title, items: [{question, answer}] (3-5) }
-12. hours     — content: { title?, rows: [{day, hours}] (3-7), note? }
-13. contact   — content: { eyebrow?, title, subtitle?, email?, phone?, address? }
-14. map       — content: { title?, address }
-15. footer    — content: { brand, tagline?, columns?: [{title, links:[{label,href}]}] (1-3), contact?:{email?,phone?,address?}, socials?:[{label,href}], copyright? }
-
-REGLAS DE COMPOSICIÓN:
-- Empieza SIEMPRE por "nav" y termina SIEMPRE por "footer".
-- Usa "hero" como segundo bloque.
-- Elige entre 6 y 14 bloques en total. Cada tipo aparece máximo 1 vez (excepto si tiene mucho sentido). Mejor pocos bloques de gran calidad que muchos vacíos.
-- Selecciona variantes ("a" o "b") alternando para evitar monotonía visual.
-- Adapta los bloques al sector: restauración suele incluir hours+map+gallery; consultoría incluye process+stats+faq; estética incluye gallery+services; fitness incluye stats+process+testimonials.
-- Solo incluye "hours" si hay horario disponible. Solo "map" si hay dirección. Solo "contact" con datos reales.
-- "testimonials" pueden inventarse (es habitual), suenan creíbles y específicos del sector. NO uses nombres famosos.
-- Los enlaces de nav/footer deben apuntar a anclas internas: #sobre-nosotros, #servicios, #contacto. La href del CTA principal va a #contacto.
-- Todo el copy debe estar en ${lang}, ser específico del negocio (no genérico), y reflejar el tono: ${brief.toneOfVoice.join(", ")}.
-- Mensajes clave a transmitir: ${brief.keyMessages.join(" | ")}.
-- NO inventes URLs de imagen. Usa solo las del pool proporcionado.
-
-Devuelve SOLO la llamada a la herramienta compose_site_blocks.`;
-
-  const user = `Negocio:
+  return {
+    contactEmail,
+    contactPhone,
+    services,
+    socials,
+    text: `Negocio:
 - Nombre: ${input.businessName}
 - Sector: ${input.sector}
 - Descripción: ${input.description}
-- Slogan: ${input.slogan || "(generar uno apropiado)"}
-- Posicionamiento: ${brief.brandPositioning}
-- Audiencia: ${brief.audience}
-
-Servicios:
-${services}
-
-Contacto:
-- Email: ${contactEmail}
-- Teléfono: ${contactPhone || "(no disponible)"}
+- Slogan: ${input.slogan || "(genera uno apropiado si hace falta)"}
 - Dirección: ${input.address || "(no disponible)"}
 - Horario: ${input.businessHours || "(no disponible)"}
+- Email: ${contactEmail}
+- Teléfono: ${contactPhone || "(no disponible)"}
 - Redes: ${socials.length ? socials.join(", ") : "(ninguna)"}
 
-${imageGuide}
+Servicios:
+${services}`,
+  };
+}
 
-Compón la landing.`;
+function buildIdentityPrompts(input: z.infer<typeof BodySchema>) {
+  const lang = langName(input.language);
+  const moodCatalog = Object.entries(MOODS)
+    .map(([id, m]) => `- ${id} (${m.label}): ${m.description}`)
+    .join("\n");
+
+  const system = `Eres un director creativo experto en branding para PYMES. Destila la esencia de un negocio y elige la dirección visual.
+Idioma de salida: ${lang}.
+
+Catálogo de moods:
+${moodCatalog}
+
+Reglas:
+- "brandPositioning": declaración clara de posicionamiento (no slogan).
+- "toneOfVoice": 2-5 adjetivos.
+- "audience": cliente objetivo en una frase.
+- "keyMessages": exactamente 3 propuestas de valor.
+- "recommendedMood": el que mejor encaje. NO te repitas siempre con el mismo.
+- "rationale": justificación breve interna.`;
+
+  const ctx = buildBusinessContext(input);
+  const user = `${ctx.text}\n\nDefine la identidad y elige el mood.`;
+  return { system, user };
+}
+
+function buildSkeletonPrompts(input: z.infer<typeof BodySchema>, brief: any, mood: MoodId) {
+  const ctx = buildBusinessContext(input);
+  const pool = input.imagePool;
+  const hasHours = !!input.businessHours;
+  const hasAddress = !!input.address;
+  const galleryReady = pool.gallery.length >= 3;
+
+  const system = `Eres un director de arte web. Vas a elegir el ESQUELETO de bloques (solo type+variant, sin copy).
+
+Mood elegido: ${mood}.
+Bloques disponibles: nav, hero, categories, about, services, stats, process, gallery, testimonials, cta, faq, hours, contact, map, footer.
+Variantes posibles: "a" o "b".
+
+Reglas:
+- Empieza SIEMPRE por "nav" y termina SIEMPRE por "footer".
+- Segundo bloque SIEMPRE "hero".
+- Total entre 7 y 11 bloques. Cada tipo máximo 1 vez.
+- Solo incluye "hours" si hay horario disponible (${hasHours ? "SÍ" : "NO"}).
+- Solo incluye "map" si hay dirección (${hasAddress ? "SÍ" : "NO"}).
+- Solo incluye "gallery" si hay al menos 3 imágenes (${galleryReady ? "SÍ" : "NO"}).
+- Adapta al sector "${input.sector}" (restauración: hours+map+gallery; consultoría: process+stats+faq; estética: gallery+services+testimonials; fitness: stats+process+testimonials).
+- Alterna variantes "a"/"b" para evitar monotonía visual.`;
+
+  const user = `${ctx.text}
+
+Tono: ${brief.toneOfVoice.join(", ")}.
+Posicionamiento: ${brief.brandPositioning}.
+
+Elige el esqueleto.`;
+  return { system, user };
+}
+
+function buildFillPrompts(
+  input: z.infer<typeof BodySchema>,
+  brief: any,
+  mood: MoodId,
+  blockType: string,
+  variant: string,
+  position: number,
+  total: number,
+) {
+  const lang = langName(input.language);
+  const ctx = buildBusinessContext(input);
+  const pool = input.imagePool;
+
+  const imageHints: Record<string, string> = {
+    hero: `Si usas "image", elige UNA de: ${pool.hero.slice(0, 3).join(" | ") || "(ninguna disponible — omite el campo)"}`,
+    about: `Si usas "image", elige UNA de: ${pool.about.slice(0, 2).join(" | ") || "(ninguna disponible — omite el campo)"}`,
+    gallery: `Para "images.src" usa SOLO estas URLs (3-5 distintas): ${pool.gallery.slice(0, 6).join(" | ") || "(ninguna disponible)"}`,
+    categories: `Si usas "image" en items, elige de: ${pool.gallery.slice(0, 4).join(" | ") || "(ninguna)"}. Mejor omitir si dudas.`,
+    services: `Para "icon" usa nombres de iconos lucide-react: Sparkles, BookOpen, Calculator, Heart, Users, TrendingUp, Building2, Scissors, UtensilsCrossed, Dumbbell, Briefcase, Coffee, Leaf, Palette, Camera, Music, Wrench, Award, Shield, Target, Zap, Globe, Phone, Mail, MapPin, Clock.`,
+  };
+
+  const blockGuide: Record<string, string> = {
+    nav: `Genera el menú. brand = "${input.businessName}". links exactamente 3: [{label:"Sobre nosotros",href:"#sobre-nosotros"},{label:"Servicios",href:"#servicios"},{label:"Contacto",href:"#contacto"}]. cta opcional con href "#contacto".`,
+    hero: `Headline impactante (NO genérico) en máx 12 palabras. Subtitle en 1-2 frases. CTAs con href "#contacto" / "#servicios".`,
+    categories: `4-6 categorías de público o tipos de cliente que atiende el negocio. Descripciones breves (máx 12 palabras).`,
+    about: `Body en 2 párrafos separados por "\\n\\n". Bullets opcionales (2-4) con beneficios concretos.`,
+    services: `3-6 servicios. Si el cliente proporcionó servicios, úsalos. Descripciones útiles (no relleno).`,
+    stats: `3-4 números creíbles para el sector. Mejor cifras concretas que vagas.`,
+    process: `3-5 pasos claros del recorrido del cliente. Títulos cortos, descripciones de 1 frase.`,
+    gallery: `3-5 imágenes del pool. Captions opcionales y breves.`,
+    testimonials: `2-3 testimonios CREÍBLES (puedes inventarlos), específicos del sector. Nombres realistas españoles, NO famosos. role describe el perfil.`,
+    cta: `Llamada a la acción final. Title corto y persuasivo. primaryCta href "#contacto".`,
+    faq: `3-6 preguntas reales que un cliente del sector se haría antes de contratar. Respuestas claras (1-3 frases).`,
+    hours: `Convierte "${input.businessHours}" en filas day/hours. Si no hay datos, usa horario habitual del sector.`,
+    contact: `email="${ctx.contactEmail}", phone="${ctx.contactPhone}", address="${input.address || ""}". Title invitador.`,
+    map: `address="${input.address || ""}". Title invitador.`,
+    footer: `brand="${input.businessName}". Tagline corto. 1-2 columns con links a anclas. contact con datos reales. socials si hay (${ctx.socials.length}).`,
+  };
+
+  const system = `Eres un copywriter web experto. Generas el contenido del bloque "${blockType}" (variante ${variant}) en posición ${position + 1}/${total} de la landing.
+
+Idioma: ${lang}. Mood: ${mood}. Tono: ${brief.toneOfVoice.join(", ")}.
+
+REGLAS:
+- Copy específico del negocio, NUNCA genérico ni de relleno.
+- Refleja los mensajes clave: ${brief.keyMessages.join(" | ")}.
+- Devuelve SOLO la llamada a la herramienta fill_${blockType}.
+- NO inventes URLs de imagen. Usa exclusivamente las del pool indicado abajo.
+
+Guía del bloque:
+${blockGuide[blockType] || ""}
+
+${imageHints[blockType] || ""}`;
+
+  const user = `${ctx.text}
+
+Posicionamiento: ${brief.brandPositioning}.
+
+Genera el contenido del bloque "${blockType}".`;
 
   return { system, user };
 }
