@@ -9,6 +9,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import PreviewBlocks from "./pages/PreviewBlocks";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/preview-blocks" element={<PreviewBlocks />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
