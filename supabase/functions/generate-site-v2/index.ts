@@ -170,6 +170,116 @@ const LINK_SCHEMA = {
   additionalProperties: false,
 };
 
+const CTA_SCHEMA = {
+  type: "object",
+  properties: { label: { type: "string" }, href: { type: "string" } },
+  required: ["label", "href"],
+  additionalProperties: false,
+};
+
+// Union content schema: every possible field across all block types is optional here.
+// The system prompt tells the model which fields belong to which block type.
+const CONTENT_SCHEMA = {
+  type: "object",
+  properties: {
+    // common
+    eyebrow: { type: "string" },
+    title: { type: "string" },
+    subtitle: { type: "string" },
+    // nav / footer
+    brand: { type: "string" },
+    tagline: { type: "string" },
+    links: { type: "array", items: LINK_SCHEMA },
+    cta: CTA_SCHEMA,
+    columns: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { title: { type: "string" }, links: { type: "array", items: LINK_SCHEMA } },
+        required: ["title", "links"],
+        additionalProperties: false,
+      },
+    },
+    socials: { type: "array", items: LINK_SCHEMA },
+    copyright: { type: "string" },
+    // hero / cta
+    primaryCta: CTA_SCHEMA,
+    secondaryCta: CTA_SCHEMA,
+    image: { type: "string" },
+    imageAlt: { type: "string" },
+    // about
+    body: { type: "string" },
+    bullets: { type: "array", items: { type: "string" } },
+    // services / categories (items)
+    items: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          title: { type: "string" },
+          description: { type: "string" },
+          icon: { type: "string" },
+          image: { type: "string" },
+          // stats
+          value: { type: "string" },
+          label: { type: "string" },
+          // testimonials
+          quote: { type: "string" },
+          author: { type: "string" },
+          role: { type: "string" },
+          // faq
+          question: { type: "string" },
+          answer: { type: "string" },
+        },
+        additionalProperties: false,
+      },
+    },
+    // process
+    steps: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { title: { type: "string" }, description: { type: "string" } },
+        required: ["title", "description"],
+        additionalProperties: false,
+      },
+    },
+    // gallery
+    images: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { src: { type: "string" }, alt: { type: "string" }, caption: { type: "string" } },
+        required: ["src"],
+        additionalProperties: false,
+      },
+    },
+    // hours
+    rows: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { day: { type: "string" }, hours: { type: "string" } },
+        required: ["day", "hours"],
+        additionalProperties: false,
+      },
+    },
+    note: { type: "string" },
+    // contact / map
+    email: { type: "string" },
+    phone: { type: "string" },
+    address: { type: "string" },
+    embedUrl: { type: "string" },
+    // footer.contact
+    contact: {
+      type: "object",
+      properties: { email: { type: "string" }, phone: { type: "string" }, address: { type: "string" } },
+      additionalProperties: false,
+    },
+  },
+  additionalProperties: false,
+};
+
 const BLOCKS_TOOL = {
   type: "function",
   function: {
@@ -190,11 +300,7 @@ const BLOCKS_TOOL = {
                 enum: ["nav", "hero", "categories", "about", "services", "stats", "process", "gallery", "testimonials", "cta", "faq", "hours", "contact", "map", "footer"],
               },
               variant: { type: "string", enum: ["a", "b"] },
-              content: {
-                type: "object",
-                description: "Content shape depends on type. Follow the per-block schemas described in the system prompt.",
-                additionalProperties: true,
-              },
+              content: CONTENT_SCHEMA,
             },
             required: ["type", "variant", "content"],
             additionalProperties: false,
