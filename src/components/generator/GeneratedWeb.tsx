@@ -141,7 +141,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           project: { ...projectWithoutBinaries, logo: logoUrl, photos: photoUrls },
-          generatedContent: { finalHtml },
+          generatedContent: { site },
           extras: selectedExtras,
         },
       });
