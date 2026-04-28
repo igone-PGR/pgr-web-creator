@@ -30,7 +30,7 @@ const EXTRAS_OPTIONS = [
 
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [project] = useState<ProjectData>(data);
-  const [finalHtml, setFinalHtml] = useState<string>("");
+  const [site, setSite] = useState<GeneratedSite | null>(null);
   const [isGenerating, setIsGenerating] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
