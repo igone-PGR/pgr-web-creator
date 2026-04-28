@@ -13,34 +13,8 @@ import { SiteRenderer } from "@/components/site/SiteRenderer";
 import { resolveImagePool } from "@/lib/site/stockImages";
 import type { GeneratedSite } from "@/lib/site/types";
 
-// Extract image slots from template HTML
-function extractImageSlots(html: string): { index: number; alt: string; dataAlt: string }[] {
-  const slots: { index: number; alt: string; dataAlt: string }[] = [];
-  const imgRegex = /<img[^>]*>/gi;
-  let match;
-  let idx = 0;
-  while ((match = imgRegex.exec(html)) !== null) {
-    const tag = match[0];
-    const altMatch = tag.match(/\balt="([^"]*)"/i);
-    const dataAltMatch = tag.match(/\bdata-alt="([^"]*)"/i);
-    slots.push({ index: idx++, alt: altMatch?.[1] || "", dataAlt: dataAltMatch?.[1] || "" });
-  }
-  return slots;
-}
+// (Image generation per-slot lives in the legacy template flow; v2 uses curated stock + client photos.)
 
-// Generate a single AI image via edge function
-async function generateAiImage(prompt: string, fileName: string): Promise<string | null> {
-  try {
-    const { data, error } = await supabase.functions.invoke("generate-ai-image", {
-      body: { prompt, fileName },
-    });
-    if (error) { console.error("AI image error:", error); return null; }
-    return data?.url || null;
-  } catch (e) {
-    console.error("AI image failed:", e);
-    return null;
-  }
-}
 
 interface GeneratedWebProps {
   data: ProjectData;
