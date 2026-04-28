@@ -8,39 +8,13 @@ import { Button } from "@/components/ui/button";
 import type { ProjectData } from "@/types/project";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getTemplateFile } from "@/lib/sector-templates";
-import { generateSiteHtml, buildInputFromProjectData } from "@/lib/templates";
-import { DEFAULT_CONTENT, DEFAULT_COLORS } from "@/types/web-content";
 import { uploadProjectAsset } from "@/lib/project-media";
+import { SiteRenderer } from "@/components/site/SiteRenderer";
+import { resolveImagePool } from "@/lib/site/stockImages";
+import type { GeneratedSite } from "@/lib/site/types";
 
-// Extract image slots from template HTML
-function extractImageSlots(html: string): { index: number; alt: string; dataAlt: string }[] {
-  const slots: { index: number; alt: string; dataAlt: string }[] = [];
-  const imgRegex = /<img[^>]*>/gi;
-  let match;
-  let idx = 0;
-  while ((match = imgRegex.exec(html)) !== null) {
-    const tag = match[0];
-    const altMatch = tag.match(/\balt="([^"]*)"/i);
-    const dataAltMatch = tag.match(/\bdata-alt="([^"]*)"/i);
-    slots.push({ index: idx++, alt: altMatch?.[1] || "", dataAlt: dataAltMatch?.[1] || "" });
-  }
-  return slots;
-}
+// (Image generation per-slot lives in the legacy template flow; v2 uses curated stock + client photos.)
 
-// Generate a single AI image via edge function
-async function generateAiImage(prompt: string, fileName: string): Promise<string | null> {
-  try {
-    const { data, error } = await supabase.functions.invoke("generate-ai-image", {
-      body: { prompt, fileName },
-    });
-    if (error) { console.error("AI image error:", error); return null; }
-    return data?.url || null;
-  } catch (e) {
-    console.error("AI image failed:", e);
-    return null;
-  }
-}
 
 interface GeneratedWebProps {
   data: ProjectData;
@@ -56,7 +30,7 @@ const EXTRAS_OPTIONS = [
 
 const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [project] = useState<ProjectData>(data);
-  const [finalHtml, setFinalHtml] = useState<string>("");
+  const [site, setSite] = useState<GeneratedSite | null>(null);
   const [isGenerating, setIsGenerating] = useState(true);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
@@ -98,90 +72,47 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         ? await uploadLogoToStorage()
         : null;
 
-      const templateFile = getTemplateFile(project.sector);
+      // Build the curated image pool (client photos first, then sector stock).
+      const imagePool = resolveImagePool(project.sector, photoUrls);
 
-      if (templateFile) {
-        const templateRes = await fetch(templateFile);
-        if (!templateRes.ok) throw new Error("No se pudo cargar la plantilla");
-        const templateHtml = await templateRes.text();
+      setGenerationStep("Definiendo identidad de marca...");
+      const { data: result, error } = await supabase.functions.invoke("generate-site-v2", {
+        body: {
+          businessName: project.businessName,
+          description: project.description,
+          sector: project.sector,
+          slogan: project.slogan,
+          address: project.address,
+          businessHours: project.businessHours,
+          email: project.email,
+          businessEmail: project.businessEmail,
+          businessPhone: project.businessPhone,
+          phone: project.phone,
+          servicesList: project.servicesList,
+          instagram: project.instagram,
+          facebook: project.facebook,
+          linkedin: (project as any).linkedin,
+          imagePool,
+          logoUrl,
+          language: project.language || "es",
+        },
+      });
 
-        // If no client photos, generate AI images for all slots
-        let finalPhotoUrls = photoUrls;
-        if (photoUrls.length === 0) {
-          setGenerationStep("Generando imágenes con IA...");
-          const imageSlots = extractImageSlots(templateHtml);
-          console.log(`Found ${imageSlots.length} image slots, generating AI images...`);
-          
-          const timestamp = Date.now();
-          const aiUrls: string[] = [];
-          
-          // Generate in batches of 2 to avoid rate limits
-          for (let i = 0; i < imageSlots.length; i += 2) {
-            const batch = imageSlots.slice(i, i + 2);
-            setGenerationStep(`Generando imagen ${i + 1} de ${imageSlots.length}...`);
-            
-            const results = await Promise.all(
-              batch.map((slot) => {
-                const context = slot.dataAlt || slot.alt || `imagen profesional para ${project.sector}`;
-                const prompt = `Generate a high-quality, professional photograph for a ${project.sector} business called "${project.businessName}". The image should depict: ${context}. Business description: ${project.description}. Style: modern, clean, commercial photography quality. NO text, NO watermarks, NO logos in the image.`;
-                return generateAiImage(prompt, `${timestamp}_img_${slot.index}`);
-              })
-            );
-            
-            aiUrls.push(...results.map(r => r || ""));
-            
-            if (i + 2 < imageSlots.length) {
-              await new Promise(r => setTimeout(r, 1500));
-            }
-          }
-          
-          finalPhotoUrls = aiUrls.filter(u => u);
-          console.log(`Generated ${finalPhotoUrls.length}/${imageSlots.length} AI images`);
-        }
-
-        setGenerationStep("Personalizando contenido con IA...");
-        const { data: result, error } = await supabase.functions.invoke("generate-web-content", {
-          body: {
-            templateHtml,
-            businessName: project.businessName,
-            description: project.description,
-            sector: project.sector,
-            address: project.address,
-            phone: project.phone,
-            email: project.email,
-            businessEmail: project.businessEmail,
-            businessPhone: project.businessPhone,
-            slogan: project.slogan,
-            businessHours: project.businessHours,
-            servicesList: project.servicesList,
-            instagram: project.instagram,
-            facebook: project.facebook,
-            photoUrls: finalPhotoUrls,
-            logoUrl,
-            language: project.language || "es",
-          },
-        });
-        if (error) throw error;
-        if (result?.html) {
-          setFinalHtml(result.html);
-        } else {
-          throw new Error("No se recibió HTML personalizado");
-        }
-      } else {
-        const finalProject = { ...project, photos: photoUrls, logo: logoUrl };
-        const input = buildInputFromProjectData(finalProject, DEFAULT_CONTENT, DEFAULT_COLORS);
-        setFinalHtml(generateSiteHtml(input));
+      if (error) throw error;
+      const generatedSite: GeneratedSite | undefined = result?.site;
+      if (!generatedSite || generatedSite.version !== 2) {
+        throw new Error("La respuesta del generador no es válida.");
       }
+
+      setGenerationStep("Componiendo bloques...");
+      setSite(generatedSite);
     } catch (err: any) {
-      console.error("Error generating content:", err);
+      console.error("Error generating site:", err);
       toast({
         title: "Error al generar",
-        description: err?.message || "No se pudo generar el contenido.",
+        description: err?.message || "No se pudo generar el sitio.",
         variant: "destructive",
       });
-      // Fallback to default template
-      const input = buildInputFromProjectData(project, DEFAULT_CONTENT, DEFAULT_COLORS);
-      setFinalHtml(generateSiteHtml(input));
     } finally {
       setIsGenerating(false);
     }
@@ -210,7 +141,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           project: { ...projectWithoutBinaries, logo: logoUrl, photos: photoUrls },
-          generatedContent: { finalHtml },
+          generatedContent: { site },
           extras: selectedExtras,
         },
       });
@@ -340,16 +271,13 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         )}
       </AnimatePresence>
 
-      {/* Iframe preview */}
-      {!isGenerating && finalHtml && (
-        <div className="flex-1">
-          <iframe
-            srcDoc={finalHtml}
-            className="w-full border-0"
-            style={{ height: "calc(100vh - 56px)" }}
-            title={`Preview - ${project.businessName}`}
-            sandbox="allow-scripts allow-same-origin allow-popups"
-          />
+      {/* Site preview (block-based renderer) */}
+      {!isGenerating && site && (
+        <div
+          className="flex-1 overflow-auto"
+          style={{ height: "calc(100vh - 56px)" }}
+        >
+          <SiteRenderer site={site} />
         </div>
       )}
     </div>
