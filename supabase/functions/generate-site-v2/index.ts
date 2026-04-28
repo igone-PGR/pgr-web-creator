@@ -161,153 +161,291 @@ const IDENTITY_TOOL = {
   },
 };
 
-// ─── Tool 2: blocks ──────────────────────────────────────────────────────────
+// ─── Tool 2: skeleton (just type + variant order) ────────────────────────────
 
-const LINK_SCHEMA = {
-  type: "object",
-  properties: { label: { type: "string" }, href: { type: "string" } },
-  required: ["label", "href"],
-  additionalProperties: false,
-};
-
-const CTA_SCHEMA = {
-  type: "object",
-  properties: { label: { type: "string" }, href: { type: "string" } },
-  required: ["label", "href"],
-  additionalProperties: false,
-};
-
-// Union content schema: every possible field across all block types is optional here.
-// The system prompt tells the model which fields belong to which block type.
-const CONTENT_SCHEMA = {
-  type: "object",
-  properties: {
-    // common
-    eyebrow: { type: "string" },
-    title: { type: "string" },
-    subtitle: { type: "string" },
-    // nav / footer
-    brand: { type: "string" },
-    tagline: { type: "string" },
-    links: { type: "array", items: LINK_SCHEMA },
-    cta: CTA_SCHEMA,
-    columns: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: { title: { type: "string" }, links: { type: "array", items: LINK_SCHEMA } },
-        required: ["title", "links"],
-        additionalProperties: false,
-      },
-    },
-    socials: { type: "array", items: LINK_SCHEMA },
-    copyright: { type: "string" },
-    // hero / cta
-    primaryCta: CTA_SCHEMA,
-    secondaryCta: CTA_SCHEMA,
-    image: { type: "string" },
-    imageAlt: { type: "string" },
-    // about
-    body: { type: "string" },
-    bullets: { type: "array", items: { type: "string" } },
-    // services / categories (items)
-    items: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          title: { type: "string" },
-          description: { type: "string" },
-          icon: { type: "string" },
-          image: { type: "string" },
-          // stats
-          value: { type: "string" },
-          label: { type: "string" },
-          // testimonials
-          quote: { type: "string" },
-          author: { type: "string" },
-          role: { type: "string" },
-          // faq
-          question: { type: "string" },
-          answer: { type: "string" },
-        },
-        additionalProperties: false,
-      },
-    },
-    // process
-    steps: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: { title: { type: "string" }, description: { type: "string" } },
-        required: ["title", "description"],
-        additionalProperties: false,
-      },
-    },
-    // gallery
-    images: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: { src: { type: "string" }, alt: { type: "string" }, caption: { type: "string" } },
-        required: ["src"],
-        additionalProperties: false,
-      },
-    },
-    // hours
-    rows: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: { day: { type: "string" }, hours: { type: "string" } },
-        required: ["day", "hours"],
-        additionalProperties: false,
-      },
-    },
-    note: { type: "string" },
-    // contact / map
-    email: { type: "string" },
-    phone: { type: "string" },
-    address: { type: "string" },
-    embedUrl: { type: "string" },
-    // footer.contact
-    contact: {
-      type: "object",
-      properties: { email: { type: "string" }, phone: { type: "string" }, address: { type: "string" } },
-      additionalProperties: false,
-    },
-  },
-  additionalProperties: false,
-};
-
-const BLOCKS_TOOL = {
+const SKELETON_TOOL = {
   type: "function",
   function: {
-    name: "compose_site_blocks",
-    description: "Compose the ordered list of website blocks with copy and structured content.",
+    name: "compose_skeleton",
+    description: "Choose the ordered list of block types and visual variants (no copy yet).",
     parameters: {
       type: "object",
       properties: {
         blocks: {
           type: "array",
           minItems: 6,
-          maxItems: 14,
+          maxItems: 12,
           items: {
             type: "object",
             properties: {
-              type: {
-                type: "string",
-                enum: ["nav", "hero", "categories", "about", "services", "stats", "process", "gallery", "testimonials", "cta", "faq", "hours", "contact", "map", "footer"],
-              },
+              type: { type: "string", enum: ["nav", "hero", "categories", "about", "services", "stats", "process", "gallery", "testimonials", "cta", "faq", "hours", "contact", "map", "footer"] },
               variant: { type: "string", enum: ["a", "b"] },
-              content: CONTENT_SCHEMA,
             },
-            required: ["type", "variant", "content"],
+            required: ["type", "variant"],
             additionalProperties: false,
           },
         },
       },
       required: ["blocks"],
+      additionalProperties: false,
+    },
+  },
+};
+
+// ─── Tool 3: per-block content schemas (one tool per block type) ─────────────
+
+const LINK = { type: "object", properties: { label: { type: "string" }, href: { type: "string" } }, required: ["label", "href"], additionalProperties: false };
+const CTA = LINK;
+
+const FILL_SCHEMAS: Record<string, any> = {
+  nav: {
+    type: "object",
+    properties: {
+      brand: { type: "string" },
+      links: { type: "array", minItems: 2, maxItems: 5, items: LINK },
+      cta: CTA,
+    },
+    required: ["brand", "links"],
+    additionalProperties: false,
+  },
+  hero: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      subtitle: { type: "string" },
+      primaryCta: CTA,
+      secondaryCta: CTA,
+      image: { type: "string" },
+      imageAlt: { type: "string" },
+    },
+    required: ["title"],
+    additionalProperties: false,
+  },
+  categories: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      items: {
+        type: "array", minItems: 3, maxItems: 6,
+        items: {
+          type: "object",
+          properties: { title: { type: "string" }, description: { type: "string" }, image: { type: "string" } },
+          required: ["title"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["title", "items"],
+    additionalProperties: false,
+  },
+  about: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      body: { type: "string" },
+      image: { type: "string" },
+      imageAlt: { type: "string" },
+      bullets: { type: "array", maxItems: 5, items: { type: "string" } },
+    },
+    required: ["title", "body"],
+    additionalProperties: false,
+  },
+  services: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      subtitle: { type: "string" },
+      items: {
+        type: "array", minItems: 3, maxItems: 6,
+        items: {
+          type: "object",
+          properties: { title: { type: "string" }, description: { type: "string" }, icon: { type: "string" } },
+          required: ["title", "description"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["title", "items"],
+    additionalProperties: false,
+  },
+  stats: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      items: {
+        type: "array", minItems: 3, maxItems: 4,
+        items: {
+          type: "object",
+          properties: { value: { type: "string" }, label: { type: "string" } },
+          required: ["value", "label"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["items"],
+    additionalProperties: false,
+  },
+  process: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      steps: {
+        type: "array", minItems: 3, maxItems: 5,
+        items: {
+          type: "object",
+          properties: { title: { type: "string" }, description: { type: "string" } },
+          required: ["title", "description"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["title", "steps"],
+    additionalProperties: false,
+  },
+  gallery: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      images: {
+        type: "array", minItems: 3, maxItems: 5,
+        items: {
+          type: "object",
+          properties: { src: { type: "string" }, alt: { type: "string" }, caption: { type: "string" } },
+          required: ["src"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["images"],
+    additionalProperties: false,
+  },
+  testimonials: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      items: {
+        type: "array", minItems: 2, maxItems: 3,
+        items: {
+          type: "object",
+          properties: { quote: { type: "string" }, author: { type: "string" }, role: { type: "string" } },
+          required: ["quote", "author"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["items"],
+    additionalProperties: false,
+  },
+  cta: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      subtitle: { type: "string" },
+      primaryCta: CTA,
+      secondaryCta: CTA,
+    },
+    required: ["title", "primaryCta"],
+    additionalProperties: false,
+  },
+  faq: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      items: {
+        type: "array", minItems: 3, maxItems: 6,
+        items: {
+          type: "object",
+          properties: { question: { type: "string" }, answer: { type: "string" } },
+          required: ["question", "answer"],
+          additionalProperties: false,
+        },
+      },
+    },
+    required: ["title", "items"],
+    additionalProperties: false,
+  },
+  hours: {
+    type: "object",
+    properties: {
+      title: { type: "string" },
+      rows: {
+        type: "array", minItems: 2, maxItems: 7,
+        items: {
+          type: "object",
+          properties: { day: { type: "string" }, hours: { type: "string" } },
+          required: ["day", "hours"],
+          additionalProperties: false,
+        },
+      },
+      note: { type: "string" },
+    },
+    required: ["rows"],
+    additionalProperties: false,
+  },
+  contact: {
+    type: "object",
+    properties: {
+      eyebrow: { type: "string" },
+      title: { type: "string" },
+      subtitle: { type: "string" },
+      email: { type: "string" },
+      phone: { type: "string" },
+      address: { type: "string" },
+    },
+    required: ["title"],
+    additionalProperties: false,
+  },
+  map: {
+    type: "object",
+    properties: { title: { type: "string" }, address: { type: "string" } },
+    required: ["address"],
+    additionalProperties: false,
+  },
+  footer: {
+    type: "object",
+    properties: {
+      brand: { type: "string" },
+      tagline: { type: "string" },
+      columns: {
+        type: "array", maxItems: 3,
+        items: {
+          type: "object",
+          properties: { title: { type: "string" }, links: { type: "array", items: LINK } },
+          required: ["title", "links"],
+          additionalProperties: false,
+        },
+      },
+      contact: {
+        type: "object",
+        properties: { email: { type: "string" }, phone: { type: "string" }, address: { type: "string" } },
+        additionalProperties: false,
+      },
+      socials: { type: "array", items: LINK },
+      copyright: { type: "string" },
+    },
+    required: ["brand"],
+    additionalProperties: false,
+  },
+};
+
+function fillToolFor(blockType: string) {
+  return {
+    type: "function",
+    function: {
+      name: `fill_${blockType}`,
+      description: `Generate the content for the "${blockType}" block.`,
+      parameters: FILL_SCHEMAS[blockType],
+    },
+  };
+}
       additionalProperties: false,
     },
   },
