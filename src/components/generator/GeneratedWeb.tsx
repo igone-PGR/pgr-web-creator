@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import type { ProjectData } from "@/types/project";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getTemplateFile } from "@/lib/sector-templates";
-import { generateSiteHtml, buildInputFromProjectData } from "@/lib/templates";
-import { DEFAULT_CONTENT, DEFAULT_COLORS } from "@/types/web-content";
 import { uploadProjectAsset } from "@/lib/project-media";
+import { SiteRenderer } from "@/components/site/SiteRenderer";
+import { resolveImagePool } from "@/lib/site/stockImages";
+import type { GeneratedSite } from "@/lib/site/types";
 
 // Extract image slots from template HTML
 function extractImageSlots(html: string): { index: number; alt: string; dataAlt: string }[] {
