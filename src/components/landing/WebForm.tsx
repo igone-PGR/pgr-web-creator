@@ -269,6 +269,36 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                         ))}
                       </div>
                     </div>
+
+                    {/* Color palette — destacado */}
+                    <div className="rounded-2xl border-2 border-accent/30 bg-accent/5 p-5 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-accent text-accent-foreground text-xs font-bold">🎨</span>
+                        <Label className="text-base font-semibold">Paleta de colores *</Label>
+                      </div>
+                      <p className="text-xs text-muted-foreground">Elige los colores principales de tu web. La tipografía y el estilo los decide la IA según tu sector.</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {COLOR_PALETTES.map((p) => {
+                          const selected = form.colorPaletteId === p.id;
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => update("colorPaletteId", p.id)}
+                              className={`group rounded-xl border-2 p-2 transition-all text-left bg-background ${selected ? "border-accent ring-2 ring-accent/40 shadow-md" : "border-border hover:border-accent/50"}`}
+                            >
+                              <div className="flex h-14 rounded-lg overflow-hidden border border-border/50">
+                                <div className="flex-1" style={{ background: p.bg }} />
+                                <div className="flex-1" style={{ background: p.surface }} />
+                                <div className="flex-1" style={{ background: p.accent }} />
+                              </div>
+                              <p className="text-[11px] font-medium mt-1.5 truncate">{p.label}</p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="description">Descripción del negocio *</Label>
                       <Textarea id="description" placeholder="Cuéntanos sobre tu negocio, qué ofrecéis, qué os hace especiales..." value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} required />
@@ -331,35 +361,6 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                       </div>
                     </div>
 
-                    {/* Color palette */}
-                    <div className="pt-4 border-t border-border">
-                      <div className="space-y-3">
-                        <div>
-                          <Label>Paleta de colores</Label>
-                          <p className="text-xs text-muted-foreground mt-1">Elige los colores principales de tu web. La tipografía y el estilo los decide la IA según tu sector.</p>
-                        </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          {COLOR_PALETTES.map((p) => {
-                            const selected = form.colorPaletteId === p.id;
-                            return (
-                              <button
-                                key={p.id}
-                                type="button"
-                                onClick={() => update("colorPaletteId", p.id)}
-                                className={`group rounded-xl border-2 p-2 transition-all text-left ${selected ? "border-accent shadow-accent" : "border-border hover:border-accent/40"}`}
-                              >
-                                <div className="flex h-12 rounded-lg overflow-hidden border border-border/50">
-                                  <div className="flex-1" style={{ background: p.bg }} />
-                                  <div className="flex-1" style={{ background: p.surface }} />
-                                  <div className="flex-1" style={{ background: p.accent }} />
-                                </div>
-                                <p className="text-[11px] font-medium mt-1.5 truncate">{p.label}</p>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
 
                     {/* Logo */}
                     <div className="pt-4 border-t border-border">
