@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowRight, ArrowLeft, Upload, Plus, Trash2, User, Building2 } from "lucide-react";
 import type { ProjectData, UploadedMediaFile } from "@/types/project";
 import { SECTORS } from "@/lib/sector-templates";
+import { COLOR_PALETTES } from "@/lib/site/colorPalettes";
 
 interface WebFormProps {
   onSubmit: (data: ProjectData) => void;
@@ -47,6 +48,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
       photoFiles: [] as UploadedMediaFile[],
     servicesList: [] as { name: string; description: string }[],
     preferredDomain: "",
+    colorPaletteId: COLOR_PALETTES[0].id,
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -146,6 +148,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
       photoFiles: form.photoFiles,
       logoFile: form.logoFile,
       language: "es",
+      colorPaletteId: form.colorPaletteId,
     } as any);
   };
 
