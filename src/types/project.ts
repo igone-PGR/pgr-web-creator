@@ -28,6 +28,7 @@ export interface ProjectData {
   preferredDomain?: string;
   language?: string;
   corporateColors?: string[];
+  colorPaletteId?: string;
 }
 
 export const COLOR_SCHEMES = [

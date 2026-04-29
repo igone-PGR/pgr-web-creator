@@ -96,6 +96,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
           imagePool,
           logoUrl,
           language: project.language || "es",
+          colorPaletteId: (project as any).colorPaletteId,
         },
       });
 
