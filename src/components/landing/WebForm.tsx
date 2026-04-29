@@ -331,6 +331,36 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                       </div>
                     </div>
 
+                    {/* Color palette */}
+                    <div className="pt-4 border-t border-border">
+                      <div className="space-y-3">
+                        <div>
+                          <Label>Paleta de colores</Label>
+                          <p className="text-xs text-muted-foreground mt-1">Elige los colores principales de tu web. La tipografía y el estilo los decide la IA según tu sector.</p>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          {COLOR_PALETTES.map((p) => {
+                            const selected = form.colorPaletteId === p.id;
+                            return (
+                              <button
+                                key={p.id}
+                                type="button"
+                                onClick={() => update("colorPaletteId", p.id)}
+                                className={`group rounded-xl border-2 p-2 transition-all text-left ${selected ? "border-accent shadow-accent" : "border-border hover:border-accent/40"}`}
+                              >
+                                <div className="flex h-12 rounded-lg overflow-hidden border border-border/50">
+                                  <div className="flex-1" style={{ background: p.bg }} />
+                                  <div className="flex-1" style={{ background: p.surface }} />
+                                  <div className="flex-1" style={{ background: p.accent }} />
+                                </div>
+                                <p className="text-[11px] font-medium mt-1.5 truncate">{p.label}</p>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Logo */}
                     <div className="pt-4 border-t border-border">
                       <div className="space-y-2">
