@@ -711,7 +711,13 @@ serve(async (req) => {
     const identity = await callAiTool(ip.system, ip.user, IDENTITY_TOOL, apiKey);
 
     const moodId: MoodId = (MOODS as any)[identity.recommendedMood] ? identity.recommendedMood : "minimal";
-    const tokens = MOODS[moodId].tokens;
+    const baseTokens = MOODS[moodId].tokens;
+    // If the client picked a palette in the form, override mood colors but keep
+    // typography, radii, spacing and shadows from the chosen mood.
+    const palette = input.colorPaletteId ? COLOR_PALETTES[input.colorPaletteId] : undefined;
+    const tokens = palette
+      ? { ...baseTokens, colors: paletteToColors(palette) }
+      : baseTokens;
 
     const brief = {
       brandPositioning: identity.brandPositioning,
