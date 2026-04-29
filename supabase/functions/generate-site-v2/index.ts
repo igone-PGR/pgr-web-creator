@@ -45,7 +45,51 @@ const BodySchema = z.object({
   imagePool: ImagePoolSchema,
   logoUrl: z.string().max(2000).optional().nullable(),
   language: z.string().max(10).optional().default("es"),
+  colorPaletteId: z.string().max(50).optional().nullable(),
 });
+
+// ─── Color palettes (mirror of src/lib/site/colorPalettes.ts) ────────────────
+
+const COLOR_PALETTES: Record<string, { bg: string; surface: string; accent: string }> = {
+  "ivory-ink":     { bg: "#FBF8F3", surface: "#FFFFFF", accent: "#1A1714" },
+  "cream-terra":   { bg: "#FBF8F3", surface: "#FFFFFF", accent: "#7A2E1F" },
+  "sand-coral":    { bg: "#FFF8F1", surface: "#FFFFFF", accent: "#E26D2C" },
+  "snow-emerald":  { bg: "#F7FAF8", surface: "#FFFFFF", accent: "#0F766E" },
+  "snow-cobalt":   { bg: "#F8FAFC", surface: "#FFFFFF", accent: "#1D4ED8" },
+  "mist-violet":   { bg: "#FAF7FF", surface: "#FFFFFF", accent: "#6D28D9" },
+  "graphite-lime": { bg: "#0E0E0F", surface: "#17171A", accent: "#D7FF3D" },
+  "midnight-rose": { bg: "#0F0F14", surface: "#1A1A22", accent: "#F43F5E" },
+};
+
+function hexToRgb(hex: string) {
+  const h = hex.replace("#", "");
+  const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  return { r: parseInt(v.slice(0, 2), 16), g: parseInt(v.slice(2, 4), 16), b: parseInt(v.slice(4, 6), 16) };
+}
+function isDark(hex: string) {
+  const { r, g, b } = hexToRgb(hex);
+  const srgb = [r, g, b].map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2] < 0.5;
+}
+function paletteToColors(p: { bg: string; surface: string; accent: string }) {
+  const dark = isDark(p.bg);
+  const accentDark = isDark(p.accent);
+  return {
+    bg: p.bg,
+    surface: p.surface,
+    surfaceAlt: dark ? "#1F1F23" : "#F4F4F5",
+    text: dark ? "#FAFAFA" : "#0A0A0A",
+    textMuted: dark ? "#A1A1AA" : "#6B6B72",
+    border: dark ? "#2A2A2F" : "#E4E4E7",
+    accent: p.accent,
+    accentText: accentDark ? "#FAFAFA" : "#0A0A0A",
+    inverse: dark ? "#FAFAFA" : "#0A0A0A",
+    inverseText: dark ? "#0A0A0A" : "#FAFAFA",
+  };
+}
 
 // ─── Mood presets (mirror of src/lib/site/moods.ts) ──────────────────────────
 
