@@ -108,6 +108,18 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
 
       setGenerationStep("Componiendo bloques...");
       setSite(generatedSite);
+
+      // Persist as a lead so the admin panel can follow up even if the user
+      // never reaches checkout. Fire-and-forget: never block the UI on this.
+      const { photos: _p, logo: _l, logoFile: _lf, photoFiles: _pf, ...projectClean } = project;
+      supabase.functions
+        .invoke("save-lead", {
+          body: {
+            project: { ...projectClean, photos: photoUrls, logo: logoUrl },
+            generatedContent: { site: generatedSite },
+          },
+        })
+        .catch((e) => console.warn("save-lead failed:", e));
     } catch (err: any) {
       console.error("Error generating site:", err);
       toast({
