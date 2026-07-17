@@ -563,17 +563,18 @@ function buildSkeletonPrompts(input: z.infer<typeof BodySchema>, brief: any, moo
   const system = `Eres un director de arte web. Vas a elegir el ESQUELETO de bloques (solo type+variant, sin copy).
 
 Mood elegido: ${mood}.
-Bloques disponibles: nav, hero, categories, about, services, stats, process, gallery, testimonials, cta, faq, hours, contact, map, footer.
+Bloques disponibles: nav, hero, categories, about, services, stats, process, gallery, cta, faq, hours, contact, map, footer.
 Variantes posibles: "a" o "b".
 
 Reglas:
 - Empieza SIEMPRE por "nav" y termina SIEMPRE por "footer".
 - Segundo bloque SIEMPRE "hero".
 - Total entre 7 y 11 bloques. Cada tipo máximo 1 vez.
+- NUNCA incluyas testimonios (no está disponible: no debemos publicar opiniones inventadas).
 - Solo incluye "hours" si hay horario disponible (${hasHours ? "SÍ" : "NO"}).
 - Solo incluye "map" si hay dirección (${hasAddress ? "SÍ" : "NO"}).
 - Solo incluye "gallery" si hay al menos 3 imágenes (${galleryReady ? "SÍ" : "NO"}).
-- Adapta al sector "${input.sector}" (restauración: hours+map+gallery; consultoría: process+stats+faq; estética: gallery+services+testimonials; fitness: stats+process+testimonials).
+- Adapta al sector "${input.sector}" (restauración: hours+map+gallery; consultoría: process+stats+faq; estética: gallery+services+faq; fitness: stats+process+faq).
 - Alterna variantes "a"/"b" para evitar monotonía visual.`;
 
   const user = `${ctx.text}
