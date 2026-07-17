@@ -1,9 +1,10 @@
 import { Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const legalLinks = [
-  { label: "Aviso Legal", href: "https://pgrdigital.tech/aviso-legal/" },
-  { label: "Condiciones de compra", href: "https://pgrdigital.tech/condiciones-de-compra/" },
-  { label: "Política de privacidad", href: "https://pgrdigital.tech/politica-privacidad/" },
+  { label: "Aviso Legal", to: "/aviso-legal" },
+  { label: "Condiciones de Contratación", to: "/condiciones" },
+  { label: "Política de Privacidad", to: "/privacidad" },
 ];
 
 const Footer = () => (
@@ -27,15 +28,13 @@ const Footer = () => (
       </p>
       <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
         {legalLinks.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            key={link.to}
+            to={link.to}
             className="hover:text-accent hover:underline transition-colors"
           >
             {link.label}
-          </a>
+          </Link>
         ))}
       </nav>
       <div className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground pt-1">
