@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { uploadProjectAsset } from "@/lib/project-media";
 import { SiteRenderer } from "@/components/site/SiteRenderer";
 import { resolveImagePool } from "@/lib/site/stockImages";
-import { renderSiteToHtml } from "@/lib/site/renderToHtml";
+import { renderSiteToHtml, renderSitePages } from "@/lib/site/renderToHtml";
 import type { GeneratedSite } from "@/lib/site/types";
 
 // (Image generation per-slot lives in the legacy template flow; v2 uses curated stock + client photos.)
@@ -152,14 +152,22 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         uploadLogoToStorage(),
       ]);
 
-      // Snapshot of what gets deployed: the React tree rendered to a single
-      // self-contained index.html (Tailwind via CDN + Google Fonts + tokens).
-      const finalHtml = site ? renderSiteToHtml(site) : null;
+      // Snapshot of what gets deployed: React tree rendered to a set of
+      // self-contained static pages (index + legal pages).
+      const legalCtx = {
+        businessName: project.businessName,
+        siteUrl: null,
+        contactEmail: project.businessEmail || project.email || null,
+        address: project.address || null,
+        language: project.language || "es",
+      };
+      const finalPages = site ? renderSitePages(site, legalCtx) : null;
+      const finalHtml = finalPages?.["index.html"] ?? (site ? renderSiteToHtml(site) : null);
 
       const { data: result, error } = await supabase.functions.invoke("create-checkout", {
         body: {
           project: { ...projectWithoutBinaries, logo: logoUrl, photos: photoUrls },
-          generatedContent: { site, finalHtml },
+          generatedContent: { site, finalHtml, finalPages },
           extras: selectedExtras,
         },
       });
