@@ -36,6 +36,8 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [showExtrasPanel, setShowExtrasPanel] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [generationStep, setGenerationStep] = useState("");
   const { toast } = useToast();
 
