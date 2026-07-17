@@ -159,7 +159,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
   const canAdvance = () => {
     switch (step) {
       case 0: return !!(form.contactName && form.email);
-      case 1: return !!(form.businessName && form.sector && form.description);
+      case 1: return !!(form.businessName && form.sector && form.description && form.contentRightsAccepted);
       default: return false;
     }
   };
