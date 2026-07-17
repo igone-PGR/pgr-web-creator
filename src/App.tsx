@@ -10,6 +10,9 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import PreviewBlocks from "./pages/PreviewBlocks";
+import Condiciones from "./pages/Condiciones";
+import AvisoLegal from "./pages/AvisoLegal";
+import Privacidad from "./pages/Privacidad";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +29,9 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/preview-blocks" element={<PreviewBlocks />} />
+            <Route path="/condiciones" element={<Condiciones />} />
+            <Route path="/aviso-legal" element={<AvisoLegal />} />
+            <Route path="/privacidad" element={<Privacidad />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
