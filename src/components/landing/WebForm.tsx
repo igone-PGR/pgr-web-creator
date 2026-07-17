@@ -247,6 +247,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                       <Label htmlFor="phone">Teléfono</Label>
                       <Input id="phone" placeholder="+34 600 000 000" value={form.phone} onChange={(e) => update("phone", e.target.value)} />
                     </div>
+
+                    {/* Microcopy RGPD — información básica al recoger datos */}
+                    <p className="text-[11px] leading-relaxed text-muted-foreground bg-muted/40 rounded-lg p-3 border border-border">
+                      <strong>Información básica de protección de datos:</strong> tus datos serán tratados por{" "}
+                      <strong>BUENA GENTE Y GENTE BUENA, S.L.</strong> (NIF B26580001) con la finalidad de gestionar tu
+                      solicitud y prestarte el servicio contratado. Base legitimadora: ejecución del contrato y
+                      consentimiento. No cederemos tus datos salvo obligación legal. Puedes ejercer tus derechos de
+                      acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a{" "}
+                      <a href="mailto:hello@pgrdigital.tech" className="text-accent hover:underline">hello@pgrdigital.tech</a>.
+                      Más información en nuestra{" "}
+                      <a href="https://pgrdigital.tech/politica-privacidad/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">política de privacidad</a>.
+                    </p>
                   </div>
                 )}
 
