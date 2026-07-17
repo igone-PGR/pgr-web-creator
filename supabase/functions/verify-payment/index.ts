@@ -171,6 +171,14 @@ serve(async (req) => {
       </div>
       `}
 
+      <!-- Legal notice -->
+      <div style="background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:20px;margin:24px 0;">
+        <h2 style="font-size:16px;color:#9a3412;margin:0 0 8px;">⚖️ Textos legales incluidos (revísalos)</h2>
+        <p style="font-size:13px;color:#7c2d12;line-height:1.6;margin:0;">
+          Tu web incluye páginas base de <strong>Aviso Legal</strong> y <strong>Política de Privacidad</strong> generadas automáticamente a partir de los datos que nos facilitaste. <strong>No sustituyen el asesoramiento jurídico profesional</strong>: algunos campos (NIF/CIF, razón social, domicilio fiscal, datos registrales) aparecen como <em>[COMPLETAR]</em> y deben ser revisados y validados por un profesional antes de considerarse definitivos. Puedes solicitarnos los cambios necesarios en tu ronda de revisiones incluida.
+        </p>
+      </div>
+
       <!-- Changes round -->
       <div style="background:#f8f7f4;border-radius:12px;padding:24px;margin:24px 0;">
         <h2 style="font-size:18px;color:#1a1a1a;margin:0 0 12px;">✏️ Tu ronda de cambios incluida</h2>

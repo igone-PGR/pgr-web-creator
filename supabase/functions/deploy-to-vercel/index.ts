@@ -45,25 +45,29 @@ serve(async (req) => {
 
     const content = project.generated_content || {};
 
-    // Use pre-generated HTML from the client (1:1 with preview)
-    const finalHtml = content.finalHtml;
+    // Pre-generated pages from the client (1:1 with preview).
+    // Prefer multi-page output (index + legal pages); fall back to single-file.
+    const pages: Record<string, string> =
+      (content.finalPages && typeof content.finalPages === "object")
+        ? content.finalPages as Record<string, string>
+        : (content.finalHtml ? { "index.html": content.finalHtml as string } : {});
 
-    if (!finalHtml) {
-      throw new Error("No finalHtml found in generated_content. The project needs to be re-generated.");
+    if (!Object.keys(pages).length) {
+      throw new Error("No pages found in generated_content. The project needs to be re-generated.");
     }
 
     const slug = slugify(project.business_name);
     const projectName = `pgr-${slug}`;
 
+    const files = Object.entries(pages).map(([path, html]) => ({
+      file: path,
+      data: btoa(unescape(encodeURIComponent(html))),
+      encoding: "base64" as const,
+    }));
+
     const deployPayload = {
       name: projectName,
-      files: [
-        {
-          file: "index.html",
-          data: btoa(unescape(encodeURIComponent(finalHtml))),
-          encoding: "base64",
-        },
-      ],
+      files,
       projectSettings: { framework: null },
       target: "production",
     };

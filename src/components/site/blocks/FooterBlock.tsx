@@ -2,9 +2,14 @@ import type { FooterContent } from "@/lib/site/blockContent";
 
 interface Props { content: FooterContent; variant: "a" | "b" }
 
+const LEGAL_LINKS = [
+  { label: "Aviso Legal", href: "aviso-legal/index.html" },
+  { label: "Política de Privacidad", href: "privacidad/index.html" },
+];
+
 export function FooterBlock({ content, variant }: Props) {
   if (variant === "b") {
-    // Minimal one-line
+    // Minimal one-line + legal links
     return (
       <footer className="border-t" style={{ borderColor: "var(--site-border)", background: "var(--site-bg)" }}>
         <div
@@ -14,7 +19,14 @@ export function FooterBlock({ content, variant }: Props) {
           <span className="font-[family-name:var(--site-font-display)]" style={{ color: "var(--site-text)" }}>
             {content.brand}
           </span>
-          <span>{content.copyright || `© ${new Date().getFullYear()} ${content.brand}`}</span>
+          <div className="flex flex-wrap gap-x-5 gap-y-2 items-center justify-center">
+            <span>{content.copyright || `© ${new Date().getFullYear()} ${content.brand}`}</span>
+            {LEGAL_LINKS.map((l) => (
+              <a key={l.href} href={l.href} className="hover:opacity-80 transition underline-offset-2 hover:underline">
+                {l.label}
+              </a>
+            ))}
+          </div>
         </div>
       </footer>
     );
@@ -59,6 +71,18 @@ export function FooterBlock({ content, variant }: Props) {
               </ul>
             </div>
           )}
+          <div className="md:col-span-2">
+            <h4 className="text-xs uppercase tracking-[0.2em] mb-4" style={{ color: "color-mix(in srgb, var(--site-inverse-text) 60%, transparent)" }}>
+              Legal
+            </h4>
+            <ul className="space-y-2 text-sm">
+              {LEGAL_LINKS.map((l) => (
+                <li key={l.href}>
+                  <a href={l.href} className="hover:opacity-80 transition">{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         <div
           className="mt-12 pt-6 border-t flex flex-col md:flex-row justify-between gap-3 text-xs"
