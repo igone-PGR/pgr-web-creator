@@ -1,0 +1,12 @@
+# PGR Web creator
+
+> Crea tu página web profesional en menos de 2 minutos. Servicio de diseño web automatizado con IA para autónomos y pequeñas empresas en España.
+
+PGR Web creator genera sitios web estáticos, personalizados y listos para publicar a partir de un cuestionario de marca. El cliente rellena un brief, el sistema propone tipografía, paleta de color y bloques de diseño, y genera una web completa con opción de pago y despliegue en un dominio propio.
+
+## Pages
+
+- [/](/): Página de inicio con el generador de webs, servicios y proceso de contratación.
+- [/condiciones](/condiciones): Condiciones generales de contratación del servicio.
+- [/aviso-legal](/aviso-legal): Información legal del titular del sitio y responsabilidades.
+- [/privacidad](/privacidad): Política de privacidad, tratamiento de datos y derechos RGPD.
