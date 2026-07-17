@@ -283,6 +283,110 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
         )}
       </AnimatePresence>
 
+      {/* Summary + Terms Modal */}
+      <AnimatePresence>
+        {showSummary && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60"
+            onClick={() => !isCheckingOut && setShowSummary(false)}>
+            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="w-full max-w-lg rounded-2xl shadow-2xl p-6 overflow-y-auto max-h-[90vh] bg-background border"
+              onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-lg font-bold">Resumen de tu pedido</h3>
+                <button onClick={() => !isCheckingOut && setShowSummary(false)} className="p-1 rounded-lg hover:opacity-70">
+                  <X className="w-5 h-5 text-muted-foreground" />
+                </button>
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between py-2 border-b">
+                  <div>
+                    <p className="font-semibold">Web profesional</p>
+                    <p className="text-xs text-muted-foreground">Diseño, publicación y 1 ronda de revisiones</p>
+                  </div>
+                  <span className="font-semibold">499,00 €</span>
+                </div>
+                {selectedExtras.map(id => {
+                  const ext = EXTRAS_OPTIONS.find(e => e.id === id);
+                  if (!ext) return null;
+                  return (
+                    <div key={id} className="flex items-center justify-between py-2 border-b">
+                      <div>
+                        <p className="font-semibold">{ext.name}</p>
+                        <p className="text-xs text-muted-foreground">{ext.description}</p>
+                      </div>
+                      <span className="font-semibold">{ext.price.toFixed(2)} €</span>
+                    </div>
+                  );
+                })}
+
+                {(() => {
+                  const total = 499 + extrasTotal;
+                  const base = +(total / 1.21).toFixed(2);
+                  const iva = +(total - base).toFixed(2);
+                  return (
+                    <div className="pt-3 space-y-1">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Base imponible</span>
+                        <span>{base.toFixed(2)} €</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>IVA (21%)</span>
+                        <span>{iva.toFixed(2)} €</span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <span className="text-sm font-semibold">Total a pagar</span>
+                        <span className="text-xl font-extrabold">{total.toFixed(2)} €</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground pt-1">
+                        Pago único. Mantenimiento y dominio: 80€/año (facturado por separado tras el primer año).
+                      </p>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              <div className="mt-5 p-3 rounded-lg bg-muted/50 border">
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={e => setAcceptedTerms(e.target.checked)}
+                    className="mt-1 h-4 w-4 rounded border-border accent-accent flex-shrink-0"
+                  />
+                  <span className="text-xs leading-relaxed">
+                    He leído y acepto las{" "}
+                    <a href="/condiciones" target="_blank" rel="noopener noreferrer" className="underline font-semibold text-accent">
+                      Condiciones de Contratación
+                    </a>
+                    , el{" "}
+                    <a href="/aviso-legal" target="_blank" rel="noopener noreferrer" className="underline">
+                      Aviso Legal
+                    </a>
+                    {" "}y la{" "}
+                    <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="underline">
+                      Política de Privacidad
+                    </a>
+                    . Entiendo que el servicio se prestará digitalmente y solicito su ejecución inmediata, renunciando al derecho de desistimiento una vez completado.
+                  </span>
+                </label>
+              </div>
+
+              <button
+                onClick={handleCheckout}
+                disabled={!acceptedTerms || isCheckingOut}
+                className="mt-5 w-full py-3 rounded-full font-bold text-sm transition-all bg-accent text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02]">
+                {isCheckingOut ? "Procesando..." : `Ir a pagar · ${(499 + extrasTotal).toFixed(2)} €`}
+              </button>
+              <p className="text-[11px] text-center text-muted-foreground mt-3">
+                Serás redirigido a la pasarela segura de Stripe.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Loading */}
       <AnimatePresence>
         {isGenerating && (
