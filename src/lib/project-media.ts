@@ -1,8 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { UploadedMediaFile } from "@/types/project";
 
-const PROJECT_PHOTOS_BUCKET = "project-photos";
 const DATA_URL_PATTERN = /^data:(image\/[a-z0-9.+-]+);base64,(.*)$/i;
+const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/svg+xml"]);
 
 type UploadSource = UploadedMediaFile | string | null | undefined;
 
@@ -10,48 +10,34 @@ function isUploadedMediaFile(source: UploadSource): source is UploadedMediaFile 
   return Boolean(source && typeof source !== "string" && source.file instanceof File);
 }
 
-function isBlobUrl(source: string): boolean {
-  return source.startsWith("blob:");
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(reader.error);
+    reader.onload = () => {
+      const result = reader.result as string;
+      const idx = result.indexOf(",");
+      resolve(idx >= 0 ? result.slice(idx + 1) : result);
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-function normalizeExtension(value: string | undefined, fallback: string): string {
-  if (!value) return fallback;
-
-  const raw = value.includes("/") ? value.split("/")[1] : value;
-  const normalized = raw.toLowerCase().replace("svg+xml", "svg").replace("jpeg", "jpg");
-  const sanitized = normalized.replace(/[^a-z0-9]/g, "");
-
-  return sanitized || fallback;
+function normalizeContentType(raw: string | undefined, fallback: string): string {
+  const ct = (raw || "").toLowerCase();
+  if (ALLOWED_MIME.has(ct)) return ct;
+  return fallback;
 }
 
-function getPublicUrl(path: string): string {
-  return supabase.storage.from(PROJECT_PHOTOS_BUCKET).getPublicUrl(path).data.publicUrl;
-}
-
-async function uploadBytes(path: string, bytes: Uint8Array, contentType: string): Promise<string | null> {
-  const { error } = await supabase.storage
-    .from(PROJECT_PHOTOS_BUCKET)
-    .upload(path, bytes, { contentType, upsert: true });
-
+async function callUpload(pathBase: string, contentType: string, base64: string): Promise<string | null> {
+  const { data, error } = await supabase.functions.invoke("upload-project-asset", {
+    body: { pathBase, contentType, base64 },
+  });
   if (error) {
-    console.error("Storage upload error:", error);
+    console.error("upload-project-asset error", error);
     return null;
   }
-
-  return getPublicUrl(path);
-}
-
-async function uploadFile(path: string, file: File, contentType: string): Promise<string | null> {
-  const { error } = await supabase.storage
-    .from(PROJECT_PHOTOS_BUCKET)
-    .upload(path, file, { contentType, upsert: true });
-
-  if (error) {
-    console.error("Storage upload error:", error);
-    return null;
-  }
-
-  return getPublicUrl(path);
+  return (data as { url?: string } | null)?.url ?? null;
 }
 
 export async function uploadProjectAsset(
@@ -61,13 +47,19 @@ export async function uploadProjectAsset(
 ): Promise<string | null> {
   if (!source) return null;
 
+  const fallbackMime = fallbackExtension === "png" ? "image/png" : "image/jpeg";
+
   if (isUploadedMediaFile(source)) {
-    const extension = normalizeExtension(source.file.name.split(".").pop() || source.file.type, fallbackExtension);
-    const contentType = source.file.type || `image/${extension}`;
-    return uploadFile(`${basePath}.${extension}`, source.file, contentType);
+    if (source.file.size > 5 * 1024 * 1024) {
+      console.error("File too large (max 5MB)");
+      return null;
+    }
+    const contentType = normalizeContentType(source.file.type, fallbackMime);
+    const base64 = await fileToBase64(source.file);
+    return callUpload(basePath, contentType, base64);
   }
 
-  if (isBlobUrl(source)) {
+  if (source.startsWith("blob:")) {
     console.error("Blob preview received without original file");
     return null;
   }
@@ -77,19 +69,9 @@ export async function uploadProjectAsset(
   }
 
   const match = source.match(DATA_URL_PATTERN);
-  if (!match) {
-    console.error("Invalid image data URL");
-    return null;
-  }
+  if (!match) return null;
 
-  const [, contentType, base64Content] = match;
-  const binaryString = atob(base64Content);
-  const bytes = new Uint8Array(binaryString.length);
-
-  for (let i = 0; i < binaryString.length; i += 1) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
-
-  const extension = normalizeExtension(contentType, fallbackExtension);
-  return uploadBytes(`${basePath}.${extension}`, bytes, contentType);
+  const [, rawType, base64Content] = match;
+  const contentType = normalizeContentType(rawType, fallbackMime);
+  return callUpload(basePath, contentType, base64Content);
 }
