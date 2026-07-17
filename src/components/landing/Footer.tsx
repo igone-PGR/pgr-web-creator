@@ -12,6 +12,16 @@ const Footer = () => (
       <span className="text-lg font-bold">
         PGR <span className="text-gradient">Web Creator</span>
       </span>
+
+      {/* LSSI-CE — identidad del prestador del servicio */}
+      <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+        Servicio prestado por <strong>BUENA GENTE Y GENTE BUENA, S.L.</strong>{" "}
+        · NIF B26580001 · C/ Martín de los Heros 52, 28008 Madrid ·{" "}
+        <a href="mailto:hello@pgrdigital.tech" className="hover:text-accent hover:underline">
+          hello@pgrdigital.tech
+        </a>
+      </p>
+
       <p className="text-sm text-muted-foreground">
         © {new Date().getFullYear()} PGR Web Creator. Todos los derechos reservados.
       </p>

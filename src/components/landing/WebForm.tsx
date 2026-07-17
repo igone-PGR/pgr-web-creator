@@ -49,6 +49,8 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     servicesList: [] as { name: string; description: string }[],
     preferredDomain: "",
     colorPaletteId: COLOR_PALETTES[0].id,
+    // Legal — declaración expresa de licitud de contenidos (obligatoria)
+    contentRightsAccepted: false,
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -157,7 +159,7 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
   const canAdvance = () => {
     switch (step) {
       case 0: return !!(form.contactName && form.email);
-      case 1: return !!(form.businessName && form.sector && form.description);
+      case 1: return !!(form.businessName && form.sector && form.description && form.contentRightsAccepted);
       default: return false;
     }
   };
@@ -245,6 +247,18 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                       <Label htmlFor="phone">Teléfono</Label>
                       <Input id="phone" placeholder="+34 600 000 000" value={form.phone} onChange={(e) => update("phone", e.target.value)} />
                     </div>
+
+                    {/* Microcopy RGPD — información básica al recoger datos */}
+                    <p className="text-[11px] leading-relaxed text-muted-foreground bg-muted/40 rounded-lg p-3 border border-border">
+                      <strong>Información básica de protección de datos:</strong> tus datos serán tratados por{" "}
+                      <strong>BUENA GENTE Y GENTE BUENA, S.L.</strong> (NIF B26580001) con la finalidad de gestionar tu
+                      solicitud y prestarte el servicio contratado. Base legitimadora: ejecución del contrato y
+                      consentimiento. No cederemos tus datos salvo obligación legal. Puedes ejercer tus derechos de
+                      acceso, rectificación, supresión, oposición, limitación y portabilidad escribiendo a{" "}
+                      <a href="mailto:hello@pgrdigital.tech" className="text-accent hover:underline">hello@pgrdigital.tech</a>.
+                      Más información en nuestra{" "}
+                      <a href="https://pgrdigital.tech/politica-privacidad/" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">política de privacidad</a>.
+                    </p>
                   </div>
                 )}
 
@@ -437,6 +451,35 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
                         <p className="text-xs text-muted-foreground">Añade tus servicios para que la IA genere textos más precisos</p>
                       )}
                     </div>
+
+                    {/* Aviso: resultado revisable / no definitivo */}
+                    <div className="rounded-xl bg-muted/40 border border-border p-4 space-y-3">
+                      <p className="text-xs leading-relaxed text-muted-foreground">
+                        <strong>ℹ️ El resultado es una propuesta inicial revisable.</strong> La web se genera con
+                        IA a partir de la información que nos facilitas. Tendrás una ronda de cambios incluida
+                        para ajustar textos, imágenes o estructura antes de considerarla definitiva. Los textos
+                        legales (Aviso Legal y Política de Privacidad) se generan como plantilla base y deben
+                        ser revisados por un profesional del derecho antes de publicar.
+                      </p>
+                    </div>
+
+                    {/* Casilla obligatoria: licitud de contenidos */}
+                    <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-accent/30 bg-accent/5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.contentRightsAccepted}
+                        onChange={(e) => setForm((f) => ({ ...f, contentRightsAccepted: e.target.checked }))}
+                        className="mt-0.5 h-4 w-4 accent-accent flex-shrink-0"
+                        required
+                      />
+                      <span className="text-xs leading-relaxed text-foreground">
+                        <strong>Declaro que soy titular o cuento con los derechos necesarios</strong> sobre los
+                        textos, imágenes, marcas y logotipos que aporto, y que su contenido es lícito, no
+                        vulnera derechos de terceros ni la legislación vigente. Asumo la responsabilidad
+                        exclusiva sobre el contenido facilitado y exonero a BUENA GENTE Y GENTE BUENA, S.L. de
+                        cualquier reclamación derivada del mismo. <span className="text-accent">*</span>
+                      </span>
+                    </label>
                   </div>
                 )}
               </motion.div>

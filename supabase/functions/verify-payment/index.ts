@@ -223,9 +223,17 @@ serve(async (req) => {
         </p>
       </div>
 
-      <!-- Footer -->
+      <!-- Footer + datos fiscales -->
       <div style="margin-top:32px;padding-top:24px;border-top:1px solid #e8e7e3;text-align:center;">
-        <p style="font-size:12px;color:#999;margin:0;">
+        <p style="font-size:11px;color:#888;line-height:1.6;margin:0 0 8px;">
+          Encontrarás la factura oficial adjunta a este pedido en tu email de Stripe. Los importes indicados
+          en tu web son con IVA incluido (21% aplicable en España, salvo exención).
+        </p>
+        <p style="font-size:11px;color:#888;line-height:1.6;margin:0 0 8px;">
+          Servicio prestado por <strong>BUENA GENTE Y GENTE BUENA, S.L.</strong> · NIF B26580001<br/>
+          C/ Martín de los Heros 52, 28008 Madrid · <a href="mailto:hello@pgrdigital.tech" style="color:#888;">hello@pgrdigital.tech</a>
+        </p>
+        <p style="font-size:12px;color:#999;margin:8px 0 0;">
           © ${new Date().getFullYear()} PGR Digital · <a href="https://pgrdigital.tech" style="color:#999;">pgrdigital.tech</a>
         </p>
       </div>
