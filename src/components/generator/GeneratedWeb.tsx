@@ -204,7 +204,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
               className="text-xs font-medium px-3 py-1.5 rounded-full border transition-all hover:shadow-md flex items-center gap-1.5 border-accent text-accent">
               🚀 Añadir extras {selectedExtras.length > 0 && `(${selectedExtras.length})`}
             </button>
-            <Button onClick={handleCheckout} disabled={isCheckingOut} size="sm"
+            <Button onClick={() => setShowSummary(true)} disabled={isCheckingOut} size="sm"
               className="text-xs font-semibold rounded-full px-5 bg-accent text-accent-foreground hover:bg-accent/90">
               {isCheckingOut ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <CreditCard className="w-3.5 h-3.5 mr-1.5" />}
               Publicar · {499 + extrasTotal}€
