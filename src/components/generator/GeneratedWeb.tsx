@@ -272,7 +272,7 @@ const GeneratedWeb = ({ data, onBack }: GeneratedWebProps) => {
                   <span className="text-sm font-semibold">Total</span>
                   <span className="text-xl font-extrabold">{499 + extrasTotal}€</span>
                 </div>
-                <button onClick={() => { setShowExtrasPanel(false); handleCheckout(); }}
+                <button onClick={() => { setShowExtrasPanel(false); setShowSummary(true); }}
                   disabled={isCheckingOut}
                   className="w-full py-3 rounded-full font-bold text-sm transition-all hover:scale-[1.02] bg-accent text-accent-foreground">
                   {isCheckingOut ? "Procesando..." : `Publicar mi web · ${499 + extrasTotal}€`}
