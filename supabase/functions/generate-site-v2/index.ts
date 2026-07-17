@@ -222,7 +222,7 @@ const SKELETON_TOOL = {
           items: {
             type: "object",
             properties: {
-              type: { type: "string", enum: ["nav", "hero", "categories", "about", "services", "stats", "process", "gallery", "testimonials", "cta", "faq", "hours", "contact", "map", "footer"] },
+              type: { type: "string", enum: ["nav", "hero", "categories", "about", "services", "stats", "process", "gallery", "cta", "faq", "hours", "contact", "map", "footer"] },
               variant: { type: "string", enum: ["a", "b"] },
             },
             required: ["type", "variant"],
