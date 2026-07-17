@@ -49,6 +49,8 @@ const WebForm = ({ onSubmit }: WebFormProps) => {
     servicesList: [] as { name: string; description: string }[],
     preferredDomain: "",
     colorPaletteId: COLOR_PALETTES[0].id,
+    // Legal — declaración expresa de licitud de contenidos (obligatoria)
+    contentRightsAccepted: false,
   });
 
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
