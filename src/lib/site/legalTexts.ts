@@ -25,7 +25,7 @@ function esc(s: string): string {
 }
 
 function noticeBlock(): string {
-  return `<div class="legal-notice"><strong>⚠️ Aviso importante:</strong> Este texto legal es una plantilla base generada automáticamente a partir de los datos facilitados. <strong>No sustituye el asesoramiento jurídico profesional.</strong> Antes de publicar tu web, revisa y completa los campos marcados como <em>[COMPLETAR]</em> y valida el contenido con un profesional del derecho.</div>`;
+  return `<div class="legal-notice"><strong>⚠️ Aviso importante:</strong> Este texto legal es una plantilla base generada automáticamente por <strong>PGR Web Creator</strong> (servicio de BUENA GENTE Y GENTE BUENA, S.L., NIF B26580001) a partir de los datos facilitados por el titular del sitio. <strong>No sustituye el asesoramiento jurídico profesional.</strong> Antes de publicar tu web, revisa y completa los campos marcados como <em>[COMPLETAR]</em> y valida el contenido con un profesional del derecho. El titular del sitio es el único responsable del contenido publicado.</div>`;
 }
 
 export function buildAvisoLegal(ctx: LegalContext): string {
